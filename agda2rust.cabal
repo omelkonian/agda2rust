@@ -1,22 +1,22 @@
 cabal-version:       2.2
-name:                agda2min
+name:                agda2rust
 version:             1.1
-author:              ???
+author:              Orestis Melkonian
 category:            Language, Compiler
 build-type:          Simple
-synopsis:            Compiling Agda code to ??.
+synopsis:            Compiling Agda code to Rust.
 
 extra-doc-files:    README.md
 
 source-repository head
   type:     git
-  location: https://github.com/omelkonian/agda-minimal-backend.git
+  location: https://github.com/omelkonian/agda2rust.git
 
-executable agda2min
+executable agda2rust
   hs-source-dirs:      src
   main-is:             Main.hs
-  other-modules:       Paths_agda2min
-  autogen-modules:     Paths_agda2min
+  other-modules:       Paths_agda2rust
+  autogen-modules:     Paths_agda2rust
   build-depends:       base >= 4.10 && < 4.18,
                        Agda >= 2.6.4 && < 2.6.5,
                        deepseq >= 1.4.4 && < 1.6
