@@ -1,4 +1,3 @@
-{-# LANGUAGE LambdaCase, RecordWildCards #-}
 module Main where
 
 import Data.Maybe ( fromMaybe )
@@ -24,6 +23,10 @@ import Agda.TypeChecking.Monad
   , CompilerPragma(..), getUniqueCompilerPragma )
 
 import Agda.Main ( runAgda )
+
+import qualified Language.Rust.Pretty as R
+
+import Agda2Rust ( convert, report, ppm )
 
 main = runAgda [Backend backend]
 
@@ -68,19 +71,22 @@ moduleSetup _ _ m _ = do
   return $ Recompile ()
 
 compile :: Options -> ModuleEnv -> IsMain -> Definition -> TCM CompiledDef
-compile opts tlm _ Defn{..}
+compile opts tlm _ def@(Defn{..})
   = withCurrentModule (qnameModule defName)
   $ getUniqueCompilerPragma "AGDA2RUST" defName >>= \case
       Nothing -> return []
-      Just (CompilerPragma _ _) ->
-        return $ prettyShow (qnameName defName) <> " = " <> prettyShow theDef
+      Just (CompilerPragma _ _) -> do
+        rustDef <- convert def
+        return $ prettyShow (qnameName defName)
+              <> " = " <> show (R.pretty' rustDef)
 
 writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName -> [CompiledDef]
             -> TCM ModuleRes
 writeModule opts _ _ m cdefs = do
   outDir <- compileDir
-  liftIO $ putStrLn (moduleNameToFileName m "txt")
-  let outFile = fromMaybe outDir (optOutDir opts) <> "/" <> moduleNameToFileName m "txt"
+  let outFile = fromMaybe outDir (optOutDir opts) <> "/" <> moduleNameToFileName m "rs"
+  let outS = "*** module " <> prettyShow m <> " ***\n" <> unlines cdefs
+  report outS
   unless (all null cdefs) $ liftIO
     $ writeFile outFile
-    $ "*** module " <> prettyShow m <> " ***\n" <> unlines cdefs
+    $ outS

@@ -16,7 +16,15 @@ executable agda2rust
   hs-source-dirs:      src
   main-is:             Main.hs
   other-modules:       Paths_agda2rust
+                       Agda2Rust
   autogen-modules:     Paths_agda2rust
+  default-extensions:
+    LambdaCase RecordWildCards PatternGuards
+    -- StandaloneDeriving DeriveGeneric DeriveAnyClass
+    -- DeriveFunctor DeriveFoldable DeriveTraversable
+    TypeFamilies TypeOperators TypeApplications FunctionalDependencies
   build-depends:       base >= 4.10 && < 4.18,
                        Agda >= 2.6.4 && < 2.6.5,
-                       deepseq >= 1.4.4 && < 1.6
+                       deepseq >= 1.4.4 && < 1.6,
+                       language-rust
+
