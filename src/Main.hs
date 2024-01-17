@@ -75,17 +75,14 @@ compile opts tlm _ def@(Defn{..})
   = withCurrentModule (qnameModule defName)
   $ getUniqueCompilerPragma "AGDA2RUST" defName >>= \case
       Nothing -> return []
-      Just (CompilerPragma _ _) -> do
-        rustDef <- convert def
-        return $ prettyShow (qnameName defName)
-              <> " = " <> show (R.pretty' rustDef)
+      Just (CompilerPragma _ _) -> show . R.pretty' <$> convert def
 
 writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName -> [CompiledDef]
             -> TCM ModuleRes
 writeModule opts _ _ m cdefs = do
   outDir <- compileDir
   let outFile = fromMaybe outDir (optOutDir opts) <> "/" <> moduleNameToFileName m "rs"
-  let outS = "*** module " <> prettyShow m <> " ***\n" <> unlines cdefs
+  let outS = "// *** module " <> prettyShow m <> " ***\n" <> unlines cdefs
   report outS
   unless (all null cdefs) $ liftIO
     $ writeFile outFile

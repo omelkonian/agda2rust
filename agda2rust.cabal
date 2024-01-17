@@ -15,9 +15,9 @@ source-repository head
 executable agda2rust
   hs-source-dirs:      src
   main-is:             Main.hs
+  autogen-modules:     Paths_agda2rust
   other-modules:       Paths_agda2rust
                        Agda2Rust
-  autogen-modules:     Paths_agda2rust
   default-extensions:
     LambdaCase RecordWildCards PatternGuards
     -- StandaloneDeriving DeriveGeneric DeriveAnyClass
@@ -26,5 +26,12 @@ executable agda2rust
   build-depends:       base >= 4.10 && < 4.18,
                        Agda >= 2.6.4 && < 2.6.5,
                        deepseq >= 1.4.4 && < 1.6,
-                       language-rust
+                       text,
+                       language-rust,
+                       data-serializer
 
+executable rustp
+  hs-source-dirs:      src
+  main-is:             RustPrinter.hs
+  build-depends:       base >= 4.10 && < 4.18,
+                       language-rust

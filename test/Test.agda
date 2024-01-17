@@ -5,6 +5,29 @@ open import Agda.Builtin.List using (List; []; _∷_)
 
 -- variable a b : Set
 
+-- ** Natural numbers
+
+answer : Nat
+answer = 42
+{-# COMPILE AGDA2RUST answer #-}
+
+suc : Nat → Nat
+suc x = x + 1
+{-# COMPILE AGDA2RUST suc #-}
+
+add : Nat → Nat → Nat
+add x y = x + y
+{-# COMPILE AGDA2RUST add #-}
+
+add3 : Nat → Nat → Nat → Nat
+add3 x y z = x + y + z
+{-# COMPILE AGDA2RUST add3 #-}
+
+-- sum : List Nat → Nat
+-- sum []       = 0
+-- sum (x ∷ xs) = x + sum xs
+-- {-# COMPILE AGDA2RUST sum #-}
+
 -- ** Datatypes & functions
 
 -- data Exp (v : Set) : Set where
@@ -18,17 +41,6 @@ open import Agda.Builtin.List using (List; []; _∷_)
 -- eval env (Int n) = n
 -- eval env (Var x) = env x
 -- {-# COMPILE AGDA2RUST eval #-}
-
--- ** Natural numbers
-
-add : Nat → Nat → Nat
-add x y = x + y
-{-# COMPILE AGDA2RUST add #-}
-
--- sum : List Nat → Nat
--- sum []       = 0
--- sum (x ∷ xs) = x + sum xs
--- {-# COMPILE AGDA2RUST sum #-}
 
 -- ** Polymorphic functions
 

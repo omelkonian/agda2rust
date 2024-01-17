@@ -2,16 +2,13 @@
 -- | Conversion from Agda's internal syntax to our simplified JSON format.
 module Agda2Rust where
 
--- import Control.Monad.Reader ( ReaderT, asks, liftIO )
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
 
 import Data.List ( elemIndex )
--- import Data.Maybe ( maybeToList, fromMaybe )
--- import qualified Data.IntMap as M
+import Data.Word ( Word64, Word8 )
+import qualified Data.Text as T ( unpack )
 
--- import qualified Agda.Utils.VarSet as VS
--- import Agda.Utils.Monad ( ifM )
--- import Agda.Syntax.Common ( unArg )
+import Agda.Syntax.Common ( unArg )
 import qualified Agda.Syntax.Common as A
 import qualified Agda.Syntax.Internal as A
 import qualified Agda.Syntax.Literal as A
@@ -31,7 +28,6 @@ import Agda.TypeChecking.Monad
 import Agda.TypeChecking.Free ( freeVars, VarCounts(..) )
 import Agda.TypeChecking.Level ( isLevelType )
 
--- import qualified Agda.Utils.Pretty as P
 import Agda.Syntax.Common.Pretty as P
   ( Pretty, prettyShow, renderStyle, Style(..), Mode(..) )
 import Agda.TypeChecking.Pretty
@@ -43,18 +39,6 @@ import qualified Language.Rust.Syntax as R
 import qualified Language.Rust.Data.Ident as R
 import qualified Language.Rust.Parser as R
 import qualified Language.Rust.Pretty as R
-
-
-exampleRust = "\
-\fn add(x: i32, y: i32) -> i32 {\
-\x + y\
-\}"
-
-sourceFile :: R.SourceFile R.Span
-sourceFile = R.parse' exampleRust
-
-prettySource :: R.Doc ()
-prettySource = R.pretty' sourceFile
 
 -- | Converting between two types @a@ and @b@ under Agda's typechecking monad.
 --
@@ -76,12 +60,14 @@ instance A.Definition ~> R.Item where
     goD = \case
       A.AbstractDefn defn -> goD defn
       def@(A.Function{..}) -> do
-        -- report $ show sourceFile <> "\n  ~>\n" <> show prettySource
+        -- let cls = takeWhile isNotCubical funClauses in
+        -- NB: handle funWith and funExtLam
+
         report $ "definition:\n" <> pp def
-        -- report $ pp argTys <> "->" <> pp resTy
         A.TelV tel resTy <- A.telViewPath defType
         let argTys = unDom <$> filter A.visible (telToList tel)
             clause = head funClauses
+        -- report $ pp argTys <> "->" <> pp resTy
         argTys' <- populateArgIds (getArgIds $ A.clauseTel clause)
                <$> traverse goA argTys
         resTy' <- go resTy
@@ -97,9 +83,6 @@ instance A.Definition ~> R.Item where
           (R.Generics [] [] (R.WhereClause [] ()) ())
           block
           ()
-    -- A.Function{..} -> let cls = takeWhile isNotCubical funClauses in
-    --   -- NB: handle funWith and funExtLam
-    --   Function <$> traverse go cls
     -- A.Datatype{..} -> do
     --   -- NB: what is a dataClause???
     --   tys <- traverse typeOfConst dataCons
@@ -125,7 +108,7 @@ instance A.Definition ~> R.Item where
     -- d@A.GeneralizableVar -> panic "generalizable variable" d
 
 getArgIds :: A.Telescope -> [String]
-getArgIds _ = ["x", "y"]
+getArgIds = fmap unArg . A.telToArgs
 
 populateArgIds :: [String] -> [R.Arg ()] -> [R.Arg ()]
 populateArgIds [] [] = []
@@ -148,26 +131,65 @@ instance A.Type ~> R.Ty where
 
 -- instance [A.Clause] ~> R.Block where
 instance A.Clause ~> R.Block where
-  go _ = return $
-    (R.Block
-       [R.NoSemi
-         (R.Binary
-            []
-            R.AddOp
-            (R.PathExpr [] Nothing (R.Path False [R.PathSegment "x" Nothing ()] ()) ())
-            (R.PathExpr [] Nothing (R.Path False [R.PathSegment "y" Nothing ()] ()) ()) ())
-            ()
-       ]
-       R.Normal
-       ()
-    )
+  go cl = case A.clauseBody cl of
+    Nothing -> error "unsupported: empty clauses"
+    Just e  -> do
+      e' <- go e
+      return $ R.Block [R.NoSemi e' ()] R.Normal ()
 
--- instance A.Clause ~> Clause where
---   go A.Clause{..} =
---     Clause <$> go clauseTel
---            <*> traverse go (A.namedThing . unArg <$> namedClausePats)
---            -- ^ drop visibility and name information
---            <*> traverse go clauseBody
+instance A.Term ~> R.Expr where
+  go = flip (.) A.unSpine $ \case
+    A.Def n es
+      | pp n == "Agda.Builtin.Nat._+_"
+      , [x, y] <- filter A.visible (A.argsFromElims es)
+      -> do
+        ctx <- A.getContextTelescope
+        report $ pp ctx
+        return $ R.Binary
+          []
+          R.AddOp
+          (R.PathExpr [] Nothing (R.Path False [R.PathSegment "x" Nothing ()] ()) ())
+          (R.PathExpr [] Nothing (R.Path False [R.PathSegment "y" Nothing ()] ()) ())
+          ()
+    (A.Lit l) -> do
+      l' <- go l
+      return $ R.Lit [] l' ()
+    e -> panic "unsupported term" e
+
+--     -- ** abstractions
+--     (A.Pi ty ab) -> do
+--       ty' <- go (unEl $ unDom ty)
+--       ab' <- go (unEl $ unAbs ab)
+--       return $ Pi (isDependentArrow ty) (absName ab :~ ty') ab'
+--     (A.Lam _ ab) -> do
+--       ab' <- go (unAbs ab)
+--       return $ Lam (pp (absName ab) :~ ab')
+--     -- ** applications
+--     (A.Var i   xs) -> App (DB i)                     <$> (traverse go xs)
+--     (A.Def f   xs) -> App (Ref $ ppName f)           <$> (traverse go xs)
+--     (A.Con c _ xs) -> App (Ref $ ppName $ conName c) <$> (traverse go xs)
+--     -- ** other constants
+--     (A.Level x)   -> return $ Level $ pp x
+--     (A.Sort  x)   -> return $ Sort  $ pp x
+--     (A.MetaV _ _) -> return UnsolvedMeta
+--     -- ** there are some occurrences of `DontCare` in the standard library
+--     (A.DontCare t) -> go t
+--     -- ** crash on the rest (should never be encountered)
+--     t@(A.Dummy _ _) -> panic "term" t
+
+
+instance A.Literal ~> R.Lit where
+  go = return . \case
+    (A.LitNat    i) -> R.Int R.Dec i R.Unsuffixed ()
+    (A.LitWord64 w) -> R.ByteStr ws R.Cooked R.Unsuffixed ()
+      where ws = splitWord64 w
+    (A.LitFloat  d) -> R.Float d R.Unsuffixed ()
+    (A.LitString s) -> R.Str (T.unpack s) R.Cooked R.Unsuffixed ()
+    (A.LitChar   c) -> R.Char c R.Unsuffixed ()
+    l -> panic "unsupported literal" l
+    where
+      splitWord64 :: Word64 -> [Word8]
+      splitWord64 = undefined
 
 -- instance A.DeBruijnPattern ~> Pattern where
 --   go = \case
@@ -197,30 +219,6 @@ instance A.Clause ~> R.Block where
 --     dl <- dependencyLevel t
 --     Type <$> go t <*> ifM (asks includeDepLvls) (pure $ Just dl) (pure Nothing)
 
--- instance A.Term ~> Term where
---   go = flip (.) A.unSpine $ \case
---     -- ** abstractions
---     (A.Pi ty ab) -> do
---       ty' <- go (unEl $ unDom ty)
---       ab' <- go (unEl $ unAbs ab)
---       return $ Pi (isDependentArrow ty) (absName ab :~ ty') ab'
---     (A.Lam _ ab) -> do
---       ab' <- go (unAbs ab)
---       return $ Lam (pp (absName ab) :~ ab')
---     -- ** applications
---     (A.Var i   xs) -> App (DB i)                     <$> (traverse go xs)
---     (A.Def f   xs) -> App (Ref $ ppName f)           <$> (traverse go xs)
---     (A.Con c _ xs) -> App (Ref $ ppName $ conName c) <$> (traverse go xs)
---     -- ** other constants
---     (A.Lit   x)   -> return $ Lit   $ pp x
---     (A.Level x)   -> return $ Level $ pp x
---     (A.Sort  x)   -> return $ Sort  $ pp x
---     (A.MetaV _ _) -> return UnsolvedMeta
---     -- ** there are some occurrences of `DontCare` in the standard library
---     (A.DontCare t) -> go t
---     -- ** crash on the rest (should never be encountered)
---     t@(A.Dummy _ _) -> panic "term" t
-
 -- instance A.Elim ~> Term where
 --   go = \case
 --     (A.Apply x)      -> go (unArg x)
@@ -249,7 +247,7 @@ report s = liftIO $ putStrLn s
 
 panic :: (P.Pretty a, Show a) => String -> a -> b
 panic s t = error $
-  "[PANIC] unexpected " <> s <> ": " <> pp t -- <> "\n show: " <> pp (show t)
+  "[PANIC] unexpected " <> s <> ": " <> pp t <> "\n show: " <> pp (show t)
 
 ppName :: A.QName -> String
 ppName qn = pp qn <> "<" <> show (fromEnum $ nameId $ qnameName qn) <> ">"
