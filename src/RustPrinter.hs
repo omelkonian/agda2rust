@@ -3,6 +3,7 @@ module Main where
 
 import System.Environment ( getArgs )
 import Control.Monad ( void )
+import Text.Show.Pretty ( pPrint )
 
 import Language.Rust.Syntax ( SourceFile )
 import Language.Rust.Data.Position ( Span )
@@ -13,4 +14,5 @@ main :: IO ()
 main = do
   [rustFn] <- getArgs
   src <- void . parse' @(SourceFile Span) <$> readInputStream rustFn
-  putStrLn $ show (pretty' src) <> "\n----------------------\n" <> show src
+  let hline = putStrLn "----------------------"
+  hline >> print (pretty' src) >> hline >> pPrint src >> hline

@@ -5,6 +5,8 @@ import Control.Monad ( unless )
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
 import Control.DeepSeq ( NFData(..) )
 
+import System.FilePath ( takeDirectory, (</>) )
+import System.Directory ( createDirectoryIfMissing )
 import System.Console.GetOpt ( OptDescr(Option), ArgDescr(ReqArg) )
 
 import Data.Version ( showVersion )
@@ -26,7 +28,9 @@ import Agda.Main ( runAgda )
 
 import qualified Language.Rust.Pretty as R
 
-import Agda2Rust ( convert, report, ppm )
+import Agda2Rust ( convert, ignoreDef, report, ppm )
+
+--
 
 main = runAgda [Backend backend]
 
@@ -72,18 +76,27 @@ moduleSetup _ _ m _ = do
 
 compile :: Options -> ModuleEnv -> IsMain -> Definition -> TCM CompiledDef
 compile opts tlm _ def@(Defn{..})
+  | ignoreDef theDef
+  = return ""
+  | otherwise
   = withCurrentModule (qnameModule defName)
-  $ getUniqueCompilerPragma "AGDA2RUST" defName >>= \case
-      Nothing -> return []
-      Just (CompilerPragma _ _) -> show . R.pretty' <$> convert def
+  -- $ getUniqueCompilerPragma "AGDA2RUST" defName >>= \case
+  --     Nothing -> return []
+  --     Just (CompilerPragma _ _) -> ...
+  $ show . R.pretty' <$> convert def
 
-writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName -> [CompiledDef]
-            -> TCM ModuleRes
+writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName
+            -> [CompiledDef] -> TCM ModuleRes
 writeModule opts _ _ m cdefs = do
   outDir <- compileDir
   let outFile = fromMaybe outDir (optOutDir opts) <> "/" <> moduleNameToFileName m "rs"
   let outS = "// *** module " <> prettyShow m <> " ***\n" <> unlines cdefs
   report outS
-  unless (all null cdefs) $ liftIO
-    $ writeFile outFile
-    $ outS
+  unless (all null cdefs) $
+    writeRsFile outFile outS
+  where
+    writeRsFile :: FilePath -> String -> TCM ()
+    writeRsFile outFn content = liftIO $ do
+      let outDir = takeDirectory outFn
+      createDirectoryIfMissing True outDir
+      writeFile outFn content
