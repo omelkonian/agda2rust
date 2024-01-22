@@ -13,8 +13,8 @@ answer = 42
 suc : Nat → Nat
 suc x = x + 1
 
-addAnswer : Nat → Nat
-addAnswer x = x + answer
+add_answer : Nat → Nat
+add_answer x = x + answer
 
 add : Nat → Nat → Nat
 add x y = x + y
@@ -31,10 +31,52 @@ add3b x y z = add x (add y z)
 
 -- ** Datatypes & functions
 
-data Exp (v : Set) : Set where
-  Plus : Exp v → Exp v → Exp v
-  Int : Nat → Exp v
-  Var : v → Exp v
+data Maybe (A : Set) : Set where
+  Nothing : Maybe A
+  Just : A → Maybe A
+
+m0 : Maybe Nat
+m0 = Nothing
+
+m1 : Maybe Nat
+m1 = Just 1
+
+fromMaybeNat : Maybe Nat → Nat
+fromMaybeNat Nothing  = 0
+fromMaybeNat (Just n) = n
+
+maybeToBool : Maybe Nat → Nat
+maybeToBool Nothing  = 0
+maybeToBool _ = 1
+
+-- fromMaybe : ∀ {A : Set} → A → Maybe A → A
+-- fromMaybe def Nothing  = def
+-- fromMaybe _   (Just x) = x
+
+-- data Maybe' {ℓ} (A : Set ℓ) : Set ℓ where
+--   Nothing : Maybe' A
+--   Just : A → Maybe' A
+
+-- m0' : Maybe' Nat
+-- m0' = Nothing
+
+-- m1' : Maybe' Nat
+-- m1' = Just 1
+
+-- fromMaybe' : ∀ {ℓ} {A : Set ℓ} → A → Maybe' A → A
+-- fromMaybe' def Nothing  = def
+-- fromMaybe' _   (Just x) = x
+
+-- data Exp (V : Set) : Set where
+--   Plus : Exp V → Exp V → Exp V
+
+-- eval : Exp a → Nat
+-- eval (Plus a b) = eval a + eval b
+
+-- data Exp (V : Set) : Set where
+--   Plus : Exp V → Exp V → Exp V
+--   Int : Nat → Exp V
+--   Var : V → Exp V
 
 -- eval : (a → Nat) → Exp a → Nat
 -- eval env (Plus a b) = eval env a + eval env b

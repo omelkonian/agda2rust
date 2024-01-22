@@ -90,7 +90,9 @@ writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName
 writeModule opts _ _ m cdefs = do
   outDir <- compileDir
   let outFile = fromMaybe outDir (optOutDir opts) <> "/" <> moduleNameToFileName m "rs"
-  let outS = "// *** module " <> prettyShow m <> " ***\n" <> unlines cdefs
+  let outS = "// *** module " <> prettyShow m <> " ***\n"
+           <> "#![allow(dead_code, non_snake_case)]\n"
+           <> unlines cdefs
   report outS
   unless (all null cdefs) $
     writeRsFile outFile outS
