@@ -25,9 +25,9 @@ add3 x y z = x + y + z
 add3b : Nat → Nat → Nat → Nat
 add3b x y z = add x (add y z)
 
--- sum : List Nat → Nat
--- sum []       = 0
--- sum (x ∷ xs) = x + sum xs
+-- -- sum : List Nat → Nat
+-- -- sum []       = 0
+-- -- sum (x ∷ xs) = x + sum xs
 
 -- ** Datatypes & functions
 
@@ -49,9 +49,31 @@ maybeToBool : Maybe Nat → Nat
 maybeToBool Nothing  = 0
 maybeToBool _ = 1
 
--- fromMaybe : ∀ {A : Set} → A → Maybe A → A
--- fromMaybe def Nothing  = def
--- fromMaybe _   (Just x) = x
+fromMaybe : ∀ {A : Set} → A → Maybe A → A
+fromMaybe def Nothing  = def
+fromMaybe _   (Just x) = x
+
+data Either (A B : Set) : Set where
+  Left  : A → Either A B
+  Right : B → Either A B
+
+fromEither : ∀ {A : Set} → A → ∀ {B : Set} → Either A B → A
+fromEither _    (Left  a) = a
+fromEither defA (Right _) = defA
+
+data EitherL (A B : Set) : Set where
+  Left : A → EitherL A B
+
+-- record _×_ (A B : Set) : Set where
+--   constructor _,_
+--   field
+--     fst : A
+--     snd : B
+-- -- open _×_ public
+
+-- fromEither : ∀ {A : Set} → A → ∀ {B : Set} → B → Either A B → A × B
+-- fromEither _ defB (Left  a) = a , defB
+-- fromEither defA _ (Right b) = defA , b
 
 -- data Maybe' {ℓ} (A : Set ℓ) : Set ℓ where
 --   Nothing : Maybe' A

@@ -1,4 +1,5 @@
-#![allow(dead_code, non_snake_case)]
+#![allow(dead_code, non_snake_case, unused_variables)]
+fn catchAll<A>() -> A { panic!("CATCH_ALL") }
 
 // enum Message {
 //     Quit,
@@ -25,11 +26,10 @@
 
 // #[derive(std::fmt::Display)]
 // #[derive(Debug)]
-
-enum Maybe<A> {
-  Nothing(),
-  Just(A),
-}
+// enum Maybe<A> {
+//   Nothing(),
+//   Just(A),
+// }
 
 // fn m0() -> Maybe<i32> {
 //   Maybe::Nothing()
@@ -46,15 +46,9 @@ enum Maybe<A> {
 //   }
 // }
 
-fn maybeToBool(x0: Maybe<i32>) -> i32 {
-  { let x = 1; match x0 { Maybe::Nothing() => 0, _ => x } }
-}
-
-fn main() {
-  let x: i32 = maybeToBool(Maybe::Just(42));
-  // println!("test let")
-  println!("{}", x)
-}
+// fn maybeToBool(x0: Maybe<i32>) -> i32 {
+//   { let x = 1; match x0 { Maybe::Nothing() => 0, _ => x } }
+// }
 
 // fn fromMaybe<A>(def: A, m: Maybe<A>) -> A {
 //   match m {
@@ -64,9 +58,40 @@ fn main() {
 // }
 
 // fn main() {
+//   let x: i32 = maybeToBool(Maybe::Just(42));
+//   let y: i32 = fromMaybe(42, Maybe::Nothing());
+//   // println!("test let")
+//   println!("{} | {}", x, y)
+// }
+
+// fn main() {
 //   // let x: Maybe<i32> = Maybe::Nothing();
 //   // let y: Maybe<i32> = Maybe::Just(5);
 //   let x = m0();
 //   let y = m1();
 //   println!("{:#?} | {:#?}", x, y);
 // }
+
+enum EitherL<A, B> {
+  Left(A),
+  Empty(std::marker::PhantomData<(A, B)>)
+}
+
+fn fromEitherL<A, B>(m: EitherL<A, B>) -> A {
+  match m {
+    EitherL::Left(x) => x
+  // , _ => panic!("CATCH_ALL")
+  , _ => catchAll()
+  }
+}
+
+// fn main() {
+//   let x: i32 = fromEitherL(EitherL::<i32, i32>::Left(42));
+//   println!("{}", x)
+// }
+
+
+fn main() {
+  // ::catchAll();
+  println!("Hi!")
+}
