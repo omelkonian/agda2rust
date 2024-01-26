@@ -150,16 +150,15 @@ instance A.Definition ~> R.Item where
         params   <- extractTyParams defType
         variants <- A.addContext tel (traverse go cs)
         return $ REnum dx (RTyParam <$> params) (variants <>
-            [RVariant (R.mkIdent "_Impossible")
+            [RVariant "_Impossible"
               [ RField
               $ RPathTy
               $ R.Path False
-                [ RPathSegment (R.mkIdent "std")
-                , RPathSegment (R.mkIdent "marker")
-                , R.PathSegment (R.mkIdent "PhantomData")
-                    (Just $ R.AngleBracketed []
-                              [R.TupTy (RTyRef <$> params) ()] [] ()
-                    ) ()
+                [ RPathSegment "std"
+                , RPathSegment "marker"
+                , R.PathSegment "PhantomData" (Just $
+                    R.AngleBracketed [] [R.TupTy (RTyRef <$> params) ()] [] ()
+                  ) ()
                 ] ()
               ]
             ])
@@ -281,7 +280,7 @@ instance A.TTerm ~> R.Expr where
     A.TCoerce t -> go t
     A.TError err -> do
       msg <- go $ A.LitString (T.pack $ ppShow err)
-      return $ RCall (R.mkIdent "_impossible") []
+      return $ RCall "_impossible" []
     t -> panic "unsupported treeless term" t
     where
     goHead :: A.TTerm -> TCM ([R.Expr ()] -> R.Expr ())

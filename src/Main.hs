@@ -18,7 +18,6 @@ import Paths_agda2rust ( version )
 
 import Agda.Syntax.Position ( Range(..), rStart, posLine )
 import Agda.Syntax.Common ( Ranged(..) )
-import Agda.Syntax.Common.Pretty ( prettyShow )
 import Agda.Syntax.Internal ( qnameName, qnameModule )
 import Agda.Syntax.TopLevelModuleName
   ( TopLevelModuleName, moduleNameToFileName )
@@ -116,16 +115,14 @@ writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName
             -> [CompiledDef] -> TCM ModuleRes
 writeModule opts _ _ m cdefs = do
   pragmas <- getForeignRust
-  report $ "PRAGMAS: " <> show pragmas
   outDir <- compileDir
   let code    = renderCode (pragmas <> cdefs)
       rustFn  = moduleNameToFileName m "rs"
       outFile = fromMaybe outDir (optOutDir opts) <> "/" <> rustFn
-      outS = -- "// *** module " <> prettyShow m <> " ***\n"
-              "#![allow(dead_code, non_snake_case, unused_variables)]\n"
+      outS =  "#![allow(dead_code, non_snake_case, unused_variables)]\n"
            <> "fn _impossible<A>() -> A { panic!(\"IMPOSSIBLE\") }\n"
            <> code
-  report $ "******* MODULE: " <> rustFn <> "********\n"
+  report $ "\n******* MODULE: " <> rustFn <> "********\n"
         <> outS
   unless (null code) $
     writeRsFile outFile outS
