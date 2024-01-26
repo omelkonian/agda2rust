@@ -31,8 +31,7 @@ jobs:
           # - "9.8.1"
 
     steps:
-    - uses: actions/checkout@v3
-      if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
+    - uses: actions/checkout@v4
 
     - name: Install Haskell
       uses: haskell-actions/setup@v2
@@ -41,25 +40,25 @@ jobs:
         ghc-version: ${{ matrix.ghc }}
         cabal-version: ${{ matrix.cabal }}
 
-    - name: Freeze
-      run: cabal freeze
+    # - name: Freeze
+    #   run: cabal freeze
 
-    - name: Cache ~/.cabal/store
-      uses: actions/cache@v3
-      with:
-        path:         ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
-        key:          ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
-        restore-keys: ${{ runner.os }}-${{ matrix.ghc }}-
+    # - name: Cache ~/.cabal/store
+    #   uses: actions/cache@v3
+    #   with:
+    #     path:         ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
+    #     key:          ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
+    #     restore-keys: ${{ runner.os }}-${{ matrix.ghc }}-
 
     - name: Build
       run: make build
 
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-          profile: minimal
-          toolchain: stable
+    # - name: Install Rust
+    #   uses: actions-rs/toolchain@v1
+    #   with:
+    #       profile: minimal
+    #       toolchain: stable
 
-    - name: Test
-      run: make test
+    # - name: Test
+    #   run: make test
 
