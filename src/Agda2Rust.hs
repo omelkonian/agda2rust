@@ -101,13 +101,15 @@ instance A.Definition ~> R.Item where
 
       -- A.Function{..} | d ^. funInline
       def@(A.Function{..}) -> do
-        (tyParams, args, resTy, body) <- workerFn
+        report $ "type: " <> pp defType
+        (tel, resTy) <- telListView defType
+        Just tterm <- A.toTreeless A.EagerEvaluation defName
+        (tyParams, args, resTy, body) <- goFn (tel, resTy, tterm)
         let fn = RFn dx (RTyParam . R.mkIdent <$> tyParams)
                         (RFnTy args resTy)
                         (RBlock body)
         report $ " fn: " <> ppR fn
         return fn
-
         where
         goA :: A.Dom (String, A.Type) -> TCM ([String], [R.Arg ()])
         goA d@(A.unDom -> (x, ty))
@@ -116,14 +118,6 @@ instance A.Definition ~> R.Item where
           | otherwise
           = do ty' <- go ty
                return ([], [RArg (R.mkIdent x) ty'])
-
-        renameArg :: A.Dom (String, A.Type) -> TCM (A.Dom (String, A.Type))
-        renameArg d@(unDom -> (x, ty))
-          | "_" <- x
-          = do x' <- freshVarInCtx
-               return $ d {A.unDom = (x', ty)}
-          | otherwise
-          = return d
 
         goFn :: (A.ListTel, A.Type, A.TTerm) -> TCM FnAccum
         goFn (d:tel, resTy, body) = do
@@ -136,35 +130,13 @@ instance A.Definition ~> R.Item where
           body' <- go (stripTopTLams body)
           return ([], [], resTy', body')
 
-        workerFn :: TCM FnAccum
-        workerFn = do
-          report $ "type: " <> pp defType
-          (tel, resTy) <- telListView defType
-          Just tterm <- A.toTreeless A.EagerEvaluation defName
-          goFn (tel, resTy, tterm)
-
-          -- (hArgs, vArgs, resTy) <- viewTy defType
-          -- report $ " type: " <> "∀ " <> pp hArgs <> ". " <> pp vArgs <> " -> " <> pp resTy
-
-          -- 1. type parameters
-          -- let tyParams = fst . unDom <$> hArgs
-          -- report $ " tyParams: " <> pp tyParams
-          -- -- 2. arguments
-          -- vArgs' <- populateArgNames vArgs
-          -- report $ " vArgs: "
-          --       <> pp (fst . A.unDom <$> vArgs)
-          --       <> " ~> "
-          --       <> pp (fst . A.unDom <$> vArgs')
-          -- args <- A.addContext hArgs $ goAs vArgs'
-          -- -- 3. return type
-          -- resTy' <- A.addContext (hArgs <> vArgs') $ go resTy
-          -- report $ " resTy': " <> ppR resTy'
-          -- -- 4. function body
-          -- Just tterm <- A.toTreeless A.EagerEvaluation defName
-          -- report $ " tterm: " <> pp tterm
-          -- body <- A.addContext (hArgs <> vArgs') $ go (stripTopTLams tterm)
-          -- report $ " body: " <> ppR body
-          -- return (tyParams, args, resTy', body)
+        renameArg :: A.Dom (String, A.Type) -> TCM (A.Dom (String, A.Type))
+        renameArg d@(unDom -> (x, ty))
+          | "_" <- x
+          = do x' <- freshVarInCtx
+               return $ d {A.unDom = (x', ty)}
+          | otherwise
+          = return d
 
         stripTopTLams :: A.TTerm -> A.TTerm
         stripTopTLams = \case

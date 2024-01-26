@@ -1,64 +1,38 @@
-name: CI
-
-# Trigger the workflow on push or pull request, but only for the master branch
-on:
-  pull_request:
-  push:
-    paths:
-      - 'src/**'
-      - 'test/**'
-      - 'agda2rust.cabal'
-      - 'cabal.project'
-      - 'Makefile'
-    branches: [master]
-
+on: [push]
+name: build
 jobs:
   cabal:
-    name: ${{ matrix.os }} / ghc ${{ matrix.ghc }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]   # macOS-latest, windows-latest
-        cabal: ["3.8"]
-        ghc:
-          # - "8.6.5"
-          # - "8.8.4"
-          # - "8.10.7"
-          # - "9.0.2"
-          # - "9.2.5"
-          - "9.4.3"
-          # - "9.6.3"
-          # - "9.8.1"
-
+    name: agda2rust
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checks-out repository
+      uses: actions/checkout@v4
 
-    - name: Install Haskell
+    - name: Set up GHC
       uses: haskell-actions/setup@v2
-      id: setup-haskell-cabal
+      id: setup
       with:
-        ghc-version: ${{ matrix.ghc }}
-        cabal-version: ${{ matrix.cabal }}
+        ghc-version: '9.4.3'
+        cabal-version: '3.8'
+        cabal-update: false
 
-    # - name: Freeze
-    #   run: cabal freeze
+    - run: cabal freeze
 
-    # - name: Cache ~/.cabal/store
-    #   uses: actions/cache@v3
-    #   with:
-    #     path:         ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
-    #     key:          ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
-    #     restore-keys: ${{ runner.os }}-${{ matrix.ghc }}-
+    - name: Cache ~/.cabal/store
+      uses: actions/cache@v3
+      with:
+        path:         ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
+        key:          ${{ runner.os }}-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
+        restore-keys: ${{ runner.os }}-${{ matrix.ghc }}-
 
     - name: Build
       run: make build
 
-    # - name: Install Rust
-    #   uses: actions-rs/toolchain@v1
-    #   with:
-    #       profile: minimal
-    #       toolchain: stable
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
 
-    # - name: Test
-    #   run: make test
-
+    - name: Test
+      run: make test
