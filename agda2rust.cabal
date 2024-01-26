@@ -30,7 +30,8 @@ executable agda2rust
                        data-serializer,
                        directory >= 1.2.6.2 && < 1.4,
                        filepath >= 1.4.1.0 && < 1.5,
-                       pretty-show
+                       pretty-show,
+                       containers==0.6.6
 
 executable rustp
   hs-source-dirs:      src

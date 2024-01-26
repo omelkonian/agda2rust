@@ -510,9 +510,9 @@ pattern REmptyGenerics = RForall []
 pattern RTyParam x  = R.TyParam [] x [] Nothing ()
 pattern RFnTy as b = R.FnDecl as (Just b) False ()
 pattern RFn x ps ty b =
-  R.Fn [] R.InheritedV x ty R.Normal R.NotConst R.Rust (RForall ps) b ()
+  R.Fn [] R.PublicV x ty R.Normal R.NotConst R.Rust (RForall ps) b ()
 
-pattern REnum x ps cs = R.Enum [] R.InheritedV x cs (RForall ps) ()
+pattern REnum x ps cs = R.Enum [] R.PublicV x cs (RForall ps) ()
 pattern RCall f xs = R.Call [] (RExprRef f) xs ()
 pattern RCallCon con xs = R.Call [] con xs ()
 

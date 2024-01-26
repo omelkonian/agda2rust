@@ -1,6 +1,10 @@
 module Main where
 
 import Data.Maybe ( fromMaybe )
+import qualified Data.Map as M ( lookup )
+import Data.Function ( on )
+import Data.List ( sortBy )
+
 import Control.Monad ( unless )
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
 import Control.DeepSeq ( NFData(..) )
@@ -12,12 +16,18 @@ import System.Console.GetOpt ( OptDescr(Option), ArgDescr(ReqArg) )
 import Data.Version ( showVersion )
 import Paths_agda2rust ( version )
 
+import Agda.Syntax.Position ( Range(..), rStart, posLine )
+import Agda.Syntax.Common ( Ranged(..) )
 import Agda.Syntax.Common.Pretty ( prettyShow )
 import Agda.Syntax.Internal ( qnameName, qnameModule )
-import Agda.Syntax.TopLevelModuleName ( TopLevelModuleName, moduleNameToFileName )
+import Agda.Syntax.TopLevelModuleName
+  ( TopLevelModuleName, moduleNameToFileName )
 
 import Agda.Compiler.Common ( curIF, compileDir )
-import Agda.Compiler.Backend ( Backend(..), Backend'(..), Recompile(..), IsMain )
+import Agda.Compiler.Backend
+  ( Backend(..), Backend'(..), Recompile(..), IsMain, nameBindingSite
+  , iForeignCode, getForeignCodeStack, ForeignCode(..)
+  )
 
 import Agda.TypeChecking.Monad.Base ( Definition(..) )
 import Agda.TypeChecking.Monad
@@ -47,7 +57,12 @@ defaultOptions = Options{ optOutDir = Nothing }
 
 type ModuleEnv = ()
 type ModuleRes = ()
-type CompiledDef = String
+type CompiledDef = Ranged String
+
+renderCode :: [CompiledDef] -> String
+renderCode = unlines . map rangedThing . sortBy (compare `on` rLine . rangeOf)
+  where rLine :: Range -> Int
+        rLine r = fromIntegral $ fromMaybe 0 $ posLine <$> rStart r
 
 backend :: Backend' Options Options ModuleEnv ModuleRes CompiledDef
 backend = Backend'
@@ -74,28 +89,45 @@ moduleSetup _ _ m _ = do
   setScope . iInsideScope =<< curIF
   return $ Recompile ()
 
+defRange :: Definition -> Range
+defRange = nameBindingSite . qnameName . defName
+
 compile :: Options -> ModuleEnv -> IsMain -> Definition -> TCM CompiledDef
 compile opts tlm _ def@(Defn{..})
   | ignoreDef theDef
-  = return ""
+  = return $ Ranged (defRange def) ""
   | otherwise
   = withCurrentModule (qnameModule defName)
   -- $ getUniqueCompilerPragma "AGDA2RUST" defName >>= \case
   --     Nothing -> return []
   --     Just (CompilerPragma _ _) -> ...
-  $ show . R.pretty' <$> convert def
+  $ Ranged (defRange def) . show . R.pretty' <$> convert def
+
+getForeignRust :: TCM [CompiledDef]
+getForeignRust
+  = reverse
+  . fmap (\case ForeignCode r s -> Ranged r s)
+  . fromMaybe []
+  . fmap getForeignCodeStack
+  . M.lookup "AGDA2RUST"
+  . iForeignCode <$> curIF
 
 writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName
             -> [CompiledDef] -> TCM ModuleRes
 writeModule opts _ _ m cdefs = do
+  pragmas <- getForeignRust
+  report $ "PRAGMAS: " <> show pragmas
   outDir <- compileDir
-  let outFile = fromMaybe outDir (optOutDir opts) <> "/" <> moduleNameToFileName m "rs"
-  let outS = "// *** module " <> prettyShow m <> " ***\n"
-           <> "#![allow(dead_code, non_snake_case, unused_variables)]\n"
+  let code    = renderCode (pragmas <> cdefs)
+      rustFn  = moduleNameToFileName m "rs"
+      outFile = fromMaybe outDir (optOutDir opts) <> "/" <> rustFn
+      outS = -- "// *** module " <> prettyShow m <> " ***\n"
+              "#![allow(dead_code, non_snake_case, unused_variables)]\n"
            <> "fn catchAll<A>() -> A { panic!(\"CATCH_ALL\") }\n"
-           <> unlines cdefs
-  report outS
-  unless (all null cdefs) $
+           <> code
+  report $ "******* MODULE: " <> rustFn <> "********\n"
+        <> outS
+  unless (null code) $
     writeRsFile outFile outS
   where
     writeRsFile :: FilePath -> String -> TCM ()

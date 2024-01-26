@@ -1,5 +1,12 @@
-_build
+*~
+# Haskell
 dist
 dist-newstyle
-*~
+# Agda
+_build
+# Rust
 *.rlib
+# Test suite
+test/build
+test/agda2rust
+test/rustp
