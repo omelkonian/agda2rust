@@ -1,5 +1,10 @@
 .PHONY : install repl rustp test golden
 
+default : build
+
+build :
+	cabal build agda2rust
+
 install :
 	cabal install --overwrite-policy=always
 
