@@ -1,9 +1,9 @@
 #![allow(dead_code, non_snake_case, unused_variables)]
-fn catchAll<A>() -> A { panic!("CATCH_ALL") }
+fn _impossible<A>() -> A { panic!("IMPOSSIBLE") }
 pub enum Maybe<  A,> {
   Nothing(),
   Just(A),
-  CatchAll(std::marker::PhantomData<(A,)>),
+  _Impossible(std::marker::PhantomData<(A,)>),
 }
 
 
@@ -17,7 +17,7 @@ pub fn fromMaybeNat(x0: Maybe<i32>) -> i32 {
   match x0 {
     Maybe::Nothing() => 0,
     Maybe::Just(x1) => x1,
-    _ => catchAll(),
+    _ => _impossible(),
   }
 }
 pub fn maybeToBool(x0: Maybe<i32>) -> i32 {
@@ -27,6 +27,6 @@ pub fn fromMaybe<  A,>(x0: A, x1: Maybe<A>) -> A {
   match x1 {
     Maybe::Nothing() => x0,
     Maybe::Just(x2) => x2,
-    _ => catchAll(),
+    _ => _impossible(),
   }
 }

@@ -123,7 +123,7 @@ writeModule opts _ _ m cdefs = do
       outFile = fromMaybe outDir (optOutDir opts) <> "/" <> rustFn
       outS = -- "// *** module " <> prettyShow m <> " ***\n"
               "#![allow(dead_code, non_snake_case, unused_variables)]\n"
-           <> "fn catchAll<A>() -> A { panic!(\"CATCH_ALL\") }\n"
+           <> "fn _impossible<A>() -> A { panic!(\"IMPOSSIBLE\") }\n"
            <> code
   report $ "******* MODULE: " <> rustFn <> "********\n"
         <> outS

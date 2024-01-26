@@ -178,7 +178,7 @@ instance A.Definition ~> R.Item where
         params   <- extractTyParams defType
         variants <- A.addContext tel (traverse go cs)
         return $ REnum dx (RTyParam <$> params) (variants <>
-            [RVariant (R.mkIdent "CatchAll")
+            [RVariant (R.mkIdent "_Impossible")
               [ RField
               $ RPathTy
               $ R.Path False
@@ -309,7 +309,7 @@ instance A.TTerm ~> R.Expr where
     A.TCoerce t -> go t
     A.TError err -> do
       msg <- go $ A.LitString (T.pack $ ppShow err)
-      return $ RCall (R.mkIdent "catchAll") []
+      return $ RCall (R.mkIdent "_impossible") []
     t -> panic "unsupported treeless term" t
     where
     goHead :: A.TTerm -> TCM ([R.Expr ()] -> R.Expr ())
