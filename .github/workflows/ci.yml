@@ -1,24 +1,52 @@
-on: [push]
-name: build
+name: CI
+
+# Trigger the workflow on push or pull request, but only for the master branch
+on:
+  pull_request:
+  push:
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'agda2rust.cabal'
+      - 'cabal.project'
+      - 'Makefile'
+    branches: [master]
+
 jobs:
   cabal:
-    name: agda2rust
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os }} / ghc ${{ matrix.ghc }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]   # macOS-latest, windows-latest
+        cabal: ["3.8"]
+        ghc:
+          # - "8.6.5"
+          # - "8.8.4"
+          # - "8.10.7"
+          # - "9.0.2"
+          # - "9.2.5"
+          - "9.4.3"
+          # - "9.6.3"
+          # - "9.8.1"
+
     steps:
-    - name: Checks-out repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v3
+      if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/master'
 
-    - name: Set up GHC
+    - run: git config --global url.https://github.com/.insteadOf git://github.com/
+
+    - name: Install Haskell
       uses: haskell-actions/setup@v2
-      id: setup
+      id: setup-haskell-cabal
       with:
-        ghc-version: '9.4.3'
-        cabal-version: '3.8'
-        cabal-update: false
+        ghc-version: ${{ matrix.ghc }}
+        cabal-version: ${{ matrix.cabal }}
 
-    - run: cabal freeze
+    - name: Freeze cabal dependencies
+      run: cabal freeze
 
-    - name: Cache ~/.cabal/store
+    - name: Cache cabal store
       uses: actions/cache@v3
       with:
         path:         ${{ steps.setup-haskell-cabal.outputs.cabal-store }}
@@ -36,3 +64,4 @@ jobs:
 
     - name: Test
       run: make test
+
