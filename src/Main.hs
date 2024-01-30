@@ -3,7 +3,9 @@ module Main where
 import Data.Maybe ( fromMaybe )
 import qualified Data.Map as M ( lookup )
 import Data.Function ( on )
-import Data.List ( sortBy )
+import Data.List ( sortBy, intercalate )
+
+import Text.Read ( readMaybe )
 
 import Control.Monad ( unless )
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
@@ -37,11 +39,27 @@ import Agda.Main ( runAgda )
 
 import qualified Language.Rust.Pretty as R
 
-import Agda2Rust ( convert, ignoreDef, report, ppm )
+import Agda2Rust
+  ( convert, ignoreDef, report, ppm, runC, runC0, initState, State )
 
 --
 
-main = runAgda [Backend backend]
+-- | State propagated across modules.
+stateFile :: FilePath
+stateFile = "agda2rust.state"
+
+cleanupState :: IO ()
+cleanupState = writeState initState
+
+readState :: IO State
+readState = read <$> readFile stateFile
+
+writeState :: State -> IO ()
+writeState = writeFile stateFile . show
+
+--
+
+main = cleanupState >> runAgda [Backend backend]
 
 data Options = Options { optOutDir :: Maybe FilePath }
 
@@ -96,11 +114,14 @@ compile opts tlm _ def@(Defn{..})
   | ignoreDef theDef
   = return $ Ranged (defRange def) ""
   | otherwise
-  = withCurrentModule (qnameModule defName)
   -- $ getUniqueCompilerPragma "AGDA2RUST" defName >>= \case
   --     Nothing -> return []
   --     Just (CompilerPragma _ _) -> ...
-  $ Ranged (defRange def) . show . R.pretty' <$> convert def
+  = withCurrentModule (qnameModule defName) $ do
+    s <- liftIO readState
+    (cdef, s') <- runC s (convert def)
+    liftIO $ writeState s'
+    return $ Ranged (defRange def) $ show (R.pretty' cdef)
 
 getForeignRust :: TCM [CompiledDef]
 getForeignRust
@@ -111,6 +132,14 @@ getForeignRust
   . M.lookup "AGDA2RUST"
   . iForeignCode <$> curIF
 
+ignoredRustWarnings :: [String]
+ignoredRustWarnings =
+  [ "dead_code"
+  , "non_snake_case"
+  , "unused_variables"
+  , "non_camel_case_types"
+  ]
+
 writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName
             -> [CompiledDef] -> TCM ModuleRes
 writeModule opts _ _ m cdefs = do
@@ -119,10 +148,10 @@ writeModule opts _ _ m cdefs = do
   let code    = renderCode (pragmas <> cdefs)
       rustFn  = moduleNameToFileName m "rs"
       outFile = fromMaybe outDir (optOutDir opts) <> "/" <> rustFn
-      outS =  "#![allow(dead_code, non_snake_case, unused_variables)]\n"
+      outS =  "#![allow(" <> intercalate "," ignoredRustWarnings <> ")]\n"
            <> "fn _impossible<A>() -> A { panic!(\"IMPOSSIBLE\") }\n"
            <> code
-  report $ "\n******* MODULE: " <> rustFn <> "********\n"
+  runC0 $ report $ "\n******* MODULE: " <> rustFn <> "********\n"
         <> outS
   unless (null code) $
     writeRsFile outFile outS

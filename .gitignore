@@ -1,4 +1,5 @@
 *~
+agda2rust.state
 # Haskell
 dist
 dist-newstyle
@@ -7,6 +8,8 @@ _build
 # Rust
 *.rlib
 # Test suite
+test/Input.rs
+test/Agda
 test/build
 test/agda2rust
 test/rustp

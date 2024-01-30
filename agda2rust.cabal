@@ -31,7 +31,8 @@ executable agda2rust
                        directory >= 1.2.6.2 && < 1.4,
                        filepath >= 1.4.1.0 && < 1.5,
                        pretty-show,
-                       containers==0.6.6
+                       containers==0.6.6,
+                       mtl==2.2.2
 
 executable rustp
   hs-source-dirs:      src

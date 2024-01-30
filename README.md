@@ -20,8 +20,10 @@
   + [x] polymorphic types / type variables
   + [x] constructors/variants
   + [x] PhantomData for unused type variables
-  + [] Infinite types (e.g. List)
+    * [ ] add Phantom constructor *only if needed*
+  + [ ] Infinite types (e.g. List)
 - [ ] records
+- [ ] higher-order functions
 - [ ] imports
   + [ ] private definitions (i.e. not `pub` for everything)
 - [x] FOREIGN pragmas
