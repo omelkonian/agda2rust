@@ -1,7 +1,8 @@
 # [WIP] A new Agda backend for compiling to Rust
 
 - The backend is defined in `src/Main.hs`.
-- The `test/` directory contains an example compilation of `Test.agda` to `Test.rs`.
+- A custom pipeline for translating internal syntax to the treeless representation is in `src/AgdaInternals.hs`.
+- The `test/` directory contains a golden-testing suite (c.f. `test/AllTests.agda`).
 
 ## TODO
 
@@ -11,19 +12,22 @@
   + [ ] ensure qualification/scopes are OK
 - [ ] primitives
   + [x] Nat->i32
+  + [ ] ...
+  + [ ] buitin modules
 - [x] functions
   + [x] function type signatures
   + [x] termrs (e.g. function bodys)
   + [x] Let bindings
   + [x] Case expresssions
+  + [x] higher-order functions
 - [ ] datatypes
   + [x] polymorphic types / type variables
   + [x] constructors/variants
   + [x] PhantomData for unused type variables
     * [ ] add Phantom constructor *only if needed*
-  + [ ] Infinite types (e.g. List)
+  + [x] Infinite types (e.g. List)
+  + [ ] more dependent/indexed types
 - [ ] records
-- [ ] higher-order functions
 - [ ] imports
   + [ ] private definitions (i.e. not `pub` for everything)
 - [x] FOREIGN pragmas

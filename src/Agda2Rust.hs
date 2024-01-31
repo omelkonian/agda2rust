@@ -1,4 +1,8 @@
-{-# LANGUAGE FlexibleInstances, FlexibleContexts, OverloadedStrings, ScopedTypeVariables #-}
+{-# LANGUAGE
+  FlexibleInstances, FlexibleContexts
+, ScopedTypeVariables
+, OverloadedStrings
+#-}
 -- | Conversion from Agda's internal syntax to our simplified JSON format.
 module Agda2Rust where
 
@@ -10,7 +14,7 @@ import Control.Monad.State ( StateT, runStateT, get, gets, put, modify )
 
 import Data.List ( elemIndex, partition, intercalate )
 import Data.List.NonEmpty ( NonEmpty((:|)) )
-import Data.Maybe ( isJust )
+import Data.Maybe ( isJust, fromMaybe )
 import Data.Word ( Word64, Word8 )
 import qualified Data.Set as S ( Set, empty, insert, member )
 import qualified Data.Text as T ( pack, unpack )
@@ -25,15 +29,19 @@ import qualified Agda.Syntax.Common as A
 import qualified Agda.Syntax.Internal as A
 import qualified Agda.Syntax.Literal as A
 import Agda.Syntax.Internal
-  ( QName, absName, qnameName, qnameModule, unAbs, unEl, unDom
+  ( QName, absName, qnameName, qnameModule, Abs(..), unAbs, unEl, unDom
   , nameId, conName, dbPatVarIndex, pDom, telToList, telFromList )
 import Agda.Syntax.Translation.InternalToAbstract ( NamedClause(..) )
 -- * treeless syntax
 import qualified Agda.Compiler.ToTreeless as A
+  hiding ( toTreeless )
+import qualified AgdaInternals as A
   ( toTreeless )
 import qualified Agda.Syntax.Treeless as A
   ( TTerm(..), TPrim(..), TAlt(..), EvaluationStrategy(..), isPrimEq )
 import Agda.Compiler.Treeless.Pretty ()
+import qualified Agda.Compiler.Treeless.EliminateLiteralPatterns as A
+  ( eliminateLiteralPatterns )
 -- * typechecking
 import qualified Agda.TypeChecking.Substitute as A
   ( TelV(..) )
@@ -186,10 +194,12 @@ instance A.Definition ~> R.Item where
 
       -- A.Function{..} | d ^. funInline
       def@(A.Function{..}) -> do
-        report $ "type: " <> pp defType
+        report $ " type: " <> pp defType
         (tel, resTy) <- telListView defType
-        Just tterm <- liftTCM $ A.toTreeless A.EagerEvaluation defName
+        tterm <- liftTCM $ A.toTreeless defName
+        report $ " tterm: " <> pp tterm
         (tyParams, args, resTy, body) <- goFn (tel, resTy, tterm)
+        report $ " fnTy: " <> ppR (RFnTy args resTy)
         let fn = RFn dx (RTyParam . R.mkIdent <$> tyParams)
                         (RFnTy args resTy)
                         (RBlock body)
@@ -266,7 +276,7 @@ instance A.Definition ~> R.Item where
     --   d <- theDef <$> getConstInfo conData
     --   return $ case d of
     --     A.Datatype{..} ->
-    --       let Just ix = elemIndex (unqual cn) (unqual <$> dataCons)
+    --       let Just i x= elemIndex (unqual cn) (unqual <$> dataCons)
     --       in  Constructor (pp conData) (toInteger ix)
     --     A.Record{..} -> Constructor (pp conData) 0
       d -> panic "unsupported definition" d
@@ -286,7 +296,11 @@ instance A.Type ~> R.Ty where
       (if toBox then rBoxTy else id) . RTyRef' (unqualR n)
         <$> gos (A.El (undefined :: A.Sort) <$> as)
 
-    -- A.Pi a b | ->
+    A.Pi a b ->
+      RBareFn (R.mkIdent x) <$> go (A.unDom a) <*> ctx (go $ A.unAbs b)
+      where
+        x   = A.bareNameWithDefault (A.absName b) (A.domName a)
+        ctx = if isDependentArrow a then A.addContext [(x, a)] else id
 
     -- otherwise, error
     A.Var i es -> do
@@ -332,7 +346,7 @@ instance A.TTerm ~> R.Expr where
       panic "unsupported treeless term" (A.TLam t)
     A.TLet t t' -> do
       x <- freshVarInCtx
-      let ty  = undefined         :: A.Type
+      let ty = undefined :: A.Type
       e  <- go t
       e' <- A.addContext [(x, A.defaultDom ty)] $ go t'
       return $ rLet [(x, e)] e'
@@ -364,13 +378,14 @@ instance A.TTerm ~> R.Expr where
     goHead = \case
       A.TDef qn -> return (Nothing, RCall (unqualR qn))
       A.TCon cn -> (Just cn,) . RCallCon . RPathExpr <$> qualR cn
-      A.TPrim prim
-        | Just binOp <- getBinOp prim
+      A.TPrim prim | Just binOp <- getBinOp prim
         -> return (Nothing, \[x, y] -> RBin binOp x y)
         -- | A.PIf <- prim
         -- , [] <- xs
-        | otherwise
-        -> panic "unsupported prim" (ppShow prim)
+      A.TVar n -> do
+        f <- R.mkIdent <$> lookupCtxVar n
+        return (Nothing, RCall f)
+      hd -> panic "unsupported head" (ppShow hd)
 
     getBinOp :: A.TPrim -> Maybe R.BinOp
     getBinOp = \case
@@ -536,6 +551,9 @@ resTy ty = do
 --     | ->
 --     | otherwise -> traverseF (filterTel p) tel
 
+isDependentArrow :: A.Dom A.Type -> Bool
+isDependentArrow ty = pp (A.domName ty) `notElem` ["_", "(nothing)"]
+
 -- * Rust utilities
 
 rLet :: [(String, R.Expr ())] -> R.Expr () -> R.Expr ()
@@ -579,6 +597,8 @@ pattern RTyParam x  = R.TyParam [] x [] Nothing ()
 pattern RFnTy as b = R.FnDecl as (Just b) False ()
 pattern RFn x ps ty b =
   R.Fn [] R.PublicV x ty R.Normal R.NotConst R.Rust (RForall ps) b ()
+pattern RBareFn x a b =
+  R.BareFn R.Normal R.Rust [] (RFnTy [ R.Arg (Just (RId x)) a ()] b) ()
 
 pattern REnum x ps cs = R.Enum [] R.PublicV x cs (RForall ps) ()
 pattern RCall f xs = R.Call [] (RExprRef f) xs ()

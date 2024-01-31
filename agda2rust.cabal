@@ -18,6 +18,7 @@ executable agda2rust
   autogen-modules:     Paths_agda2rust
   other-modules:       Paths_agda2rust
                        Agda2Rust
+                       AgdaInternals
   default-extensions:
     LambdaCase RecordWildCards PatternSynonyms PatternGuards TupleSections
     ViewPatterns

@@ -9,6 +9,6 @@ _++_ : List A → List A → List A
 []       ++ ys = ys
 (x ∷ xs) ++ ys = x ∷ (xs ++ ys)
 
--- map : (A → B) → List A → List b
--- map f [] = []
--- map f (x ∷ xs) = f x ∷ map f xs
+map : (A → B) → List A → List B
+map f [] = []
+map f (x ∷ xs) = f x ∷ map f xs
