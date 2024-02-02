@@ -28,6 +28,8 @@
   + [x] Infinite types (e.g. List)
   + [ ] more dependent/indexed types
 - [ ] records
+  + [x] simple records
+  + [ ] complex records
 - [ ] imports
   + [ ] private definitions (i.e. not `pub` for everything)
 - [x] FOREIGN pragmas
