@@ -1,7 +1,7 @@
 record _×_ (A B : Set) : Set where
   constructor _,_
-  field fst : A
-        snd : B
+  field proj₁ : A
+        proj₂ : B
 open _×_ public
 
 private variable A B C : Set

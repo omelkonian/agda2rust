@@ -7,8 +7,6 @@
 -- | Conversion from Agda's internal syntax to our simplified JSON format.
 module Agda2Rust where
 
-import GHC.Generics ( Generic )
-
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
 import Control.Monad ( unless, when, (<=<) )
 import Control.Arrow ( first )
@@ -25,8 +23,6 @@ import qualified Data.Map as M ( Map, empty, insert, lookup )
 import qualified Data.Text as T ( pack, unpack )
 import Data.Serializer ( toBytes )
 
--- * concrete syntax
-import qualified Agda.Syntax.Concrete.Name as AC
 -- * abstract syntax
 import qualified Agda.Syntax.Abstract.Name as A
   ( qnameToList0 )
@@ -294,7 +290,6 @@ instance A.Definition ~> R.Item where
         let (tel, fs) = splitAt recPars (A.telToList recTel)
         report $ " tel: " <> pp tel
         report $ " fs: " <> pp fs
-        let params = undefined; fields = undefined
         let params = extractTyParams tel
         report $ " params: " <> show params
         fields <- A.addContext tel (goFs $ unDom <$> fs)
@@ -312,7 +307,7 @@ instance A.Definition ~> R.Item where
               <*> A.addContext (A.defaultDom (x, ty)) (goFs fs)
 
         goF :: (String, A.Type) :~> R.StructField
-        goF (x, ty) = RNamedField (R.mkIdent x) <$> go ty
+        goF (x, ty) = RNamedField (R.mkIdent $ transcribe x) <$> go ty
 
     -- A.Constructor{..} -> do
     --   let cn = conName conSrcCon
@@ -379,11 +374,14 @@ instance (A.QName, A.Type) ~> R.Variant where
 -- | Compiling (treeless) Agda terms into Rust expressions.
 instance A.TTerm ~> R.Expr where
   go = boxTerm <=< (\case
-    A.TVar i -> RExprRef . R.mkIdent <$> lookupCtxVar i
+    A.TVar i -> do
+      report $ "* compiling variable: " <> pp i
+      RExprRef . R.mkIdent <$> lookupCtxVar i
     A.TLit l -> RLit <$> go l
     t@(A.TDef qn) -> go (A.TApp t [])
     t@(A.TCon qn) -> go (A.TApp t [])
     A.TApp t ts -> do -- goHead t <*> gos (onlyNonErased ts)
+      report $ "* compiling application: " <> pp t <> " $ " <> pp ts
       (cn, h) <- goHead t
       ts' <- maybe inNonConstructor inConstructor cn $ gos (onlyNonErased ts)
       return $ h ts'
@@ -492,10 +490,11 @@ instance A.TAlt ~> R.Arm where
           path <- parentQualR con
           (_, vargs, _) <- viewTy =<< A.typeOfConst con
           vargs' <- populateArgNames vargs
-          let xs = take n (fst . unDom <$> vargs')
+          report $ " vargs': " <> pp vargs'
+          let xs = transcribe . fst . unDom <$> take n vargs'
           let pats = RId . R.mkIdent <$> xs
-          -- report $ " pat: " <> pp con <> "(" <> show n <> ")"
-          --       <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
+          report $ " pat: " <> pp con <> "(" <> show n <> ")"
+                <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
           body'  <- A.addContext vargs' (go body)
           report $ " body: " <> pp body <> " ~> " <> ppR body'
           -- return $ RArm (RStructP path $ zipWith RFieldP (R.mkIdent <$> fs) pats) body'
@@ -563,17 +562,13 @@ reportCurrentCtx = currentCtx >>= \ctx ->
   report $ "currentCtx: " <> pp ctx
 
 lookupCtx :: Int -> C (String, A.Type)
-lookupCtx i = (!! i) <$> currentCtx
+lookupCtx i = first transcribe . (!! i) <$> currentCtx
 
 currentCtxVars :: C [String]
 currentCtxVars = fmap fst <$> currentCtx
 
 lookupCtxVar :: Int -> C String
-lookupCtxVar i = do
-  ctx <- currentCtxVars
-  let x = pp (ctx !! i)
-  -- report $ pp ctx <> "[" <> show i <> "] = " <> x
-  return x
+lookupCtxVar i = transcribe . (!! i) <$> currentCtxVars
 
 varPool :: [String]
 varPool = zipWith (<>) (repeat "x") (show <$> [0..])
@@ -751,18 +746,18 @@ panic s t = error $
     <> "show: " <> limit (ppShow t)
   where limit = take 500
 
+transcribe :: String -> String
+transcribe "[]" = "Nil"
+transcribe "_∷_" = "Cons"
+transcribe "_++_" = "con"
+transcribe "_×_" = "Product"
+transcribe "proj₁" = "fst"
+transcribe "proj₂" = "snd"
+-- transcribe "_,_" = "mkProduct"
+transcribe s = s
+
 unqual :: A.QName -> String
 unqual = transcribe . pp . qnameName
-  where
-  transcribe :: String -> String
-  transcribe "[]" = "Nil"
-  transcribe "_∷_" = "Cons"
-  transcribe "_++_" = "con"
-  transcribe "_×_" = "Product"
-  transcribe "proj₁" = "fst"
-  transcribe "proj₂" = "snd"
-  -- transcribe "_,_" = "mkProduct"
-  transcribe s = s
 
 unqualR :: A.QName -> R.Ident
 unqualR = R.mkIdent . unqual
