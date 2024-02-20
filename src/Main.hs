@@ -28,6 +28,7 @@ import Agda.Compiler.Common ( curIF, compileDir )
 import Agda.Compiler.Backend
   ( Backend(..), Backend'(..), Recompile(..), IsMain, nameBindingSite
   , iForeignCode, getForeignCodeStack, ForeignCode(..)
+  , Flag
   )
 
 import Agda.TypeChecking.Monad.Base ( Definition(..) )
@@ -66,7 +67,7 @@ data Options = Options { optOutDir :: Maybe FilePath }
 instance NFData Options where
   rnf _ = ()
 
-outdirOpt :: Monad m => FilePath -> Options -> m Options
+outdirOpt :: FilePath -> Flag Options
 outdirOpt dir opts = return opts{ optOutDir = Just dir }
 
 defaultOptions :: Options
