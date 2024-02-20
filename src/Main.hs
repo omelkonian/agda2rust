@@ -150,7 +150,6 @@ writeModule opts _ _ m cdefs = do
       rustFn  = moduleNameToFileName m "rs"
       outFile = fromMaybe outDir (optOutDir opts) <> "/" <> rustFn
       outS =  "#![allow(" <> intercalate "," ignoredRustWarnings <> ")]\n"
-           <> "fn _impossible<A>() -> A { panic!(\"IMPOSSIBLE\") }\n"
            <> code
   runC0 $ report $ "\n******* MODULE: " <> rustFn <> "********\n"
         <> outS

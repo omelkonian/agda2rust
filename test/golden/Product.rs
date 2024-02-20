@@ -1,5 +1,4 @@
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types)]
-fn _impossible<A>() -> A { panic!("IMPOSSIBLE") }
 pub struct Product<A, B> {
   pub fst: A,
   pub snd: B,

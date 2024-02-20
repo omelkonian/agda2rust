@@ -75,6 +75,7 @@ import Agda.Utils.Monad ( ifM, mapMaybeM )
 -- * Rust
 import qualified Language.Rust.Syntax as R
 import qualified Language.Rust.Data.Ident as R
+import qualified Language.Rust.Data.Position as R
 import qualified Language.Rust.Parser as R
 import qualified Language.Rust.Pretty as R
 import Text.Show.Pretty ( ppShow )
@@ -411,10 +412,11 @@ instance A.TTerm ~> R.Expr where
     -- A.TUnit ->
     -- A.TSort ->
     -- A.TErased ->
+
     A.TCoerce t -> go t
     A.TError err -> do
       msg <- go $ A.LitString (T.pack $ ppShow err)
-      return $ RCall "_impossible" []
+      return $ RMacroCall (RRef "panic") (RStrTok "IMPOSSIBLE")
     t -> panic "unsupported treeless term" t)
     where
     boxTerm :: R.Expr () :~> R.Expr
@@ -686,9 +688,11 @@ pattern RBareFn x a b =
 pattern RCall f xs = R.Call [] (RExprRef f) xs ()
 pattern RCallCon con xs = R.Call [] con xs ()
 pattern RMkStruct path fs = R.Struct [] path fs Nothing ()
+pattern RMacroCall f xs = R.MacExpr [] (R.Mac f xs ()) ()
 
--- rStruct :: [R.Expr ()] -> R.Expr ()
--- rStruct path xs =
+pattern RNoSpan   = R.Span R.NoPosition R.NoPosition
+pattern RTok    t = R.Tree (R.Token RNoSpan (R.LiteralTok t Nothing))
+pattern RStrTok s = RTok (R.StrTok s)
 
 pattern REnum x ps cs = R.Enum [] R.PublicV x cs (RForall ps) ()
 pattern RVariant x fs = R.Variant x [] (R.TupleD fs ()) Nothing ()
