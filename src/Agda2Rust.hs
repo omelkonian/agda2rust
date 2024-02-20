@@ -323,12 +323,16 @@ instance A.Definition ~> R.Item where
 -- | Compiling types.
 instance A.Type ~> R.Ty where
   go ty = asks curDatatype >>= \curD -> case unEl ty of
-    -- Nat ~> i32
     A.Def n as
       | Just primTy <- R.mkIdent <$> goPrim n
       -> do
         unless (null as) $ panic "primitive types cannot have type parameters" ty
         return $ RTyRef primTy
+      where
+      goPrim :: QName -> Maybe String
+      goPrim n = case pp n of
+        "Agda.Builtin.Nat.Nat" -> Just "i32"
+        _ -> Nothing
     A.Def n es | as <- vElims es -> do
       let toBox = curD == Just n
       when toBox setBox
@@ -347,11 +351,6 @@ instance A.Type ~> R.Ty where
       -- es' <- traverse go (vArgs es)
       return $ RTyRef (R.mkIdent x)
     ty -> panic "unsupported type" ty
-    where
-    goPrim :: QName -> Maybe String
-    goPrim n = case pp n of
-      "Agda.Builtin.Nat.Nat" -> Just "i32"
-      _ -> Nothing
 
 -- | Compiling a collection of (tagged) Agda types into Rust struct fields.
 -- instance [(A.QName, A.Type)] ~>* R.StructField where
@@ -361,13 +360,13 @@ instance A.Type ~> R.Ty where
 instance (A.QName, A.Type) ~> R.Variant where
   go (c, ty) = inConstructor c $ do
     as <- vargTys ty
-    RVariant (unqualR c) <$> goFs (unDom <$> as)
+    RVariant (unqualR c) <$> goFs 1 (unDom <$> as)
     where
-      goFs :: [(String, A.Type)] :~>* R.StructField
-      goFs [] = return []
-      goFs ((x, ty):fs) =
-        (:) <$> goF (x, ty)
-            <*> A.addContext (A.defaultDom (x, ty)) (goFs fs)
+      goFs :: Int -> [(String, A.Type)] :~>* R.StructField
+      goFs _ [] = return []
+      goFs i ((x, ty):fs) =
+        (:) <$> inArgument i (goF (x, ty))
+            <*> A.addContext (A.defaultDom (x, ty)) (goFs (i + 1) fs)
 
       goF :: (String, A.Type) :~> R.StructField
       goF (x, ty) = RField <$> go ty
