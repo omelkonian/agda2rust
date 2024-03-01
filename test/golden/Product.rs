@@ -1,26 +1,32 @@
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types)]
-pub struct Product<A, B> {
-  pub fst: A,
-  pub snd: B,
+pub struct _Ֆ215Ֆ_<A, B> {
+  pub projՖ8321Ֆ: A,
+  pub projՖ8322Ֆ: B,
 }
 
-pub fn fst<A, B>(r: Product<A, B>) -> A {
+pub fn projՖ8321Ֆ<A, B>(r: _Ֆ215Ֆ_<A, B>) -> A {
   match r {
-    Product { fst, snd } => fst,
+    _Ֆ215Ֆ_ { projՖ8321Ֆ, projՖ8322Ֆ } => projՖ8321Ֆ,
   }
 }
-pub fn snd<A, B>(r: Product<A, B>) -> B {
+pub fn projՖ8322Ֆ<A, B>(r: _Ֆ215Ֆ_<A, B>) -> B {
   match r {
-    Product { fst, snd } => snd,
+    _Ֆ215Ֆ_ { projՖ8321Ֆ, projՖ8322Ֆ } => projՖ8322Ֆ,
   }
 }
-pub fn mapFst<A, C, B>(x0: fn(_: A) -> C, x1: Product<A, B>) -> Product<C, B> {
+pub fn mapFst<A, C, B>(x0: fn(_: A) -> C, x1: _Ֆ215Ֆ_<A, B>) -> _Ֆ215Ֆ_<C, B> {
   match x1 {
-    Product { fst, snd } => Product { fst: x0(fst), snd: snd },
+    _Ֆ215Ֆ_ { projՖ8321Ֆ, projՖ8322Ֆ } => _Ֆ215Ֆ_ {
+      projՖ8321Ֆ: x0(projՖ8321Ֆ),
+      projՖ8322Ֆ: projՖ8322Ֆ,
+    },
   }
 }
-pub fn mapSnd<B, C, A>(x0: fn(_: B) -> C, x1: Product<A, B>) -> Product<A, C> {
+pub fn mapSnd<B, C, A>(x0: fn(_: B) -> C, x1: _Ֆ215Ֆ_<A, B>) -> _Ֆ215Ֆ_<A, C> {
   match x1 {
-    Product { fst, snd } => Product { fst: fst, snd: x0(snd) },
+    _Ֆ215Ֆ_ { projՖ8321Ֆ, projՖ8322Ֆ } => _Ֆ215Ֆ_ {
+      projՖ8321Ֆ: projՖ8321Ֆ,
+      projՖ8322Ֆ: x0(projՖ8322Ֆ),
+    },
   }
 }

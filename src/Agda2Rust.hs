@@ -7,6 +7,8 @@
 -- | Conversion from Agda's internal syntax to our simplified JSON format.
 module Agda2Rust where
 
+import System.IO.Unsafe ( unsafePerformIO )
+
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
 import Control.Monad ( unless, when, (<=<) )
 import Control.Arrow ( first )
@@ -16,12 +18,15 @@ import Control.Monad.State ( StateT, runStateT, get, gets, put, modify )
 import Data.List ( elemIndex, partition, intercalate )
 import Data.List.NonEmpty ( NonEmpty((:|)) )
 import qualified Data.List.NonEmpty as NE ( fromList )
-import Data.Maybe ( isJust, fromMaybe )
+import Data.Maybe ( isJust, fromMaybe, mapMaybe )
+import Data.Either ( isRight )
 import Data.Word ( Word64, Word8 )
 import qualified Data.Set as S ( Set, empty, insert, member )
 import qualified Data.Map as M ( Map, empty, insert, lookup )
 import qualified Data.Text as T ( pack, unpack )
 import Data.Serializer ( toBytes )
+import Unicode.Char.Identifiers ( isXIDStart, isXIDContinue )
+import Data.Char ( ord )
 
 -- * abstract syntax
 import qualified Agda.Syntax.Abstract.Name as A
@@ -46,10 +51,6 @@ import Agda.Compiler.Treeless.Pretty ()
 import qualified Agda.Compiler.Treeless.EliminateLiteralPatterns as A
   ( eliminateLiteralPatterns )
 -- * typechecking
-import qualified Agda.TypeChecking.Substitute as A
-  ( TelV(..) )
-import qualified Agda.TypeChecking.Telescope as A
-  ( telViewPath, telViewUpTo )
 import qualified Agda.TypeChecking.Monad as A
 import Agda.TypeChecking.Monad
   ( TCM, MonadTCM, liftTCM
@@ -57,11 +58,16 @@ import Agda.TypeChecking.Monad
   , typeOfConst, getConstInfo
   , reportSLn, VerboseLevel )
 import Agda.TypeChecking.Free ( freeVars, VarCounts(..) )
-import Agda.TypeChecking.Level ( isLevelType )
 import qualified Agda.TypeChecking.Datatypes as A
   ( getConstructorData, getConHead )
 import qualified Agda.TypeChecking.Records as A
   ( isRecord, isRecordConstructor, isRecordType )
+import qualified Agda.TypeChecking.Level as A
+  ( isLevelType )
+import qualified Agda.TypeChecking.Substitute as A
+  ( TelV(..) )
+import qualified Agda.TypeChecking.Telescope as A
+  ( telViewPath, telViewUpTo )
 -- * pretty-printing
 import Agda.Syntax.Common.Pretty as P
   ( Pretty, prettyShow, renderStyle, Style(..), Mode(..) )
@@ -95,7 +101,7 @@ initEnv = Env
 
 data State = State
   { boxedConstructors :: S.Set (String, Int)
-  , recordConstructors :: M.Map [String] [String]
+  , recordConstructors :: M.Map String [String]
   } deriving (Show, Read)
 initState :: State
 initState = State
@@ -156,11 +162,11 @@ shouldBox = asks curConstructor >>= \case
 
 setRecordConstructor :: A.ConHead -> C ()
 setRecordConstructor A.ConHead{..} = modify $ \s -> s
-  { recordConstructors = M.insert (pp <$> A.qnameToList0 conName) (unqual <$> vArgs conFields) (recordConstructors s) }
+  { recordConstructors = M.insert (pp $ unqual conName) (unqual <$> vArgs conFields) (recordConstructors s) }
 
 isRecordConstructor :: A.QName -> C (Maybe [String])
 isRecordConstructor qn = do
-  M.lookup (pp <$> A.qnameToList0 qn) . recordConstructors <$> get
+  M.lookup (pp $ unqual qn) . recordConstructors <$> get
 
 -- | Converting between two types @a@ and @b@ under Agda's typechecking monad.
 --
@@ -226,8 +232,9 @@ instance A.Definition ~> R.Item where
           | isJust $ A.isSort $ A.unEl ty
           = return ([x], [])
           | otherwise
-          = do ty' <- go ty
-               return ([], [RArg (R.mkIdent x) ty'])
+          = do isLvl <- A.isLevelType ty
+               ty' <- go ty
+               return ([], [RArg (R.mkIdent x) ty' | not isLvl])
 
         goFn :: (A.ListTel, A.Type, A.TTerm) -> C FnAccum
         goFn (d:tel, resTy, body) = do
@@ -257,7 +264,7 @@ instance A.Definition ~> R.Item where
         cs <- zip dataCons <$> traverse typeOfConst dataCons
         A.TelV tel _ <- A.telViewUpTo dataPars defType
         report $ "tel: " <> pp tel
-        params   <- extractTyParams defType
+        params   <- extractTyParams tel
         variants <- A.addContext tel (gos cs)
         return $ REnum dx (RTyParam <$> params) (variants <>
             [RVariant "_Impossible"
@@ -273,14 +280,21 @@ instance A.Definition ~> R.Item where
               ]
             ])
         where
-        extractTyParams :: A.Type -> C [R.Ident]
-        extractTyParams ty = do
-          xs <- traverse goA =<< fmap unDom <$> vargTys ty
+        extractTyParams :: A.Telescope -> C [R.Ident]
+        extractTyParams tel = do
+          let xs = mapMaybe dropTyParam (A.telToList tel)
+          -- let xs = A.namedTelVars 0 tel
+          -- xs <- traverse goA =<< fmap unDom <$> vargTys ty
           report $ "xs: " <> pp xs
           return (R.mkIdent <$> xs)
           where
-            goA :: (String, A.Type) -> C String
-            goA (x, _) = return x
+            dropTyParam :: A.Dom (String, A.Type) -> Maybe String
+            dropTyParam dst
+              | (s, ty) <- unDom dst
+              , Just _ <- A.isSort (unEl ty)
+              = Just s
+              | otherwise
+              = Nothing
       A.Record{..} -> do
         -- NB: incorporate conHead/namedCon in the future for accuracy
         --     + to solve the issue with private (non-public) fields
@@ -489,6 +503,7 @@ instance A.TAlt ~> R.Arm where
         -- compiling match on a record/struct value
         Just fs -> do
           path <- parentQualR con
+          report $ " path: " <> ppR path
           (_, vargs, _) <- viewTy =<< A.typeOfConst con
           vargs' <- populateArgNames vargs
           report $ " vargs': " <> pp vargs'
@@ -750,14 +765,26 @@ panic s t = error $
   where limit = take 500
 
 transcribe :: String -> String
-transcribe "[]" = "Nil"
-transcribe "_∷_" = "Cons"
-transcribe "_++_" = "con"
-transcribe "_×_" = "Product"
-transcribe "proj₁" = "fst"
-transcribe "proj₂" = "snd"
--- transcribe "_,_" = "mkProduct"
-transcribe s = s
+transcribe ""     = error "[UNEXPECTED] empty identifier"
+transcribe "_"    = error "[UNEXPECTED] placeholder identifier `_` should not be compiled"
+transcribe (c:cs) = toXIDStart c <> concatMap toXIDContinue cs
+  where
+  -- TODO: malicious user can break compiler by reverse engineering an identifier
+  -- * SOLUTION: keep a state of all produced identifiers and generate fresh ones
+  toXIDStart, toXIDContinue :: Char -> String
+  toXIDStart c
+    | isXIDStart c || c == '_'
+    = [c]
+    | isXIDContinue c
+    = "_" <> [c]
+    | otherwise
+    = toXIDContinue c
+
+  toXIDContinue c
+    | isXIDContinue c
+    = [c]
+    | otherwise
+    = "Ֆ" <> show (ord c) <> "Ֆ"
 
 unqual :: A.QName -> String
 unqual = transcribe . pp . qnameName
@@ -777,5 +804,5 @@ qParent =
 
 parentQualR :: A.QName :~> R.Path
 parentQualR qn = do
-  Right con <- fmap (qParent . A.conName) <$> A.getConHead qn
+  con <- A.getConstructorData qn
   return $ RRef (unqualR con)

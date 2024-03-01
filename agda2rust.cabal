@@ -33,7 +33,8 @@ executable agda2rust
                        filepath >= 1.4.1.0 && < 1.5,
                        pretty-show,
                        containers==0.6.6,
-                       mtl==2.2.2
+                       mtl==2.2.2,
+                       unicode-data
 
 executable rustp
   hs-source-dirs:      src
