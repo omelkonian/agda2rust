@@ -13,7 +13,9 @@ import Control.DeepSeq ( NFData(..) )
 
 import System.FilePath ( takeDirectory, (</>) )
 import System.Directory ( createDirectoryIfMissing )
-import System.Console.GetOpt ( OptDescr(Option), ArgDescr(ReqArg) )
+import System.Environment ( getArgs )
+import System.Console.GetOpt
+  ( OptDescr(Option), ArgDescr(ReqArg, NoArg), ArgOrder(Permute), getOpt )
 
 import Data.Version ( showVersion )
 import Paths_agda2rust ( version )
@@ -60,9 +62,24 @@ writeState = writeFile stateFile . show
 
 --
 
-main = cleanupState >> runAgda [Backend backend]
+main :: IO ()
+main = do
+  isInt <- isInteractive
+  cleanupState
+  if isInt
+    then runAgda [Backend backend{isEnabled = const False}]
+    else runAgda [Backend backend]
 
-data Options = Options { optOutDir :: Maybe FilePath }
+isInteractive :: IO Bool
+isInteractive = do
+  let o = Option ['I'] ["interactive", "interaction", "interaction-json"] (NoArg ()) ""
+  (i, _, _) <- getOpt Permute [o] <$> getArgs
+  return $ not $ null i
+
+data Options = Options
+  { optOutDir  :: Maybe FilePath
+  , optEnabled :: Bool
+  }
 
 instance NFData Options where
   rnf _ = ()
@@ -70,8 +87,14 @@ instance NFData Options where
 outdirOpt :: FilePath -> Flag Options
 outdirOpt dir opts = return opts{ optOutDir = Just dir }
 
+disableOpt :: Flag Options
+disableOpt opts = return opts { optEnabled = False }
+
 defaultOptions :: Options
-defaultOptions = Options{ optOutDir = Nothing }
+defaultOptions = Options
+  { optOutDir  = Nothing
+  , optEnabled = True
+  }
 
 type ModuleEnv = ()
 type ModuleRes = ()
@@ -90,8 +113,12 @@ backend = Backend'
   , commandLineFlags      =
       [ Option ['o'] ["out-dir"] (ReqArg outdirOpt "DIR")
         "Write output files to DIR. (default: project root)"
+      , Option ['d'] ["disable"] (NoArg disableOpt)
+          "Disable backend and fall back to vanilla Agda behaviour, \
+          \without compilation (important for Emacs mode). \
+          \Implied when run in interactive mode (with --interactive, --interaction or --interaction-json)."
       ]
-  , isEnabled             = \ _ -> True
+  , isEnabled             = optEnabled
   , preCompile            = return
   , postCompile           = \ _ _ _ -> return ()
   , preModule             = moduleSetup
