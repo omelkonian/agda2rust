@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>AllTests</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Keyword">import</a> <a id="8" href="Identity.html" class="Module">Identity</a>
+<a id="17" class="Keyword">import</a> <a id="24" href="Numbers.html" class="Module">Numbers</a>
+<a id="32" class="Keyword">import</a> <a id="39" href="Singleton.html" class="Module">Singleton</a>
+<a id="49" class="Keyword">import</a> <a id="56" href="Maybe.html" class="Module">Maybe</a>
+<a id="62" class="Keyword">import</a> <a id="69" href="Either.html" class="Module">Either</a>
+<a id="76" class="Keyword">import</a> <a id="83" href="List0.html" class="Module">List0</a>
+<a id="89" class="Keyword">import</a> <a id="96" href="Product.html" class="Module">Product</a>
+<a id="104" class="Keyword">import</a> <a id="111" href="Exp.html" class="Module">Exp</a>
+
+<a id="116" class="Symbol">{-#</a> <a id="120" class="Keyword">FOREIGN</a> <a id="128" class="Pragma">AGDA2RUST</a>
+<a id="138" class="Pragma">mod</a> <a id="142" class="Pragma">Identity;</a>
+<a id="152" class="Pragma">mod</a> <a id="156" class="Pragma">Numbers;</a>
+<a id="165" class="Pragma">mod</a> <a id="169" class="Pragma">Singleton;</a> <a id="180" class="Pragma">use</a> <a id="184" class="Pragma">Singleton::The::{the};</a>
+<a id="207" class="Pragma">mod</a> <a id="211" class="Pragma">Maybe;</a> <a id="218" class="Pragma">use</a> <a id="222" class="Pragma">Maybe::Maybe::{Just};</a>
+<a id="244" class="Pragma">mod</a> <a id="248" class="Pragma">Either;</a> <a id="256" class="Pragma">use</a> <a id="260" class="Pragma">Either::Either::{Left};</a>
+<a id="284" class="Pragma">mod</a> <a id="288" class="Pragma">List0;</a> <a id="295" class="Pragma">use</a> <a id="299" class="Pragma">List0::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};</a>
+<a id="333" class="Pragma">mod</a> <a id="337" class="Pragma">Product;</a>
+<a id="346" class="Pragma">mod</a> <a id="350" class="Pragma">Exp;</a> <a id="355" class="Pragma">use</a> <a id="359" class="Pragma">Exp::Exp::{Plus,Int,Var};</a>
+
+<a id="386" class="Pragma">fn</a> <a id="389" class="Pragma">main()</a> <a id="396" class="Pragma">{</a>
+  <a id="400" class="Pragma">println!(&quot;{}</a> <a id="413" class="Pragma">|</a> <a id="415" class="Pragma">{}</a> <a id="418" class="Pragma">|</a> <a id="420" class="Pragma">{}</a> <a id="423" class="Pragma">|</a> <a id="425" class="Pragma">{:?}</a> <a id="430" class="Pragma">|</a> <a id="432" class="Pragma">{}</a> <a id="435" class="Pragma">|</a> <a id="437" class="Pragma">{}</a> <a id="440" class="Pragma">|</a> <a id="442" class="Pragma">{:?}</a> <a id="447" class="Pragma">|</a> <a id="449" class="Pragma">{}</a> <a id="452" class="Pragma">|</a> <a id="454" class="Pragma">{}&quot;,</a>
+    <a id="463" class="Pragma">Identity::id(&quot;Hi!&quot;),</a>
+    <a id="488" class="Pragma">Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(&quot;Hi!&quot;),</a>
+    <a id="529" class="Pragma">Numbers::add(40,2),</a>
+    <a id="553" class="Pragma">the(42),</a>
+    <a id="566" class="Pragma">Maybe::fromMaybe(41,</a> <a id="587" class="Pragma">Just(42)),</a>
+    <a id="602" class="Pragma">Either::fromEither::&lt;i32,</a> <a id="628" class="Pragma">i32&gt;(41,</a> <a id="637" class="Pragma">Left(42)),</a>
+    <a id="652" class="Pragma">List0::map(|x|</a> <a id="667" class="Pragma">x</a> <a id="669" class="Pragma">+</a> <a id="671" class="Pragma">1,</a> <a id="674" class="Pragma">List0::_Ֆ43ՖՖ43Ֆ_(</a>
+      <a id="699" class="Pragma">_Ֆ8759Ֆ_(3,</a> <a id="711" class="Pragma">Box::new(Ֆ91ՖՖ93Ֆ())),</a>
+      <a id="740" class="Pragma">_Ֆ8759Ֆ_(1,</a> <a id="752" class="Pragma">Box::new(Ֆ91ՖՖ93Ֆ()))</a>
+    <a id="778" class="Pragma">)),</a>
+    <a id="786" class="Pragma">Product::mapSnd(</a>
+      <a id="809" class="Pragma">|x|</a> <a id="813" class="Pragma">x</a> <a id="815" class="Pragma">+</a> <a id="817" class="Pragma">1</a>
+      <a id="825" class="Pragma">,</a> <a id="827" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="844" class="Pragma">{projՖ8321Ֆ:</a> <a id="857" class="Pragma">0,</a> <a id="860" class="Pragma">projՖ8322Ֆ:</a> <a id="872" class="Pragma">41}</a>
+    <a id="880" class="Pragma">).projՖ8322Ֆ,</a>
+    <a id="898" class="Pragma">Exp::eval(|x|</a> <a id="912" class="Pragma">x,</a> <a id="915" class="Pragma">Plus(Box::new(Int(5)),Box::new(Var(37))))</a>
+  <a id="959" class="Pragma">);</a>
+<a id="962" class="Pragma">}</a>
+<a id="964" class="Symbol">#-}</a>
+</pre><div class="split right"><embed src="../build/AllTests.html"/></div></body></html>

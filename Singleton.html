@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Singleton</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Comment">-- open import Agda.Primitive using (Level)</a>
+<a id="45" class="Keyword">open</a> <a id="50" class="Keyword">import</a> <a id="57" href="Agda.Builtin.Nat.html" class="Module">Agda.Builtin.Nat</a> <a id="74" class="Keyword">using</a> <a id="80" class="Symbol">()</a>
+
+<a id="84" class="Symbol">{-#</a> <a id="88" class="Keyword">FOREIGN</a> <a id="96" class="Pragma">AGDA2RUST</a> <a id="106" class="Pragma">#[derive(Debug)]</a> <a id="123" class="Symbol">#-}</a>
+<a id="127" class="Keyword">data</a> <a id="The"></a><a id="132" href="Singleton.html#132" class="Datatype">The</a> <a id="136" class="Symbol">{</a><a id="137" href="Singleton.html#137" class="Bound">ℓ</a><a id="138" class="Symbol">}{</a><a id="140" href="Singleton.html#140" class="Bound">A</a> <a id="142" class="Symbol">:</a> <a id="144" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="148" href="Singleton.html#137" class="Bound">ℓ</a><a id="149" class="Symbol">}</a> <a id="151" class="Symbol">:</a> <a id="153" href="Singleton.html#140" class="Bound">A</a> <a id="155" class="Symbol">→</a> <a id="157" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="161" href="Singleton.html#137" class="Bound">ℓ</a> <a id="163" class="Keyword">where</a>
+  <a id="The.the"></a><a id="171" href="Singleton.html#171" class="InductiveConstructor">the</a> <a id="175" class="Symbol">:</a> <a id="177" class="Symbol">(</a><a id="178" href="Singleton.html#178" class="Bound">a</a> <a id="180" class="Symbol">:</a> <a id="182" href="Singleton.html#140" class="Bound">A</a><a id="183" class="Symbol">)</a> <a id="185" class="Symbol">→</a> <a id="187" href="Singleton.html#132" class="Datatype">The</a> <a id="191" href="Singleton.html#178" class="Bound">a</a>
+
+<a id="194" href="Singleton.html#194" class="Function">_</a> <a id="196" class="Symbol">:</a> <a id="198" href="Singleton.html#132" class="Datatype">The</a> <a id="202" class="Number">42</a>
+<a id="205" class="Symbol">_</a> <a id="207" class="Symbol">=</a> <a id="209" href="Singleton.html#171" class="InductiveConstructor">the</a> <a id="213" class="Number">42</a>
+
+<a id="217" class="Comment">-- private variable ℓ : Level; A : Set ℓ; a : A</a>
+
+<a id="266" class="Comment">-- unThe : The a → _</a>
+<a id="287" class="Comment">-- unThe (the a) = a</a>
+</pre><div class="split right"><embed src="../build/Singleton.html"/></div></body></html>
