@@ -1,20 +1,45 @@
+MAIN=AllTests
+.PHONY : default rust html compare test golden clean cleanHtml
 
-.PHONY : default clean golden alltests ompare
+default : build/$(MAIN).rs compare test
 
-default : alltests compare
+rust : build/$(MAIN).rs
+
+build/$(MAIN).rs : *.agda
+	@echo == Compiling tests ==
+	./agda2rust $(MAIN).agda -o build
+
+html : html/Agda.css html/index.html
+
+html/Agda.css : Agda.css
+	mkdir -p html/
+	cp -f $< $@
+
+html/index.html : html/$(MAIN).html
+	mkdir -p html/
+	cp -f $< $@
+
+html/$(MAIN).html : *.agda build/$(MAIN).rs html/Agda.css
+	@echo == Generating HTML ==
+	./agda2rust -d --html --css=Agda.css $(MAIN).agda
+	./renderTranslations.sh
+
+compare :
+	@echo == Comparing output ==
+	@diff -r build golden
+
+test :
+	@echo == Running rustc ==
+	@(cd build; rustc $(MAIN).rs && ./$(MAIN) && rm $(MAIN))
+
+golden :
+	@cp -r build/*.rs golden
 
 clean :
 	@rm -rf build/*
 
-alltests :
-	@echo == Compiling tests ==
-	./agda2rust AllTests.agda -o build
-	@echo == Running rustc ==
-	@(cd build; rustc AllTests.rs && ./AllTests && rm AllTests)
+cleanHtml :
+	 @rm -rf html/*
+	 @rm -rf golden/**.html golden/**.md
 
-compare :
-	@echo == Comparing output ==
-	@diff -r build golden $(patsubst %,-x%.rs,Exp List Product Lambdas)
 
-golden :
-	@cp -r build/* golden
