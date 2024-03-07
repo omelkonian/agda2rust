@@ -37,11 +37,15 @@ for f in $BUILD_DIR/**/**.*; do
   targetHtml=$BUILD_DIR/"$fn".html
   echo " Generating $targetHtml"
   pandoc --quiet -i "$mdFn" -o "$targetHtml" -s --highlight-style=tango
+  echo " Generating $targetUnicodeHtml"
+  targetUnicodeHtml=$BUILD_DIR/"$fn".unicode.html
+  ./reUnicode "$targetHtml" "$targetUnicodeHtml"
   mkdir -p "$AGDA_HTML_DIR/$BUILD_DIR"
+  echo " Copy build/ into html/"
   cp $BUILD_DIR/*.html "$AGDA_HTML_DIR/$BUILD_DIR"
 
   echo " Modifying $sourceHtml"
   sed -i "s%class=\"Agda\"%class=\"split left Agda\"%g" $sourceHtml
-  sed -i "s%</body>%<div class=\"split right\"><embed src=\"$targetHtml\"/></div></body>%g" $sourceHtml
+  sed -i "s%</body>%<div class=\"split right\"><embed src=\"$targetUnicodeHtml\"/></div></body>%g" $sourceHtml
 done
 echo "...done!"
