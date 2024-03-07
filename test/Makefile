@@ -30,7 +30,7 @@ compare :
 
 test :
 	@echo == Running rustc ==
-	@(cd build; rustc $(MAIN).rs && ./$(MAIN) && rm $(MAIN))
+	@(cd build; rustc -A uncommon_codepoints $(MAIN).rs && ./$(MAIN) && rm $(MAIN))
 
 golden :
 	@cp -r build/*.rs golden

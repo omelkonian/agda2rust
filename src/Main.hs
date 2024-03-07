@@ -166,7 +166,7 @@ ignoredRustWarnings =
   , "non_snake_case"
   , "unused_variables"
   , "non_camel_case_types"
-  -- , "uncommon_codepoints"
+  -- , "uncommon_codepoints" -- only crate-level attribute
   ]
 
 writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName

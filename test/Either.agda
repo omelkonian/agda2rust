@@ -8,9 +8,8 @@ fromEither : ∀ {A : Set} → A → ∀ {B : Set} → Either A B → A
 fromEither _    (Left  a) = a
 fromEither defA (Right _) = defA
 
-data EitherL (A B : Set) : Set where
-  Left : A → EitherL A B
+data OnlyLeft (A B : Set) : Set where
+  Left : A → OnlyLeft A B
 
--- fromEither : ∀ {A : Set} → A → ∀ {B : Set} → B → Either A B → A × B
--- fromEither _ defB (Left  a) = a , defB
--- fromEither defA _ (Right b) = defA , b
+fromOnlyLeft : ∀ {A B : Set} → OnlyLeft A B → A
+fromOnlyLeft (Left  a) = a

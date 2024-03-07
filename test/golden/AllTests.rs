@@ -1,29 +1,43 @@
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types)]
 mod Identity;
 mod Numbers;
-mod Singleton; use Singleton::The::{the};
-mod Maybe; use Maybe::Maybe::{Just};
-mod Either; use Either::Either::{Left};
-mod List0; use List0::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};
 mod Product;
+mod Either; use Either::Either::{Left};
+mod Maybe; use Maybe::Maybe::{Just};
 mod Exp; use Exp::Exp::{Plus,Int,Var};
+mod Nat0; use Nat0::Nat::{zero,suc};
+mod List0; use List0::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};
+mod Singleton; use Singleton::The::{the};
+
+fn ᐁ<T>(x : T) -> Box<T> {
+  return Box::new(x);
+}
 
 fn main() {
-  println!("{} | {} | {} | {:?} | {} | {} | {:?} | {} | {}",
-    Identity::id("Hi!"),
-    Identity::idՖ10216Ֆ_Ֆ10217Ֆ_("Hi!"),
+  println!("{} | {} | {} | {} | {} | {} | {} | {} | {:?} | {:?} | {:?} | {:?}",
+    // *** Identity ***
+    Identity::id(42),
+    Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(42),
+    // Base types
     Numbers::add(40,2),
-    the(42),
-    Maybe::fromMaybe(41, Just(42)),
-    Either::fromEither::<i32, i32>(41, Left(42)),
-    List0::map(|x| x + 1, List0::_Ֆ43ՖՖ43Ֆ_(
-      _Ֆ8759Ֆ_(3, Box::new(Ֆ91ՖՖ93Ֆ())),
-      _Ֆ8759Ֆ_(1, Box::new(Ֆ91ՖՖ93Ֆ()))
-    )),
+    // *** Records ***
     Product::mapSnd(
       |x| x + 1
       , Product::_Ֆ215Ֆ_ {projՖ8321Ֆ: 0, projՖ8322Ֆ: 41}
     ).projՖ8322Ֆ,
-    Exp::eval(|x| x, Plus(Box::new(Int(5)),Box::new(Var(37))))
+    // *** ADTs ***
+    Either::fromEither::<i32, i32>(41, Left(42)),
+    Either::fromOnlyLeft::<i32, i32>(Either::OnlyLeft::Left(42)),
+    Maybe::fromMaybe(41, Just(42)),
+    // *** Resursive ADTs ***
+    Exp::eval(|x| x, Plus(ᐁ(Int(5)),ᐁ(Var(37)))),
+    suc(ᐁ(suc(ᐁ(suc(ᐁ(suc(ᐁ(zero())))))))),
+    Nat0::_Ֆ43Ֆ_(suc(ᐁ(zero())), suc(ᐁ(zero()))),
+    List0::map(|x| x + 1, List0::_Ֆ43ՖՖ43Ֆ_(
+      _Ֆ8759Ֆ_(3, ᐁ(Ֆ91ՖՖ93Ֆ())),
+      _Ֆ8759Ֆ_(1, ᐁ(Ֆ91ՖՖ93Ֆ()))
+    )),
+    // *** Value-dependent types ***
+    the(42)
   );
 }

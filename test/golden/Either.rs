@@ -13,8 +13,14 @@ pub fn fromEither<A, B>(x0: A, x1: Either<A, B>) -> A {
     _ => panic!("IMPOSSIBLE"),
   }
 }
-pub enum EitherL<A, B> {
+pub enum OnlyLeft<A, B> {
   Left(A),
   _Impossible(std::marker::PhantomData<(A, B)>),
 }
 
+pub fn fromOnlyLeft<A, B>(x0: OnlyLeft<A, B>) -> A {
+  match x0 {
+    OnlyLeft::Left(x1) => x1,
+    _ => panic!("IMPOSSIBLE"),
+  }
+}

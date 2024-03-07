@@ -8,7 +8,7 @@
 
 - [x] Switch to treeless syntax
 - [ ] identifiers
-  + [ ] transcribe to valid Rust identifiers (e.g. remove Unicode somehow)
+  + [x] transcribe to valid Rust identifiers (e.g. remove Unicode somehow)
   + [ ] ensure qualification/scopes are OK
 - [ ] primitives
   + [x] Nat->i32

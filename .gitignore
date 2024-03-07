@@ -13,4 +13,5 @@ test/Agda
 test/build
 test/agda2rust
 test/rustp
+test/reUnicode
 test/html
