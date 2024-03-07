@@ -26,30 +26,31 @@
 
 <a id="487" class="Pragma">fn</a> <a id="490" class="Pragma">main()</a> <a id="497" class="Pragma">{</a>
   <a id="501" class="Pragma">println!(&quot;{}</a> <a id="514" class="Pragma">|</a> <a id="516" class="Pragma">{}</a> <a id="519" class="Pragma">|</a> <a id="521" class="Pragma">{}</a> <a id="524" class="Pragma">|</a> <a id="526" class="Pragma">{}</a> <a id="529" class="Pragma">|</a> <a id="531" class="Pragma">{}</a> <a id="534" class="Pragma">|</a> <a id="536" class="Pragma">{}</a> <a id="539" class="Pragma">|</a> <a id="541" class="Pragma">{}</a> <a id="544" class="Pragma">|</a> <a id="546" class="Pragma">{}</a> <a id="549" class="Pragma">|</a> <a id="551" class="Pragma">{:?}</a> <a id="556" class="Pragma">|</a> <a id="558" class="Pragma">{:?}</a> <a id="563" class="Pragma">|</a> <a id="565" class="Pragma">{:?}</a> <a id="570" class="Pragma">|</a> <a id="572" class="Pragma">{:?}&quot;,</a>
-    <a id="583" class="Pragma">//</a> <a id="586" class="Pragma">Identity</a>
-    <a id="599" class="Pragma">Identity::id(42),</a>
-    <a id="621" class="Pragma">Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(42),</a>
-    <a id="659" class="Pragma">//</a> <a id="662" class="Pragma">Base</a> <a id="667" class="Pragma">types</a>
-    <a id="677" class="Pragma">Numbers::add(40,2),</a>
-    <a id="701" class="Pragma">//</a> <a id="704" class="Pragma">Records</a>
-    <a id="716" class="Pragma">Product::mapSnd(</a>
-      <a id="739" class="Pragma">|x|</a> <a id="743" class="Pragma">x</a> <a id="745" class="Pragma">+</a> <a id="747" class="Pragma">1</a>
-      <a id="755" class="Pragma">,</a> <a id="757" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="774" class="Pragma">{projՖ8321Ֆ:</a> <a id="787" class="Pragma">0,</a> <a id="790" class="Pragma">projՖ8322Ֆ:</a> <a id="802" class="Pragma">41}</a>
-    <a id="810" class="Pragma">).projՖ8322Ֆ,</a>
-    <a id="828" class="Pragma">//</a> <a id="831" class="Pragma">ADTs</a>
-    <a id="840" class="Pragma">Either::fromEither::&lt;i32,</a> <a id="866" class="Pragma">i32&gt;(41,</a> <a id="875" class="Pragma">Left(42)),</a>
-    <a id="890" class="Pragma">Either::fromOnlyLeft::&lt;i32,</a> <a id="918" class="Pragma">i32&gt;(Either::OnlyLeft::Left(42)),</a>
-    <a id="956" class="Pragma">Maybe::fromMaybe(41,</a> <a id="977" class="Pragma">Just(42)),</a>
-    <a id="992" class="Pragma">Exp::eval(|x|</a> <a id="1006" class="Pragma">x,</a> <a id="1009" class="Pragma">Plus(ᐁ(Int(5)),ᐁ(Var(37)))),</a>
-    <a id="1042" class="Pragma">suc(ᐁ(suc(ᐁ(suc(ᐁ(suc(ᐁ(zero())))))))),</a>
-    <a id="1086" class="Pragma">Nat0::_Ֆ43Ֆ_(suc(ᐁ(zero())),</a> <a id="1115" class="Pragma">suc(ᐁ(zero()))),</a>
-    <a id="1136" class="Pragma">List0::map(|x|</a> <a id="1151" class="Pragma">x</a> <a id="1153" class="Pragma">+</a> <a id="1155" class="Pragma">1,</a> <a id="1158" class="Pragma">List0::_Ֆ43ՖՖ43Ֆ_(</a>
-      <a id="1183" class="Pragma">_Ֆ8759Ֆ_(3,</a> <a id="1195" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ())),</a>
-      <a id="1217" class="Pragma">_Ֆ8759Ֆ_(1,</a> <a id="1229" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ()))</a>
-    <a id="1248" class="Pragma">)),</a>
-    <a id="1256" class="Pragma">//</a> <a id="1259" class="Pragma">Value-dependent</a> <a id="1275" class="Pragma">types</a>
-    <a id="1285" class="Pragma">the(42)</a>
-  <a id="1295" class="Pragma">);</a>
-<a id="1298" class="Pragma">}</a>
-<a id="1300" class="Symbol">#-}</a>
+    <a id="583" class="Pragma">//</a> <a id="586" class="Pragma">***</a> <a id="590" class="Pragma">Identity</a> <a id="599" class="Pragma">***</a>
+    <a id="607" class="Pragma">Identity::id(42),</a>
+    <a id="629" class="Pragma">Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(42),</a>
+    <a id="667" class="Pragma">//</a> <a id="670" class="Pragma">Base</a> <a id="675" class="Pragma">types</a>
+    <a id="685" class="Pragma">Numbers::add(40,2),</a>
+    <a id="709" class="Pragma">//</a> <a id="712" class="Pragma">***</a> <a id="716" class="Pragma">Records</a> <a id="724" class="Pragma">***</a>
+    <a id="732" class="Pragma">Product::mapSnd(</a>
+      <a id="755" class="Pragma">|x|</a> <a id="759" class="Pragma">x</a> <a id="761" class="Pragma">+</a> <a id="763" class="Pragma">1</a>
+      <a id="771" class="Pragma">,</a> <a id="773" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="790" class="Pragma">{projՖ8321Ֆ:</a> <a id="803" class="Pragma">0,</a> <a id="806" class="Pragma">projՖ8322Ֆ:</a> <a id="818" class="Pragma">41}</a>
+    <a id="826" class="Pragma">).projՖ8322Ֆ,</a>
+    <a id="844" class="Pragma">//</a> <a id="847" class="Pragma">***</a> <a id="851" class="Pragma">ADTs</a> <a id="856" class="Pragma">***</a>
+    <a id="864" class="Pragma">Either::fromEither::&lt;i32,</a> <a id="890" class="Pragma">i32&gt;(41,</a> <a id="899" class="Pragma">Left(42)),</a>
+    <a id="914" class="Pragma">Either::fromOnlyLeft::&lt;i32,</a> <a id="942" class="Pragma">i32&gt;(Either::OnlyLeft::Left(42)),</a>
+    <a id="980" class="Pragma">Maybe::fromMaybe(41,</a> <a id="1001" class="Pragma">Just(42)),</a>
+    <a id="1016" class="Pragma">//</a> <a id="1019" class="Pragma">***</a> <a id="1023" class="Pragma">Resursive</a> <a id="1033" class="Pragma">ADTs</a> <a id="1038" class="Pragma">***</a>
+    <a id="1046" class="Pragma">Exp::eval(|x|</a> <a id="1060" class="Pragma">x,</a> <a id="1063" class="Pragma">Plus(ᐁ(Int(5)),ᐁ(Var(37)))),</a>
+    <a id="1096" class="Pragma">suc(ᐁ(suc(ᐁ(suc(ᐁ(suc(ᐁ(zero())))))))),</a>
+    <a id="1140" class="Pragma">Nat0::_Ֆ43Ֆ_(suc(ᐁ(zero())),</a> <a id="1169" class="Pragma">suc(ᐁ(zero()))),</a>
+    <a id="1190" class="Pragma">List0::map(|x|</a> <a id="1205" class="Pragma">x</a> <a id="1207" class="Pragma">+</a> <a id="1209" class="Pragma">1,</a> <a id="1212" class="Pragma">List0::_Ֆ43ՖՖ43Ֆ_(</a>
+      <a id="1237" class="Pragma">_Ֆ8759Ֆ_(3,</a> <a id="1249" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ())),</a>
+      <a id="1271" class="Pragma">_Ֆ8759Ֆ_(1,</a> <a id="1283" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ()))</a>
+    <a id="1302" class="Pragma">)),</a>
+    <a id="1310" class="Pragma">//</a> <a id="1313" class="Pragma">***</a> <a id="1317" class="Pragma">Value-dependent</a> <a id="1333" class="Pragma">types</a> <a id="1339" class="Pragma">***</a>
+    <a id="1347" class="Pragma">the(42)</a>
+  <a id="1357" class="Pragma">);</a>
+<a id="1360" class="Pragma">}</a>
+<a id="1362" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/AllTests.unicode.html"/></div></body></html>
