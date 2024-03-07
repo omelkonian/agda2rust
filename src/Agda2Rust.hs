@@ -15,6 +15,8 @@ import Control.Arrow ( first )
 import Control.Monad.Reader ( ReaderT(runReaderT), asks, local )
 import Control.Monad.State ( StateT, runStateT, get, gets, put, modify )
 
+import Data.Generics ( Data, listify )
+
 import Data.List ( elemIndex, partition, intercalate )
 import Data.List.NonEmpty ( NonEmpty((:|)) )
 import qualified Data.List.NonEmpty as NE ( fromList )
@@ -24,7 +26,11 @@ import Data.Word ( Word64, Word8 )
 import qualified Data.Set as S ( Set, empty, insert, member )
 import qualified Data.Map as M ( Map, empty, insert, lookup )
 import qualified Data.Text as T ( pack, unpack )
+
+-- * Bytes
 import Data.Serializer ( toBytes )
+
+-- * Unicode
 import Unicode.Char.Identifiers ( isXIDStart, isXIDContinue )
 import Data.Char ( ord )
 
@@ -68,6 +74,9 @@ import qualified Agda.TypeChecking.Substitute as A
   ( TelV(..) )
 import qualified Agda.TypeChecking.Telescope as A
   ( telViewPath, telViewUpTo )
+-- * reduction
+import qualified Agda.TypeChecking.Reduce as A
+  ( reduce )
 -- * pretty-printing
 import Agda.Syntax.Common.Pretty as P
   ( Pretty, prettyShow, renderStyle, Style(..), Mode(..) )
@@ -76,7 +85,7 @@ import Agda.TypeChecking.Pretty
 import qualified Agda.TypeChecking.Pretty as P
   hiding (text)
 -- * utils
-import Agda.Utils.Monad ( ifM, mapMaybeM )
+import Agda.Utils.Monad ( ifM, mapMaybeM, anyM )
 
 -- * Rust
 import qualified Language.Rust.Syntax as R
@@ -99,14 +108,19 @@ initEnv = Env
   , curArgument    = 0
   }
 
+type QNameS   = String
+type ConHeadS = String
+
 data State = State
-  { boxedConstructors :: S.Set (String, Int)
-  , recordConstructors :: M.Map String [String]
+  { boxedConstructors  :: S.Set (QNameS, Int)
+  , recordConstructors :: M.Map ConHeadS [String]
+  , unusedTyParams     :: M.Map QNameS [String]
   } deriving (Show, Read)
 initState :: State
 initState = State
-  { boxedConstructors = S.empty
+  { boxedConstructors  = S.empty
   , recordConstructors = M.empty
+  , unusedTyParams     = M.empty
   }
 
 type C = StateT State (ReaderT Env TCM)
@@ -167,6 +181,15 @@ setRecordConstructor A.ConHead{..} = modify $ \s -> s
 isRecordConstructor :: A.QName -> C (Maybe [String])
 isRecordConstructor qn = do
   M.lookup (pp $ unqual qn) . recordConstructors <$> get
+
+setUnusedTyParams :: A.QName -> [String] -> C ()
+setUnusedTyParams qn ps = modify $ \s -> s
+  { unusedTyParams = M.insert (pp qn) ps (unusedTyParams s) }
+
+hasUnusedTyParams :: A.QName -> C Bool
+hasUnusedTyParams qn = do
+  Just ps <- M.lookup (pp qn) . unusedTyParams <$> get
+  return $ not (null ps)
 
 -- | Converting between two types @a@ and @b@ under Agda's typechecking monad.
 --
@@ -266,19 +289,12 @@ instance A.Definition ~> R.Item where
         report $ "tel: " <> pp tel
         params   <- extractTyParams tel
         variants <- A.addContext tel (gos cs)
+        let unusedParams = filter (unusedIn variants) params
+        setUnusedTyParams defName (ppR <$> unusedParams)
         return $ REnum dx (RTyParam <$> params) (variants <>
-            [RVariant "_Impossible"
-              [ RField
-              $ RPathTy
-              $ R.Path False
-                [ RPathSegment "std"
-                , RPathSegment "marker"
-                , R.PathSegment "PhantomData" (Just $
-                    R.AngleBracketed [] [R.TupTy (RTyRef <$> params) ()] [] ()
-                  ) ()
-                ] ()
-              ]
-            ])
+          [ RVariant "_Impossible" [ RField $ phantomField unusedParams ]
+          | not (null unusedParams)
+          ])
         where
         extractTyParams :: A.Telescope -> C [R.Ident]
         extractTyParams tel = do
@@ -295,6 +311,7 @@ instance A.Definition ~> R.Item where
               = Just s
               | otherwise
               = Nothing
+
       A.Record{..} -> do
         -- NB: incorporate conHead/namedCon in the future for accuracy
         --     + to solve the issue with private (non-public) fields
@@ -309,7 +326,13 @@ instance A.Definition ~> R.Item where
         report $ " params: " <> show params
         fields <- A.addContext tel (goFs $ unDom <$> fs)
         report $ " fields: " <> show fields
-        return $ RStruct dx (RTyParam <$> params) fields
+        let unusedParams = filter (unusedIn fields) params
+        setUnusedTyParams defName (ppR <$> unusedParams)
+        return $ RStruct dx (RTyParam <$> params) (fields <>
+          [ RNamedField "_phantom" (phantomField unusedParams)
+          | not (null unusedParams)
+          ])
+
 
         where
         extractTyParams :: A.ListTel -> [R.Ident]
@@ -333,6 +356,15 @@ instance A.Definition ~> R.Item where
     --       in  Constructor (pp conData) (toInteger ix)
     --     A.Record{..} -> Constructor (pp conData) 0
       d -> panic "unsupported definition" d
+     where
+      phantomField :: [R.Ident] -> R.Ty ()
+      phantomField ps
+        = RPathTy
+        $ RPath
+          [ RPathSeg "std"
+          , RPathSeg "marker"
+          , RPathSeg' "PhantomData" (RAngles [R.TupTy (RTyRef <$> ps) ()])
+          ]
 
 -- | Compiling types.
 instance A.Type ~> R.Ty where
@@ -412,15 +444,23 @@ instance A.TTerm ~> R.Expr where
     t@(A.TCase scrutinee _ defCase alts) -> do
       report $ "* compiling case expression:\n" <> pp t
       (x, ty) <- lookupCtx scrutinee
-      isRec <- isJust <$> A.isRecordType ty
       report $ " scrutinee: " <> x
       report $ " scrutineeTy: " <> pp ty
       arms <- traverse go alts
       -- report $ " arms: " <> ppShow arms
-      catchAll <- go defCase
-      -- report $ " catchAll: " <> ppShow catchAll
-      return $ RMatch (RExprRef $ R.mkIdent x)
-                      (arms <> [RArm RWildP catchAll | not isRec])
+      defArm <- case defCase of
+        A.TError _ -> do
+          let catchAll = RMacroCall (RRef "panic") (RStrTok "IMPOSSIBLE")
+          shouldCatchAll <- A.reduce (unEl ty) >>= \case
+            A.Def qn _ -> (theDef <$> getConstInfo qn) >>= \case
+              A.Datatype{} -> hasUnusedTyParams qn
+              _ -> return False
+          return [RArm RWildP catchAll | shouldCatchAll]
+        t -> do
+          catchAll <- go t
+          -- report $ " catchAll: " <> ppShow catchAll
+          return [RArm RWildP catchAll]
+      return $ RMatch (RExprRef $ R.mkIdent x) (arms <> defArm)
 
     -- A.TUnit ->
     -- A.TSort ->
@@ -428,8 +468,9 @@ instance A.TTerm ~> R.Expr where
 
     A.TCoerce t -> go t
     A.TError err -> do
-      msg <- go $ A.LitString (T.pack $ ppShow err)
-      return $ RMacroCall (RRef "panic") (RStrTok "IMPOSSIBLE")
+      -- msg <- go $ A.LitString (T.pack $ ppShow err)
+      let msg = ppShow err
+      return $ RMacroCall (RRef "panic") (RStrTok msg)
     t -> panic "unsupported treeless term" t)
     where
     boxTerm :: R.Expr () :~> R.Expr
@@ -488,9 +529,7 @@ instance A.TTerm ~> R.Expr where
       -- A.PSeq ->
       -- A.PITo64 ->
 
--- | Compiling *the* match clause in a case expression (records).
-
--- | Compiling match clauses in a case expression (datatypes).
+-- | Compiling match clauses into case expressions.
 instance A.TAlt ~> R.Arm where
   go = \case
     (A.TACon con n body) -> do
@@ -508,13 +547,14 @@ instance A.TAlt ~> R.Arm where
           vargs' <- populateArgNames vargs
           report $ " vargs': " <> pp vargs'
           let xs = transcribe . fst . unDom <$> take n vargs'
-          let pats = RId . R.mkIdent <$> xs
+          Just (qn, _) <- A.isRecordConstructor con
+          hasPhantomField <- hasUnusedTyParams qn
+          let pats = RId . R.mkIdent <$> xs <> ["_phantom" | hasPhantomField]
           report $ " pat: " <> pp con <> "(" <> show n <> ")"
                 <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
           body'  <- A.addContext vargs' (go body)
           report $ " body: " <> pp body <> " ~> " <> ppR body'
-          -- return $ RArm (RStructP path $ zipWith RFieldP (R.mkIdent <$> fs) pats) body'
-          return $ RArm (RStructP path $ RNoFieldP <$> pats) body'
+          return $ RArm (RStructP path (RNoFieldP <$> pats)) body'
 
         -- compiling match on a data/enum value
         Nothing -> do
@@ -672,17 +712,21 @@ pattern RMatch scr arms = R.Match [] scr arms ()
 
 pattern RPathExpr p = R.PathExpr [] Nothing p ()
 pattern RPathTy   p = R.PathTy      Nothing p ()
-pattern RPathSegment x = R.PathSegment x Nothing ()
 
-pattern RRef     x = R.Path False [RPathSegment x] ()
+pattern RPathSeg  x    = R.PathSegment x Nothing ()
+pattern RPathSeg' x ts = R.PathSegment x (Just ts) ()
+
+pattern RPath ps = R.Path False ps ()
+pattern RRef     x = RPath [RPathSeg x]
 pattern RExprRef x = RPathExpr (RRef x)
 pattern RTyRef   x = RPathTy   (RRef x)
 
-pattern RConRef     x y = R.Path False [RPathSegment x, RPathSegment y] ()
+pattern RConRef     x y = RPath [RPathSeg x, RPathSeg y]
 pattern RExprConRef x y = RPathExpr (RConRef x y)
 pattern RTyConRef   x y = RPathTy   (RConRef x y)
 
-pattern RRef'   x ts = R.Path False [R.PathSegment x (Just (R.AngleBracketed [] ts [] ())) ()] ()
+pattern RAngles   ts = R.AngleBracketed [] ts [] ()
+pattern RRef'   x ts = RPath [RPathSeg' x (RAngles ts)]
 pattern RTyRef' x ts = RPathTy (RRef' x ts)
 
 pattern RBin op x y = R.Binary [] op x y ()
@@ -734,6 +778,13 @@ rBox e = RCallCon (RExprConRef (R.mkIdent "Box") (R.mkIdent "new")) [ e ]
 
 ppR :: (R.Pretty a, R.Resolve a) => a -> String
 ppR = show . R.pretty'
+
+idUses :: Data a => R.Ident -> a -> [R.Ident]
+idUses n = listify (== n)
+
+usedIn, unusedIn :: Data a => a -> R.Ident -> Bool
+usedIn x n = not $ null $ idUses n x
+unusedIn x = not . usedIn x
 
 -- * Utilities
 

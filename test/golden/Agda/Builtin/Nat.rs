@@ -2,7 +2,6 @@
 pub enum Nat {
   zero(),
   suc(i32),
-  _Impossible(std::marker::PhantomData<()>),
 }
 
 

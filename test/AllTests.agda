@@ -12,7 +12,7 @@ import Singleton
 mod Identity;
 mod Numbers;
 mod Product;
-mod Either; use Either::Either::{Left};
+mod Either;
 mod Maybe; use Maybe::Maybe::{Just};
 mod Exp; use Exp::Exp::{Plus,Int,Var};
 mod Nat0; use Nat0::Nat::{zero,suc};
@@ -23,8 +23,13 @@ fn ᐁ<T>(x : T) -> Box<T> {
   return Box::new(x);
 }
 
+use std::marker::{PhantomData};
+fn __<T>() -> PhantomData<T> {
+  return PhantomData;
+}
+
 fn main() {
-  println!("{} | {} | {} | {} | {} | {} | {} | {} | {:?} | {:?} | {:?} | {:?}",
+  println!("{} | {} | {} | {} | {} | {} | {} | {} | {} | {:?} | {:?} | {:?} | {:?}",
     // *** Identity ***
     Identity::id(42),
     Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(42),
@@ -36,8 +41,9 @@ fn main() {
       , Product::_Ֆ215Ֆ_ {projՖ8321Ֆ: 0, projՖ8322Ֆ: 41}
     ).projՖ8322Ֆ,
     // *** ADTs ***
-    Either::fromEither::<i32, i32>(41, Left(42)),
+    Either::fromEither::<i32, i32>(41, Either::Either::Left(42)),
     Either::fromOnlyLeft::<i32, i32>(Either::OnlyLeft::Left(42)),
+    Either::fromOnlyLeftR::<i32, i32>(Either::OnlyLeftR {left: 42, _phantom: __()}),
     Maybe::fromMaybe(41, Just(42)),
     // *** Resursive ADTs ***
     Exp::eval(|x| x, Plus(ᐁ(Int(5)),ᐁ(Var(37)))),

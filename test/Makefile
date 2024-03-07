@@ -34,6 +34,8 @@ test :
 
 golden :
 	@cp -r build/*.rs golden
+	@cp -r build/Agda/*.rs golden/Agda
+	@cp -r build/Agda/Builtin/*.rs golden/Agda/Builtin
 
 clean :
 	@rm -rf build/*

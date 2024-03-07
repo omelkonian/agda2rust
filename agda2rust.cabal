@@ -23,6 +23,7 @@ executable agda2rust
     LambdaCase RecordWildCards PatternSynonyms PatternGuards TupleSections
     ViewPatterns
     TypeFamilies TypeOperators TypeApplications FunctionalDependencies
+  ghc-options:         -rtsopts
   build-depends:       base >= 4.10 && < 4.18,
                        Agda >= 2.6.4 && < 2.6.5,
                        deepseq >= 1.4.4 && < 1.6,
@@ -34,7 +35,8 @@ executable agda2rust
                        pretty-show,
                        containers==0.6.6,
                        mtl==2.2.2,
-                       unicode-data
+                       unicode-data,
+                       syb
 
 executable rustp
   hs-source-dirs:      src

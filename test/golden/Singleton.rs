@@ -2,6 +2,5 @@
 #[derive(Debug)]
 pub enum The<  A,> {
   the(A),
-  _Impossible(std::marker::PhantomData<(A,)>),
 }
 

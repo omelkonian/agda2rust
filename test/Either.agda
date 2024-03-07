@@ -12,4 +12,11 @@ data OnlyLeft (A B : Set) : Set where
   Left : A → OnlyLeft A B
 
 fromOnlyLeft : ∀ {A B : Set} → OnlyLeft A B → A
-fromOnlyLeft (Left  a) = a
+fromOnlyLeft (Left a) = a
+
+record OnlyLeftR (A B : Set) : Set where
+  field left : A
+open OnlyLeftR public
+
+fromOnlyLeftR : ∀ {A B : Set} → OnlyLeftR A B → A
+fromOnlyLeftR r = r .left

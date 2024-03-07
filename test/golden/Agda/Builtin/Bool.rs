@@ -2,7 +2,6 @@
 pub enum Bool {
   r#false(),
   r#true(),
-  _Impossible(std::marker::PhantomData<()>),
 }
 
 

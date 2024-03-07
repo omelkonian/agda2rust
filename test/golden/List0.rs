@@ -3,7 +3,6 @@
 pub enum List<  A,> {
   Ֆ91ՖՖ93Ֆ(),
   _Ֆ8759Ֆ_(A, Box<List<A>>),
-  _Impossible(std::marker::PhantomData<(A,)>),
 }
 
 
@@ -14,7 +13,6 @@ pub fn _Ֆ43ՖՖ43Ֆ_<  A,>(x0: List<A>, x1: List<A>) -> List<A> {
       let xs = *xs;
       List::_Ֆ8759Ֆ_(x, Box::new(_Ֆ43ՖՖ43Ֆ_(xs, x1)))
     },
-    _ => panic!("IMPOSSIBLE"),
   }
 }
 pub fn map<A, B>(x0: fn(_: A) -> B, x1: List<A>) -> List<B> {
@@ -24,6 +22,5 @@ pub fn map<A, B>(x0: fn(_: A) -> B, x1: List<A>) -> List<B> {
       let xs = *xs;
       List::_Ֆ8759Ֆ_(x0(x), Box::new(map(x0, xs)))
     },
-    _ => panic!("IMPOSSIBLE"),
   }
 }

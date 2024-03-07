@@ -12,8 +12,9 @@
   + [ ] ensure qualification/scopes are OK
 - [ ] primitives
   + [x] Nat->i32
+    * [ ] avoid overflow
   + [ ] ...
-  + [ ] buitin modules
+  + [ ] builtin modules
 - [x] functions
   + [x] function type signatures
   + [x] termrs (e.g. function bodys)
@@ -24,7 +25,7 @@
   + [x] polymorphic types / type variables
   + [x] constructors/variants
   + [x] PhantomData for unused type variables
-    * [ ] add Phantom constructor *only if needed*
+    * [x] add Phantom constructor *only if needed*
   + [x] Infinite types (e.g. List)
   + [ ] more dependent/indexed types
 - [ ] records
