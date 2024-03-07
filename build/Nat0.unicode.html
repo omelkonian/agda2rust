@@ -81,16 +81,14 @@
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">enum</span> Nat <span class="op">{</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  zero()<span class="op">,</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  suc(<span class="dt">Box</span><span class="op">&lt;</span>Nat<span class="op">&lt;&gt;&gt;</span>)<span class="op">,</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  _Impossible(<span class="pp">std::marker::</span>PhantomData<span class="op">&lt;</span>()<span class="op">&gt;</span>)<span class="op">,</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> _+_(x0<span class="op">:</span> Nat<span class="op">&lt;&gt;,</span> x1<span class="op">:</span> Nat<span class="op">&lt;&gt;</span>) <span class="op">-&gt;</span> Nat<span class="op">&lt;&gt;</span> <span class="op">{</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>  <span class="kw">match</span> x0 <span class="op">{</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>    <span class="pp">Nat::</span>zero() <span class="op">=&gt;</span> x1<span class="op">,</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>    <span class="pp">Nat::</span>suc(x2) <span class="op">=&gt;</span> <span class="op">{</span> <span class="kw">let</span> x2 <span class="op">=</span> <span class="op">*</span>x2<span class="op">;</span> <span class="pp">Nat::</span>suc(<span class="dt">Box</span><span class="pp">::</span>new(_+_(x2<span class="op">,</span> x1))) <span class="op">},</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>    _ <span class="op">=&gt;</span> <span class="pp">panic!</span>(<span class="st">&quot;IMPOSSIBLE&quot;</span>)<span class="op">,</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  <span class="op">}</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> _+_(x0<span class="op">:</span> Nat<span class="op">&lt;&gt;,</span> x1<span class="op">:</span> Nat<span class="op">&lt;&gt;</span>) <span class="op">-&gt;</span> Nat<span class="op">&lt;&gt;</span> <span class="op">{</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>  <span class="kw">match</span> x0 <span class="op">{</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="pp">Nat::</span>zero() <span class="op">=&gt;</span> x1<span class="op">,</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>    <span class="pp">Nat::</span>suc(x2) <span class="op">=&gt;</span> <span class="op">{</span> <span class="kw">let</span> x2 <span class="op">=</span> <span class="op">*</span>x2<span class="op">;</span> <span class="pp">Nat::</span>suc(<span class="dt">Box</span><span class="pp">::</span>new(_+_(x2<span class="op">,</span> x1))) <span class="op">},</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  <span class="op">}</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>

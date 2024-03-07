@@ -13,44 +13,50 @@
 <a id="150" class="Pragma">mod</a> <a id="154" class="Pragma">Identity;</a>
 <a id="164" class="Pragma">mod</a> <a id="168" class="Pragma">Numbers;</a>
 <a id="177" class="Pragma">mod</a> <a id="181" class="Pragma">Product;</a>
-<a id="190" class="Pragma">mod</a> <a id="194" class="Pragma">Either;</a> <a id="202" class="Pragma">use</a> <a id="206" class="Pragma">Either::Either::{Left};</a>
-<a id="230" class="Pragma">mod</a> <a id="234" class="Pragma">Maybe;</a> <a id="241" class="Pragma">use</a> <a id="245" class="Pragma">Maybe::Maybe::{Just};</a>
-<a id="267" class="Pragma">mod</a> <a id="271" class="Pragma">Exp;</a> <a id="276" class="Pragma">use</a> <a id="280" class="Pragma">Exp::Exp::{Plus,Int,Var};</a>
-<a id="306" class="Pragma">mod</a> <a id="310" class="Pragma">Nat0;</a> <a id="316" class="Pragma">use</a> <a id="320" class="Pragma">Nat0::Nat::{zero,suc};</a>
-<a id="343" class="Pragma">mod</a> <a id="347" class="Pragma">List0;</a> <a id="354" class="Pragma">use</a> <a id="358" class="Pragma">List0::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};</a>
-<a id="392" class="Pragma">mod</a> <a id="396" class="Pragma">Singleton;</a> <a id="407" class="Pragma">use</a> <a id="411" class="Pragma">Singleton::The::{the};</a>
+<a id="190" class="Pragma">mod</a> <a id="194" class="Pragma">Either;</a>
+<a id="202" class="Pragma">mod</a> <a id="206" class="Pragma">Maybe;</a> <a id="213" class="Pragma">use</a> <a id="217" class="Pragma">Maybe::Maybe::{Just};</a>
+<a id="239" class="Pragma">mod</a> <a id="243" class="Pragma">Exp;</a> <a id="248" class="Pragma">use</a> <a id="252" class="Pragma">Exp::Exp::{Plus,Int,Var};</a>
+<a id="278" class="Pragma">mod</a> <a id="282" class="Pragma">Nat0;</a> <a id="288" class="Pragma">use</a> <a id="292" class="Pragma">Nat0::Nat::{zero,suc};</a>
+<a id="315" class="Pragma">mod</a> <a id="319" class="Pragma">List0;</a> <a id="326" class="Pragma">use</a> <a id="330" class="Pragma">List0::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};</a>
+<a id="364" class="Pragma">mod</a> <a id="368" class="Pragma">Singleton;</a> <a id="379" class="Pragma">use</a> <a id="383" class="Pragma">Singleton::The::{the};</a>
 
-<a id="435" class="Pragma">fn</a> <a id="438" class="Pragma">ᐁ&lt;T&gt;(x</a> <a id="445" class="Pragma">:</a> <a id="447" class="Pragma">T)</a> <a id="450" class="Pragma">-&gt;</a> <a id="453" class="Pragma">Box&lt;T&gt;</a> <a id="460" class="Pragma">{</a>
-  <a id="464" class="Pragma">return</a> <a id="471" class="Pragma">Box::new(x);</a>
-<a id="484" class="Pragma">}</a>
+<a id="407" class="Pragma">fn</a> <a id="410" class="Pragma">ᐁ&lt;T&gt;(x</a> <a id="417" class="Pragma">:</a> <a id="419" class="Pragma">T)</a> <a id="422" class="Pragma">-&gt;</a> <a id="425" class="Pragma">Box&lt;T&gt;</a> <a id="432" class="Pragma">{</a>
+  <a id="436" class="Pragma">return</a> <a id="443" class="Pragma">Box::new(x);</a>
+<a id="456" class="Pragma">}</a>
 
-<a id="487" class="Pragma">fn</a> <a id="490" class="Pragma">main()</a> <a id="497" class="Pragma">{</a>
-  <a id="501" class="Pragma">println!(&quot;{}</a> <a id="514" class="Pragma">|</a> <a id="516" class="Pragma">{}</a> <a id="519" class="Pragma">|</a> <a id="521" class="Pragma">{}</a> <a id="524" class="Pragma">|</a> <a id="526" class="Pragma">{}</a> <a id="529" class="Pragma">|</a> <a id="531" class="Pragma">{}</a> <a id="534" class="Pragma">|</a> <a id="536" class="Pragma">{}</a> <a id="539" class="Pragma">|</a> <a id="541" class="Pragma">{}</a> <a id="544" class="Pragma">|</a> <a id="546" class="Pragma">{}</a> <a id="549" class="Pragma">|</a> <a id="551" class="Pragma">{:?}</a> <a id="556" class="Pragma">|</a> <a id="558" class="Pragma">{:?}</a> <a id="563" class="Pragma">|</a> <a id="565" class="Pragma">{:?}</a> <a id="570" class="Pragma">|</a> <a id="572" class="Pragma">{:?}&quot;,</a>
-    <a id="583" class="Pragma">//</a> <a id="586" class="Pragma">***</a> <a id="590" class="Pragma">Identity</a> <a id="599" class="Pragma">***</a>
-    <a id="607" class="Pragma">Identity::id(42),</a>
-    <a id="629" class="Pragma">Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(42),</a>
-    <a id="667" class="Pragma">//</a> <a id="670" class="Pragma">Base</a> <a id="675" class="Pragma">types</a>
-    <a id="685" class="Pragma">Numbers::add(40,2),</a>
-    <a id="709" class="Pragma">//</a> <a id="712" class="Pragma">***</a> <a id="716" class="Pragma">Records</a> <a id="724" class="Pragma">***</a>
-    <a id="732" class="Pragma">Product::mapSnd(</a>
-      <a id="755" class="Pragma">|x|</a> <a id="759" class="Pragma">x</a> <a id="761" class="Pragma">+</a> <a id="763" class="Pragma">1</a>
-      <a id="771" class="Pragma">,</a> <a id="773" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="790" class="Pragma">{projՖ8321Ֆ:</a> <a id="803" class="Pragma">0,</a> <a id="806" class="Pragma">projՖ8322Ֆ:</a> <a id="818" class="Pragma">41}</a>
-    <a id="826" class="Pragma">).projՖ8322Ֆ,</a>
-    <a id="844" class="Pragma">//</a> <a id="847" class="Pragma">***</a> <a id="851" class="Pragma">ADTs</a> <a id="856" class="Pragma">***</a>
-    <a id="864" class="Pragma">Either::fromEither::&lt;i32,</a> <a id="890" class="Pragma">i32&gt;(41,</a> <a id="899" class="Pragma">Left(42)),</a>
-    <a id="914" class="Pragma">Either::fromOnlyLeft::&lt;i32,</a> <a id="942" class="Pragma">i32&gt;(Either::OnlyLeft::Left(42)),</a>
-    <a id="980" class="Pragma">Maybe::fromMaybe(41,</a> <a id="1001" class="Pragma">Just(42)),</a>
-    <a id="1016" class="Pragma">//</a> <a id="1019" class="Pragma">***</a> <a id="1023" class="Pragma">Resursive</a> <a id="1033" class="Pragma">ADTs</a> <a id="1038" class="Pragma">***</a>
-    <a id="1046" class="Pragma">Exp::eval(|x|</a> <a id="1060" class="Pragma">x,</a> <a id="1063" class="Pragma">Plus(ᐁ(Int(5)),ᐁ(Var(37)))),</a>
-    <a id="1096" class="Pragma">suc(ᐁ(suc(ᐁ(suc(ᐁ(suc(ᐁ(zero())))))))),</a>
-    <a id="1140" class="Pragma">Nat0::_Ֆ43Ֆ_(suc(ᐁ(zero())),</a> <a id="1169" class="Pragma">suc(ᐁ(zero()))),</a>
-    <a id="1190" class="Pragma">List0::map(|x|</a> <a id="1205" class="Pragma">x</a> <a id="1207" class="Pragma">+</a> <a id="1209" class="Pragma">1,</a> <a id="1212" class="Pragma">List0::_Ֆ43ՖՖ43Ֆ_(</a>
-      <a id="1237" class="Pragma">_Ֆ8759Ֆ_(3,</a> <a id="1249" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ())),</a>
-      <a id="1271" class="Pragma">_Ֆ8759Ֆ_(1,</a> <a id="1283" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ()))</a>
-    <a id="1302" class="Pragma">)),</a>
-    <a id="1310" class="Pragma">//</a> <a id="1313" class="Pragma">***</a> <a id="1317" class="Pragma">Value-dependent</a> <a id="1333" class="Pragma">types</a> <a id="1339" class="Pragma">***</a>
-    <a id="1347" class="Pragma">the(42)</a>
-  <a id="1357" class="Pragma">);</a>
-<a id="1360" class="Pragma">}</a>
-<a id="1362" class="Symbol">#-}</a>
+<a id="459" class="Pragma">use</a> <a id="463" class="Pragma">std::marker::{PhantomData};</a>
+<a id="491" class="Pragma">fn</a> <a id="494" class="Pragma">__&lt;T&gt;()</a> <a id="502" class="Pragma">-&gt;</a> <a id="505" class="Pragma">PhantomData&lt;T&gt;</a> <a id="520" class="Pragma">{</a>
+  <a id="524" class="Pragma">return</a> <a id="531" class="Pragma">PhantomData;</a>
+<a id="544" class="Pragma">}</a>
+
+<a id="547" class="Pragma">fn</a> <a id="550" class="Pragma">main()</a> <a id="557" class="Pragma">{</a>
+  <a id="561" class="Pragma">println!(&quot;{}</a> <a id="574" class="Pragma">|</a> <a id="576" class="Pragma">{}</a> <a id="579" class="Pragma">|</a> <a id="581" class="Pragma">{}</a> <a id="584" class="Pragma">|</a> <a id="586" class="Pragma">{}</a> <a id="589" class="Pragma">|</a> <a id="591" class="Pragma">{}</a> <a id="594" class="Pragma">|</a> <a id="596" class="Pragma">{}</a> <a id="599" class="Pragma">|</a> <a id="601" class="Pragma">{}</a> <a id="604" class="Pragma">|</a> <a id="606" class="Pragma">{}</a> <a id="609" class="Pragma">|</a> <a id="611" class="Pragma">{}</a> <a id="614" class="Pragma">|</a> <a id="616" class="Pragma">{:?}</a> <a id="621" class="Pragma">|</a> <a id="623" class="Pragma">{:?}</a> <a id="628" class="Pragma">|</a> <a id="630" class="Pragma">{:?}</a> <a id="635" class="Pragma">|</a> <a id="637" class="Pragma">{:?}&quot;,</a>
+    <a id="648" class="Pragma">//</a> <a id="651" class="Pragma">***</a> <a id="655" class="Pragma">Identity</a> <a id="664" class="Pragma">***</a>
+    <a id="672" class="Pragma">Identity::id(42),</a>
+    <a id="694" class="Pragma">Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(42),</a>
+    <a id="732" class="Pragma">//</a> <a id="735" class="Pragma">Base</a> <a id="740" class="Pragma">types</a>
+    <a id="750" class="Pragma">Numbers::add(40,2),</a>
+    <a id="774" class="Pragma">//</a> <a id="777" class="Pragma">***</a> <a id="781" class="Pragma">Records</a> <a id="789" class="Pragma">***</a>
+    <a id="797" class="Pragma">Product::mapSnd(</a>
+      <a id="820" class="Pragma">|x|</a> <a id="824" class="Pragma">x</a> <a id="826" class="Pragma">+</a> <a id="828" class="Pragma">1</a>
+      <a id="836" class="Pragma">,</a> <a id="838" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="855" class="Pragma">{projՖ8321Ֆ:</a> <a id="868" class="Pragma">0,</a> <a id="871" class="Pragma">projՖ8322Ֆ:</a> <a id="883" class="Pragma">41}</a>
+    <a id="891" class="Pragma">).projՖ8322Ֆ,</a>
+    <a id="909" class="Pragma">//</a> <a id="912" class="Pragma">***</a> <a id="916" class="Pragma">ADTs</a> <a id="921" class="Pragma">***</a>
+    <a id="929" class="Pragma">Either::fromEither::&lt;i32,</a> <a id="955" class="Pragma">i32&gt;(41,</a> <a id="964" class="Pragma">Either::Either::Left(42)),</a>
+    <a id="995" class="Pragma">Either::fromOnlyLeft::&lt;i32,</a> <a id="1023" class="Pragma">i32&gt;(Either::OnlyLeft::Left(42)),</a>
+    <a id="1061" class="Pragma">Either::fromOnlyLeftR::&lt;i32,</a> <a id="1090" class="Pragma">i32&gt;(Either::OnlyLeftR</a> <a id="1113" class="Pragma">{left:</a> <a id="1120" class="Pragma">42,</a> <a id="1124" class="Pragma">_phantom:</a> <a id="1134" class="Pragma">__()}),</a>
+    <a id="1146" class="Pragma">Maybe::fromMaybe(41,</a> <a id="1167" class="Pragma">Just(42)),</a>
+    <a id="1182" class="Pragma">//</a> <a id="1185" class="Pragma">***</a> <a id="1189" class="Pragma">Resursive</a> <a id="1199" class="Pragma">ADTs</a> <a id="1204" class="Pragma">***</a>
+    <a id="1212" class="Pragma">Exp::eval(|x|</a> <a id="1226" class="Pragma">x,</a> <a id="1229" class="Pragma">Plus(ᐁ(Int(5)),ᐁ(Var(37)))),</a>
+    <a id="1262" class="Pragma">suc(ᐁ(suc(ᐁ(suc(ᐁ(suc(ᐁ(zero())))))))),</a>
+    <a id="1306" class="Pragma">Nat0::_Ֆ43Ֆ_(suc(ᐁ(zero())),</a> <a id="1335" class="Pragma">suc(ᐁ(zero()))),</a>
+    <a id="1356" class="Pragma">List0::map(|x|</a> <a id="1371" class="Pragma">x</a> <a id="1373" class="Pragma">+</a> <a id="1375" class="Pragma">1,</a> <a id="1378" class="Pragma">List0::_Ֆ43ՖՖ43Ֆ_(</a>
+      <a id="1403" class="Pragma">_Ֆ8759Ֆ_(3,</a> <a id="1415" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ())),</a>
+      <a id="1437" class="Pragma">_Ֆ8759Ֆ_(1,</a> <a id="1449" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ()))</a>
+    <a id="1468" class="Pragma">)),</a>
+    <a id="1476" class="Pragma">//</a> <a id="1479" class="Pragma">***</a> <a id="1483" class="Pragma">Value-dependent</a> <a id="1499" class="Pragma">types</a> <a id="1505" class="Pragma">***</a>
+    <a id="1513" class="Pragma">the(42)</a>
+  <a id="1523" class="Pragma">);</a>
+<a id="1526" class="Pragma">}</a>
+<a id="1528" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/AllTests.unicode.html"/></div></body></html>
