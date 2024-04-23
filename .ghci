@@ -1,0 +1,6 @@
+:def! . readFile
+:def! reset (\_ -> return ":. .ghci\n")
+:def! test (\x -> return $ ":r\n :set args -itest -otest/build -v agda2rust:10 test/" <> x <> ".agda\n main")
+:def! main (\_ -> return $ ":r\n :set args -itest -v agda2rust:10 test/Input.agda\n main")
+:def! allTests (\_ -> return $ ":r\n :set args -itest -otest/build -v agda2rust:10 test/AllTests.agda\n main")
+:def! rustp (\x -> return $ ":r\n :set args test/" <> x <> ".rs\n main")
