@@ -4,6 +4,16 @@
 - A custom pipeline for translating internal syntax to the treeless representation is in `src/AgdaInternals.hs`.
 - The `test/` directory contains a golden-testing suite (c.f. `test/AllTests.agda`).
 
+## How to run
+
+Assuming a working Haskell installation with `ghc` and `cabal` (e.g. using `ghcup`):
+- `$ make build` builds the project
+- `$ make install` installs the `agda2rust` executable
+- `$ make test` runs the test suite
+- `$ make repl` starts an interactive session with the agda2rust library loaded
+- `$ make html` renders the Github website where you can navigate through the Agda test cases
+alongside the corresponding generated Rust code
+
 ## TODO
 
 - [x] Switch to treeless syntax
@@ -34,6 +44,9 @@
 - [ ] imports
   + [ ] private definitions (i.e. not `pub` for everything)
 - [x] FOREIGN pragmas
+- [ ] FFI with postulates
+- [ ] Erasure (a.k.a. run-time irrelevance)
+- [ ] Compile-time irrelevance
 - [x] test suite
   + [x] golden files
   + [x] CI

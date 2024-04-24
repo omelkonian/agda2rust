@@ -63,14 +63,10 @@ jobs:
     - name: Run test suite
       run: make test
 
-    - name: Install pandoc
-      run: sudo apt-get install -y pandoc
-
-    - name: Install zsh
-      run: sudo apt-get install -y zsh
-
     - name: Generate HTML
-      run: make html
+      run: |
+        sudo apt-get install -y pandoc zsh
+        make html
 
     - name: Deploy HTML
       uses: peaceiris/actions-gh-pages@v3

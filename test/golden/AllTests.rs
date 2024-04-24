@@ -1,6 +1,7 @@
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types)]
 mod Identity;
 mod Numbers;
+mod Simplification;
 mod Product;
 mod Either;
 mod Maybe; use Maybe::Maybe::{Just};
@@ -8,6 +9,7 @@ mod Exp; use Exp::Exp::{Plus,Int,Var};
 mod Nat0; use Nat0::Nat::{zero,suc};
 mod List0; use List0::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};
 mod Singleton; use Singleton::The::{the};
+// mod NonLinearFun; use NonLinearFun::double;
 
 fn ᐁ<T>(x : T) -> Box<T> {
   return Box::new(x);
@@ -19,12 +21,14 @@ fn __<T>() -> PhantomData<T> {
 }
 
 fn main() {
-  println!("{} | {} | {} | {} | {} | {} | {} | {} | {} | {:?} | {:?} | {:?} | {:?}",
+  println!(
+    "{} | {} | {} | {} | {} | | {} | {} | {} | {} | {} | {:?} | {:?} | {:?} | {:?}",
     // *** Identity ***
     Identity::id(42),
     Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(42),
     // Base types
     Numbers::add(40,2),
+    Simplification::increment(41),
     // *** Records ***
     Product::mapSnd(
       |x| x + 1
@@ -44,6 +48,8 @@ fn main() {
       _Ֆ8759Ֆ_(1, ᐁ(Ֆ91ՖՖ93Ֆ()))
     )),
     // *** Value-dependent types ***
-    the(42)
+    the(42),
+    // *** Non-linear functions ***
+    // double(21)
   );
 }

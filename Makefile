@@ -27,6 +27,9 @@ golden :
 testRust :
 	make -C test rust
 
+testRun :
+	make -C test test
+
 testClean :
 	make -C test clean
 

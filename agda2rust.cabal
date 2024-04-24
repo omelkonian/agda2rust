@@ -12,6 +12,10 @@ source-repository head
   type:     git
   location: https://github.com/omelkonian/agda2rust.git
 
+tested-with:
+    GHC == 9.4.8
+    GHC == 9.4.3
+
 executable agda2rust
   hs-source-dirs:      src
   main-is:             Main.hs
@@ -49,3 +53,4 @@ executable reUnicode
   hs-source-dirs:      src
   main-is:             RustUnicode.hs
   build-depends:       base >= 4.10 && < 4.18,
+

@@ -1,0 +1,4 @@
+name: agda2rust-test
+depend:
+include: .
+flags:

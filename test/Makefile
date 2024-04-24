@@ -42,6 +42,6 @@ clean :
 
 cleanHtml :
 	 @rm -rf html/*
-	 @rm -rf golden/**.html golden/**.md
+	 @rm -rf build/**.html build/**.md
 
 
