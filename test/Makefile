@@ -1,7 +1,7 @@
 MAIN=AllTests
 .PHONY : default rust html compare test golden clean cleanHtml
 
-default : build/$(MAIN).rs compare test
+default : clean cleanHtml build/$(MAIN).rs compare test
 
 rust : build/$(MAIN).rs
 
@@ -33,9 +33,9 @@ test :
 	@(cd build; rustc -A uncommon_codepoints $(MAIN).rs && ./$(MAIN) && rm $(MAIN))
 
 golden :
-	@cp -r build/*.rs golden
-	@cp -r build/Agda/*.rs golden/Agda
-	@cp -r build/Agda/Builtin/*.rs golden/Agda/Builtin
+	@rm -rf golden/ && mkdir golden
+	@find build/ -name *.rs -exec cp --parents {} golden/ \;
+	@mv -f golden/build/* golden/
 
 clean :
 	@rm -rf build/*

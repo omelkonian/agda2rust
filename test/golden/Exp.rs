@@ -1,11 +1,10 @@
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
+
 pub enum Exp<  V,> {
   Plus(Box<Exp<V>>, Box<Exp<V>>),
   Int(i32),
   Var(V),
 }
-
-
 
 pub fn eval<  A,>(x0: fn(_: A) -> i32, x1: Exp<A>) -> i32 {
   match x1 {
@@ -18,3 +17,4 @@ pub fn eval<  A,>(x0: fn(_: A) -> i32, x1: Exp<A>) -> i32 {
     Exp::Var(x2) => x0(x2),
   }
 }
+

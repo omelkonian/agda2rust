@@ -1,6 +1,6 @@
 module Main where
 
-import Data.Maybe ( fromMaybe )
+import Data.Maybe ( fromMaybe, catMaybes )
 import qualified Data.Map as M ( lookup )
 import Data.Function ( on )
 import Data.List ( sortBy, intercalate )
@@ -104,7 +104,7 @@ renderCode = unlines . map rangedThing . sortBy (compare `on` rLine . rangeOf)
   where rLine :: Range -> Int
         rLine r = fromIntegral $ fromMaybe 0 $ posLine <$> rStart r
 
-backend :: Backend' Options Options ModuleEnv ModuleRes CompiledDef
+backend :: Backend' Options Options ModuleEnv ModuleRes (Maybe CompiledDef)
 backend = Backend'
   { backendName           = "agda2rust"
   , backendVersion        = Just (showVersion version)
@@ -139,10 +139,10 @@ moduleSetup _ _ m _ = do
 defRange :: Definition -> Range
 defRange = nameBindingSite . qnameName . defName
 
-compile :: Options -> ModuleEnv -> IsMain -> Definition -> TCM CompiledDef
+compile :: Options -> ModuleEnv -> IsMain -> Definition -> TCM (Maybe CompiledDef)
 compile opts tlm _ def@(Defn{..})
   | ignoreDef def
-  = return $ Ranged (defRange def) ""
+  = return Nothing
   | otherwise
   -- $ getUniqueCompilerPragma "AGDA2RUST" defName >>= \case
   --     Nothing -> return []
@@ -151,7 +151,7 @@ compile opts tlm _ def@(Defn{..})
     s <- liftIO readState
     (cdef, s') <- runC s (convert def)
     liftIO $ writeState s'
-    return $ Ranged (defRange def) $ show (R.pretty' cdef)
+    return $ Just $ Ranged (defRange def) $ show (R.pretty' cdef)
 
 getForeignRust :: TCM [CompiledDef]
 getForeignRust
@@ -173,14 +173,14 @@ ignoredRustWarnings =
   ]
 
 writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName
-            -> [CompiledDef] -> TCM ModuleRes
-writeModule opts _ _ m cdefs = do
+            -> [Maybe CompiledDef] -> TCM ModuleRes
+writeModule opts _ _ m (catMaybes -> cdefs) = do
   pragmas <- getForeignRust
   outDir <- compileDir
-  let code    = renderCode (pragmas <> cdefs)
+  let code    = renderCode (pragmas <> addNewLines cdefs)
       rustFn  = moduleNameToFileName m "rs"
       outFile = fromMaybe outDir (optOutDir opts) <> "/" <> rustFn
-      outS =  "#![allow(" <> intercalate "," ignoredRustWarnings <> ")]\n"
+      outS =  "#![allow(" <> intercalate "," ignoredRustWarnings <> ")]\n\n"
            <> code
   runC0 $ report $ "\n******* MODULE: " <> rustFn <> "********\n"
         <> outS
@@ -192,3 +192,7 @@ writeModule opts _ _ m cdefs = do
       let outDir = takeDirectory outFn
       createDirectoryIfMissing True outDir
       writeFile outFn content
+
+    addNewLines :: [CompiledDef] -> [CompiledDef]
+    addNewLines [] = []
+    addNewLines (d:ds) = d : Ranged (rangeOf d) "" : addNewLines ds
