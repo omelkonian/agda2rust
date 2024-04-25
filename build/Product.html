@@ -76,7 +76,7 @@
   </style>
 </head>
 <body>
-<div class="sourceCode" id="cb1"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="at">#![</span>allow<span class="at">(</span>dead_code<span class="op">,</span>non_snake_case<span class="op">,</span>unused_variables<span class="op">,</span>non_camel_case_types<span class="at">)]</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="at">#![</span>allow<span class="at">(</span>dead_code<span class="op">,</span>non_snake_case<span class="op">,</span>unused_variables<span class="op">,</span>non_camel_case_types<span class="op">,</span>non_upper_case_globals<span class="at">)]</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">struct</span> _Ֆ215Ֆ_<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span> <span class="op">{</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  <span class="kw">pub</span> projՖ8321Ֆ<span class="op">:</span> A<span class="op">,</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="kw">pub</span> projՖ8322Ֆ<span class="op">:</span> B<span class="op">,</span></span>
@@ -107,6 +107,9 @@
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>      projՖ8322Ֆ<span class="op">:</span> x0(projՖ8322Ֆ)<span class="op">,</span></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>    <span class="op">},</span></span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>  <span class="op">}</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> fst<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>(x0<span class="op">:</span> _Ֆ215Ֆ_<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>) <span class="op">-&gt;</span> A <span class="op">{</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>  projՖ8321Ֆ(x0)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>
