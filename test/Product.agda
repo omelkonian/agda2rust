@@ -11,3 +11,6 @@ mapFst f (a , b) = f a , b
 
 mapSnd : (B → C) → A × B → A × C
 mapSnd f (a , b) = a , f b
+
+fst : A × B → A
+fst = proj₁

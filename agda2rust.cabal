@@ -23,6 +23,9 @@ executable agda2rust
   other-modules:       Paths_agda2rust
                        Agda2Rust
                        AgdaInternals
+                       Utils
+                       AgdaUtils
+                       RustUtils
   default-extensions:
     LambdaCase RecordWildCards PatternSynonyms PatternGuards TupleSections
     ViewPatterns

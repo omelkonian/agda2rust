@@ -4,13 +4,12 @@
 , OverloadedStrings
 , DoAndIfThenElse
 #-}
--- | Conversion from Agda's internal syntax to our simplified JSON format.
 module Agda2Rust where
 
 import System.IO.Unsafe ( unsafePerformIO )
 
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
-import Control.Monad ( unless, when, (<=<) )
+import Control.Monad ( unless, when, (<=<), forM )
 import Control.Arrow ( first )
 import Control.Monad.Reader ( ReaderT(runReaderT), asks, local )
 import Control.Monad.State ( StateT, runStateT, get, gets, put, modify )
@@ -29,10 +28,6 @@ import qualified Data.Text as T ( pack, unpack )
 
 -- * Bytes
 import Data.Serializer ( toBytes )
-
--- * Unicode
-import Unicode.Char.Identifiers ( isXIDStart, isXIDContinue )
-import Data.Char ( ord )
 
 -- * abstract syntax
 import qualified Agda.Syntax.Abstract.Name as A
@@ -86,6 +81,7 @@ import qualified Agda.TypeChecking.Pretty as P
   hiding (text)
 -- * utils
 import Agda.Utils.Monad ( ifM, mapMaybeM, anyM )
+import Text.Show.Pretty ( ppShow )
 
 -- * Rust
 import qualified Language.Rust.Syntax as R
@@ -93,7 +89,10 @@ import qualified Language.Rust.Data.Ident as R
 import qualified Language.Rust.Data.Position as R
 import qualified Language.Rust.Parser as R
 import qualified Language.Rust.Pretty as R
-import Text.Show.Pretty ( ppShow )
+
+import Utils
+import AgdaUtils
+import RustUtils
 
 -- | TCM monad extended with a custom environment.
 data Env = Env
@@ -116,6 +115,7 @@ data State = State
   , recordConstructors :: M.Map ConHeadS [String]
   , unusedTyParams     :: M.Map QNameS [String]
   } deriving (Show, Read)
+
 initState :: State
 initState = State
   { boxedConstructors  = S.empty
@@ -211,15 +211,22 @@ gos = igos . enumerate
     as' <- igos as
     return (a' : as')
 
-ignoreDef :: A.Defn -> Bool
-ignoreDef = \case
+ignoreDef :: A.Definition -> Bool
+ignoreDef d@A.Defn{..} = case theDef of
+  -- ** erasure
+  _ | A.hasQuantity0 d -> True
+  -- ** ignore functions that are either @0, or pattern lambdas, or with-generated
+  A.Function{..} | {-funErasure ||-} isJust funExtLam || isJust funWith -> True
+  -- ** ignored these kind of definitions
   A.Primitive{..} -> True
   A.PrimitiveSort{..} -> True
   A.Axiom{..} -> True
   A.DataOrRecSig{..} -> True
   A.GeneralizableVar -> True
-  -- TODO
+  -- ** TODO: handle in the future
   A.Constructor{..} -> True
+  -- A.Constructor{..} | conErasure -> True
+  -- ** compile everything else
   _ -> False
 
 type FnAccum = ([String], [R.Arg ()], R.Ty (), R.Expr ())
@@ -244,9 +251,10 @@ instance A.Definition ~> R.Item where
         report $ " tterm: " <> pp tterm
         (tyParams, args, resTy, body) <- goFn (tel, resTy, tterm)
         report $ " fnTy: " <> ppR (RFnTy args resTy)
-        let fn = RFn dx (RTyParam . R.mkIdent <$> tyParams)
-                        (RFnTy args resTy)
-                        (RBlock body)
+        let fn | null args = RConst dx resTy body
+               | otherwise = RFn dx (RTyParam . R.mkIdent <$> tyParams)
+                              (RFnTy args resTy)
+                              (RBlock body)
         report $ " fn: " <> ppR fn
         return fn
         where
@@ -254,6 +262,8 @@ instance A.Definition ~> R.Item where
         goA d@(A.unDom -> (x, ty))
           | isJust $ A.isSort $ A.unEl ty
           = return ([x], [])
+          | A.hasQuantity0 d
+          = return ([], [])
           | otherwise
           = do isLvl <- A.isLevelType ty
                ty' <- go ty
@@ -284,9 +294,12 @@ instance A.Definition ~> R.Item where
           t -> t
 
       A.Datatype{..} -> inDatatype defName $ do
-        cs <- zip dataCons <$> traverse typeOfConst dataCons
+        -- cs <- zip dataCons <$> traverse typeOfConst dataCons)
+        cs <- concat <$> forM dataCons (\dc -> do
+          cDef <- A.instantiateDef =<< getConstInfo dc
+          return [ (dc, A.defType cDef) | not (A.hasQuantity0 cDef)]
+          )
         A.TelV tel _ <- A.telViewUpTo dataPars defType
-        report $ "tel: " <> pp tel
         params   <- extractTyParams tel
         variants <- A.addContext tel (gos cs)
         let unusedParams = filter (unusedIn variants) params
@@ -306,6 +319,8 @@ instance A.Definition ~> R.Item where
           where
             dropTyParam :: A.Dom (String, A.Type) -> Maybe String
             dropTyParam dst
+              | A.hasQuantity0 (A.domInfo dst)
+              = Nothing
               | (s, ty) <- unDom dst
               , Just _ <- A.isSort (unEl ty)
               = Just s
@@ -324,7 +339,7 @@ instance A.Definition ~> R.Item where
         report $ " fs: " <> pp fs
         let params = extractTyParams tel
         report $ " params: " <> show params
-        fields <- A.addContext tel (goFs $ unDom <$> fs)
+        fields <- A.addContext tel (goFs $ unDom <$> filter (not . A.hasQuantity0) fs)
         report $ " fields: " <> show fields
         let unusedParams = filter (unusedIn fields) params
         setUnusedTyParams defName (ppR <$> unusedParams)
@@ -336,7 +351,7 @@ instance A.Definition ~> R.Item where
 
         where
         extractTyParams :: A.ListTel -> [R.Ident]
-        extractTyParams = map (R.mkIdent . fst . A.unDom)
+        extractTyParams = map (R.mkIdent . fst . A.unDom) . filter (not . A.hasQuantity0)
 
         goFs :: [(String, A.Type)] :~>* R.StructField
         goFs [] = return []
@@ -382,11 +397,14 @@ instance A.Type ~> R.Ty where
     A.Def n es | as <- vElims es -> do
       let toBox = curD == Just n
       when toBox setBox
-      (if toBox then rBoxTy else id) . RTyRef' (unqualR n)
+      (if toBox then rBoxTy else id) . rTyRef' (unqualR n)
         <$> gos (A.El (undefined :: A.Sort) <$> as)
 
     A.Pi a b ->
-      RBareFn (R.mkIdent x) <$> go (A.unDom a) <*> ctx (go $ A.unAbs b)
+      if A.hasQuantity0 a then
+        ctx (go $ A.unAbs b)
+      else
+        RBareFn (R.mkIdent x) <$> go (A.unDom a) <*> ctx (go $ A.unAbs b)
       where
         x   = A.bareNameWithDefault (A.absName b) (A.domName a)
         ctx = if isDependentArrow a then A.addContext [(x, a)] else id
@@ -406,7 +424,7 @@ instance A.Type ~> R.Ty where
 instance (A.QName, A.Type) ~> R.Variant where
   go (c, ty) = inConstructor c $ do
     as <- vargTys ty
-    RVariant (unqualR c) <$> goFs 1 (unDom <$> as)
+    RVariant (unqualR c) <$> goFs 1 (unDom <$> filter shouldKeep as)
     where
       goFs :: Int -> [(String, A.Type)] :~>* R.StructField
       goFs _ [] = return []
@@ -480,7 +498,7 @@ instance A.TTerm ~> R.Expr where
 
     goHead :: A.TTerm -> C (Maybe A.QName, ([R.Expr ()] -> R.Expr ()))
     goHead = \case
-      A.TDef qn -> return (Nothing, RCall (unqualR qn))
+      A.TDef qn -> return (Nothing, rCall (unqualR qn))
       A.TCon cn -> do
         report $ "* compiling head of application (constructor: " <> pp cn <> ")"
         isRec <- A.isRecordConstructor cn
@@ -493,13 +511,15 @@ instance A.TTerm ~> R.Expr where
         else do
           h <- qualR cn
           return (Just cn, \es -> RCallCon (RPathExpr h) es)
-      A.TPrim prim | Just binOp <- getBinOp prim
-        -> return (Nothing, \[x, y] -> RBin binOp x y)
+      A.TPrim prim | Just binOp <- getBinOp prim ->
+        return (Nothing, \[x, y] -> RBin binOp x y)
+      A.TPrim A.PSeq ->
+        return (Nothing, last)
         -- | A.PIf <- prim
         -- , [] <- xs
       A.TVar n -> do
         f <- R.mkIdent <$> lookupCtxVar n
-        return (Nothing, RCall f)
+        return (Nothing, rCall f)
       hd -> panic "unsupported head" (ppShow hd)
 
     getBinOp :: A.TPrim -> Maybe R.BinOp
@@ -540,13 +560,13 @@ instance A.TAlt ~> R.Arm where
       report $ " isRec: " <> pp isRec
       case isRec of
         -- compiling match on a record/struct value
-        Just fs -> do
+        Just _ -> do
           path <- parentQualR con
           report $ " path: " <> ppR path
           (_, vargs, _) <- viewTy =<< A.typeOfConst con
           vargs' <- populateArgNames vargs
           report $ " vargs': " <> pp vargs'
-          let xs = transcribe . fst . unDom <$> take n vargs'
+          let xs = transcribe . fst . unDom <$> filter (not . A.hasQuantity0) (take n vargs')
           Just (qn, _) <- A.isRecordConstructor con
           hasPhantomField <- hasUnusedTyParams qn
           let pats = RId . R.mkIdent <$> xs <> ["_phantom" | hasPhantomField]
@@ -561,7 +581,7 @@ instance A.TAlt ~> R.Arm where
           path <- qualR con
           (_, vargs, _) <- viewTy =<< A.typeOfConst con
           vargs' <- populateArgNames vargs
-          let xs = take n (fst . unDom <$> vargs')
+          let xs = take n (fst . unDom <$> filter (not . A.hasQuantity0) vargs')
           let pats = RId . R.mkIdent <$> xs
           report $ " pat: " <> pp con <> "(" <> show n <> ")"
                 <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
@@ -607,238 +627,6 @@ instance A.Literal ~> R.Lit where
     A.LitString s -> R.Str (T.unpack s) R.Cooked R.Unsuffixed ()
     A.LitChar   c -> R.Char c R.Unsuffixed ()
     l -> panic "unsupported literal" l
-
--- * Agda utilities
-
-currentCtx :: C [(String, A.Type)]
-currentCtx = fmap (first pp . unDom) <$> A.getContext
-
-reportCurrentCtx :: C ()
-reportCurrentCtx = currentCtx >>= \ctx ->
-  report $ "currentCtx: " <> pp ctx
-
-lookupCtx :: Int -> C (String, A.Type)
-lookupCtx i = first transcribe . (!! i) <$> currentCtx
-
-currentCtxVars :: C [String]
-currentCtxVars = fmap fst <$> currentCtx
-
-lookupCtxVar :: Int -> C String
-lookupCtxVar i = transcribe . (!! i) <$> currentCtxVars
-
-varPool :: [String]
-varPool = zipWith (<>) (repeat "x") (show <$> [0..])
-
-getVarPool :: C [String]
-getVarPool = do
-  xs <- currentCtxVars
-  return $ filter (`elem` xs) varPool
-
-freshVar :: [String] -> String
-freshVar xs = head $ dropWhile (`elem` xs) varPool
-
-freshVarInCtx :: C String
-freshVarInCtx = freshVar <$> currentCtxVars
-
-onlyVisible :: A.LensHiding a => [a] -> [a]
-onlyVisible = filter A.visible
-
-onlyHidden :: A.LensHiding a => [a] -> [a]
-onlyHidden = filter (not . A.visible)
-
-vArgs :: [A.Arg a] -> [a]
-vArgs = fmap unArg . onlyVisible
-
-vElims :: [A.Elim] -> [A.Term]
-vElims = vArgs . A.argsFromElims
-
-isErased :: A.TTerm -> Bool
-isErased = \case
-  A.TErased -> True
-  _         -> False
-
-onlyNonErased :: [A.TTerm] -> [A.TTerm]
-onlyNonErased = filter (not . isErased)
-
-telListView :: A.Type -> C (A.ListTel, A.Type)
-telListView t = do
-  A.TelV tel t <- A.telViewPath t
-  return (A.telToList tel, t)
-
-viewTy :: A.Type -> C (A.ListTel, A.ListTel, A.Type)
-viewTy ty = do
-  (tel, resTy) <- telListView ty
-  let (vargs, hargs) = partition A.visible tel
-  return (hargs, vargs, resTy)
-
-vargTys :: A.Type -> C A.ListTel
-vargTys ty = do
-  (_ , vargs, _) <- viewTy ty
-  return vargs
-
-resTy :: A.Type -> C A.Type
-resTy ty = do
-  (_ , _, ty) <- viewTy ty
-  return ty
-
-isData :: A.Type -> C Bool
-isData ty = undefined
--- filterTel :: (Dom Type -> Bool) -> A.Telescope -> A.Telescope
--- filterTel p = \case
---   A.EmptyTel -> A.EmptyTel
---   A.ExtendTel a tel
---     (if p a then A.ExtendTel
---     | ->
---     | otherwise -> traverseF (filterTel p) tel
-
-isDependentArrow :: A.Dom A.Type -> Bool
-isDependentArrow ty = pp (A.domName ty) `notElem` ["_", "(nothing)"]
-
--- * Rust utilities
-
-rLet :: [(String, R.Expr ())] -> R.Expr () -> R.Expr ()
-rLet [] e = e
-rLet xs e =
-  let
-    ps = map (\(x, e) -> R.Local (RId (R.mkIdent x)) Nothing (Just e) [] ()) xs
-  in
-    R.BlockExpr [] (R.Block (ps ++ [R.NoSemi e ()]) R.Normal ()) ()
-
-pattern RBlock e = R.Block [R.NoSemi e ()] R.Normal ()
-pattern RId x = R.IdentP (R.ByValue R.Immutable) x Nothing ()
-pattern RArg x ty = R.Arg (Just (RId x)) ty ()
-pattern RLit l = R.Lit [] l ()
-pattern RMatch scr arms = R.Match [] scr arms ()
-
-pattern RPathExpr p = R.PathExpr [] Nothing p ()
-pattern RPathTy   p = R.PathTy      Nothing p ()
-
-pattern RPathSeg  x    = R.PathSegment x Nothing ()
-pattern RPathSeg' x ts = R.PathSegment x (Just ts) ()
-
-pattern RPath ps = R.Path False ps ()
-pattern RRef     x = RPath [RPathSeg x]
-pattern RExprRef x = RPathExpr (RRef x)
-pattern RTyRef   x = RPathTy   (RRef x)
-
-pattern RConRef     x y = RPath [RPathSeg x, RPathSeg y]
-pattern RExprConRef x y = RPathExpr (RConRef x y)
-pattern RTyConRef   x y = RPathTy   (RConRef x y)
-
-pattern RAngles   ts = R.AngleBracketed [] ts [] ()
-pattern RRef'   x ts = RPath [RPathSeg' x (RAngles ts)]
-pattern RTyRef' x ts = RPathTy (RRef' x ts)
-
-pattern RBin op x y = R.Binary [] op x y ()
-pattern RAdd x y = RBin R.AddOp x y
-pattern RDeref x = R.Unary [] R.Deref (RExprRef x) ()
-
-pattern REmptyWhere = R.WhereClause [] ()
-pattern RForall tys = R.Generics [] tys REmptyWhere ()
-pattern REmptyGenerics = RForall []
-pattern RTyParam x  = R.TyParam [] x [] Nothing ()
-pattern RFnTy as b = R.FnDecl as (Just b) False ()
-pattern RFn x ps ty b =
-  R.Fn [] R.PublicV x ty R.Normal R.NotConst R.Rust (RForall ps) b ()
-pattern RBareFn x a b =
-  R.BareFn R.Normal R.Rust [] (RFnTy [ R.Arg (Just (RId x)) a ()] b) ()
-
-pattern RCall f xs = R.Call [] (RExprRef f) xs ()
-pattern RCallCon con xs = R.Call [] con xs ()
-pattern RMkStruct path fs = R.Struct [] path fs Nothing ()
-pattern RMacroCall f xs = R.MacExpr [] (R.Mac f xs ()) ()
-
-pattern RNoSpan   = R.Span R.NoPosition R.NoPosition
-pattern RTok    t = R.Tree (R.Token RNoSpan (R.LiteralTok t Nothing))
-pattern RStrTok s = RTok (R.StrTok s)
-
-pattern REnum x ps cs = R.Enum [] R.PublicV x cs (RForall ps) ()
-pattern RVariant x fs = R.Variant x [] (R.TupleD fs ()) Nothing ()
-
-pattern RStruct x ps fs = R.StructItem [] R.PublicV x (R.StructD fs ()) (RForall ps) ()
-pattern RNamedField x ty = R.StructField (Just x) R.PublicV ty [] ()
-pattern RField ty = R.StructField Nothing R.InheritedV ty [] ()
-
-pattern RPointer ty = R.Rptr Nothing R.Immutable ty ()
-
-pattern RWildP = R.WildP ()
-pattern RLitP lit = R.LitP lit ()
-pattern RFieldP x p = R.FieldPat (Just x) p ()
-pattern RNoFieldP p = R.FieldPat Nothing p ()
-pattern RTupleP path pats = R.TupleStructP path pats Nothing ()
-pattern RStructP path fpats = R.StructP path fpats False ()
-pattern RArm pat body = R.Arm [] (pat :| []) Nothing body ()
-pattern RGuardedArm pat guard body = R.Arm [] (pat :| []) (Just guard) body ()
-
-rBoxTy :: R.Ty () -> R.Ty ()
-rBoxTy ty = RTyRef' (R.mkIdent "Box") [ ty ]
-
-rBox :: R.Expr () -> R.Expr ()
-rBox e = RCallCon (RExprConRef (R.mkIdent "Box") (R.mkIdent "new")) [ e ]
-
-ppR :: (R.Pretty a, R.Resolve a) => a -> String
-ppR = show . R.pretty'
-
-idUses :: Data a => R.Ident -> a -> [R.Ident]
-idUses n = listify (== n)
-
-usedIn, unusedIn :: Data a => a -> R.Ident -> Bool
-usedIn x n = not $ null $ idUses n x
-unusedIn x = not . usedIn x
-
--- * Utilities
-
-enumerate :: [a] -> [(Int, a)]
-enumerate = zip [1..]
-
-pp :: P.Pretty a => a -> String
-pp = P.prettyShow
-
-ppm :: (MonadPretty m, P.PrettyTCM a) => a -> m Doc
-ppm = P.prettyTCM
-
-prender :: Doc -> String
-prender = P.renderStyle (P.Style P.OneLineMode 0 0.0)
-
-pinterleave :: (Applicative m, Semigroup (m Doc)) => m Doc -> [m Doc] -> m Doc
-pinterleave sep = fsep . punctuate sep
-
-pbindings :: (MonadPretty m, PrettyTCM a) => [(String, a)] -> [m Doc]
-pbindings = map $ \(n, ty) -> parens $ ppm n <> " : " <> ppm ty
-
-report :: String -> C ()
-report s = liftIO $ putStrLn s
-
-panic :: (P.Pretty a, Show a) => String -> a -> b
-panic s t = error $
-  "[PANIC] unexpected " <> s <> ": " <> limit (pp t) <> "\n"
-    <> "show: " <> limit (ppShow t)
-  where limit = take 500
-
-transcribe :: String -> String
-transcribe ""     = error "[UNEXPECTED] empty identifier"
-transcribe "_"    = error "[UNEXPECTED] placeholder identifier `_` should not be compiled"
-transcribe (c:cs) = toXIDStart c <> concatMap toXIDContinue cs
-  where
-  -- TODO: malicious user can break compiler by reverse engineering an identifier
-  -- * SOLUTION: keep a state of all produced identifiers and generate fresh ones
-  toXIDStart, toXIDContinue :: Char -> String
-  toXIDStart c
-    | isXIDStart c || c == '_'
-    = [c]
-    | isXIDContinue c
-    = "_" <> [c]
-    | otherwise
-    = toXIDContinue c
-
-  toXIDContinue c
-    | isXIDContinue c
-    = [c]
-    | otherwise
-    = "Ֆ" <> show (ord c) <> "Ֆ"
-
-unqual :: A.QName -> String
-unqual = transcribe . pp . qnameName
 
 unqualR :: A.QName -> R.Ident
 unqualR = R.mkIdent . unqual

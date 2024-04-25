@@ -21,7 +21,7 @@ import Data.Version ( showVersion )
 import Paths_agda2rust ( version )
 
 import Agda.Syntax.Position ( Range(..), rStart, posLine )
-import Agda.Syntax.Common ( Ranged(..) )
+import Agda.Syntax.Common ( Ranged(..), Origin(..), getOrigin )
 import Agda.Syntax.Internal ( qnameName, qnameModule )
 import Agda.Syntax.TopLevelModuleName
   ( TopLevelModuleName, moduleNameToFileName )
@@ -42,10 +42,9 @@ import Agda.Main ( runAgda )
 
 import qualified Language.Rust.Pretty as R
 
-import Agda2Rust
-  ( convert, ignoreDef, report, ppm, runC, runC0, initState, State )
-
---
+import Utils ( report )
+import AgdaUtils ( pp, ppm )
+import Agda2Rust ( convert, ignoreDef, runC, runC0, initState, State )
 
 -- | State propagated across modules.
 stateFile :: FilePath
@@ -125,7 +124,10 @@ backend = Backend'
   , postModule            = writeModule
   , compileDef            = compile
   , scopeCheckingSuffices = False
-  , mayEraseType          = \ _ -> return True
+  , mayEraseType          = \qn -> do
+    return True
+    -- return False
+    -- return $ getOrigin qn /= UserWritten
   }
 
 moduleSetup :: Options -> IsMain -> TopLevelModuleName -> Maybe FilePath
@@ -139,7 +141,7 @@ defRange = nameBindingSite . qnameName . defName
 
 compile :: Options -> ModuleEnv -> IsMain -> Definition -> TCM CompiledDef
 compile opts tlm _ def@(Defn{..})
-  | ignoreDef theDef
+  | ignoreDef def
   = return $ Ranged (defRange def) ""
   | otherwise
   -- $ getUniqueCompilerPragma "AGDA2RUST" defName >>= \case
@@ -166,6 +168,7 @@ ignoredRustWarnings =
   , "non_snake_case"
   , "unused_variables"
   , "non_camel_case_types"
+  , "non_upper_case_globals"
   -- , "uncommon_codepoints" -- only crate-level attribute
   ]
 

@@ -1,16 +1,12 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types)]
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
 pub enum Maybe<  A,> {
   Nothing(),
   Just(A),
 }
 
 
-pub fn m0() -> Maybe<i32> {
-  Maybe::Nothing()
-}
-pub fn m1() -> Maybe<i32> {
-  Maybe::Just(1)
-}
+pub const m0: Maybe<i32> = Maybe::Nothing();
+pub const m1: Maybe<i32> = Maybe::Just(1);
 pub fn fromMaybeNat(x0: Maybe<i32>) -> i32 {
   match x0 {
     Maybe::Nothing() => 0,

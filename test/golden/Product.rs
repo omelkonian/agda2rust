@@ -1,4 +1,4 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types)]
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
 pub struct _Ֆ215Ֆ_<A, B> {
   pub projՖ8321Ֆ: A,
   pub projՖ8322Ֆ: B,
@@ -29,4 +29,7 @@ pub fn mapSnd<B, C, A>(x0: fn(_: B) -> C, x1: _Ֆ215Ֆ_<A, B>) -> _Ֆ215Ֆ_<A, C
       projՖ8322Ֆ: x0(projՖ8322Ֆ),
     },
   }
+}
+pub fn fst<A, B>(x0: _Ֆ215Ֆ_<A, B>) -> A {
+  projՖ8321Ֆ(x0)
 }

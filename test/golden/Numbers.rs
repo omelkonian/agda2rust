@@ -1,12 +1,10 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types)]
-pub fn answer() -> i32 {
-  42
-}
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
+pub const answer: i32 = 42;
 pub fn suc(x0: i32) -> i32 {
   1 + x0
 }
 pub fn add_answer(x0: i32) -> i32 {
-  answer() + x0
+  answer + x0
 }
 pub fn add(x0: i32, x1: i32) -> i32 {
   x0 + x1
