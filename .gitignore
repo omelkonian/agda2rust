@@ -7,6 +7,7 @@ dist-newstyle
 _build
 # Rust
 *.rlib
+target/
 # Test suite
 test/Input.rs
 test/Agda
