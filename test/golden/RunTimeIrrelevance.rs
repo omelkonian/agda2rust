@@ -8,7 +8,9 @@ pub fn erasedHigherOrderFunArg(x1: i32) -> i32 {
   1 + x1
 }
 
-pub const erasedRec: i32 = 42;
+pub fn erasedRec() -> i32 {
+  42
+}
 
 pub struct ErasedField {
   pub x: i32,
@@ -42,7 +44,9 @@ pub fn erasedRecParam(x0: ErasedRecParam) -> i32 {
   }
 }
 
-pub const erasedData: i32 = 42;
+pub fn erasedData() -> i32 {
+  42
+}
 
 #[derive(Debug)]
 pub enum ErasedCon {

@@ -43,13 +43,17 @@ alongside the corresponding generated Rust code
   + [ ] complex records
 - [ ] imports
   + [ ] private definitions (i.e. not `pub` for everything)
+- [x] Postulates
 - [x] FOREIGN pragmas
-- [ ] FFI with postulates
-- [ ] Erasure (a.k.a. run-time irrelevance)
+  - [ ] FFI with postulates
+- [x] Erasure (a.k.a. run-time irrelevance)
 - [ ] Compile-time irrelevance
+  - [ ] Prop universe
 - [x] test suite
   + [x] golden files
   + [x] CI
 - [ ] interface
   + [ ] emacs mode?
   + [ ] TUI?
+- [ ] Optional features
+  + [ ] Inlining

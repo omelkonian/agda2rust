@@ -211,25 +211,35 @@ gos = igos . enumerate
     as' <- igos as
     return (a' : as')
 
-ignoreDef :: A.Definition -> Bool
-ignoreDef d@A.Defn{..} = case theDef of
-  -- ** erasure
-  _ | A.hasQuantity0 d -> True
-  -- ** ignore functions that are either @0, or pattern lambdas, or with-generated
-  A.Function{..} | {-funErasure ||-} isJust funExtLam || isJust funWith -> True
-  -- ** ignored these kind of definitions
-  A.Primitive{..} -> True
-  A.PrimitiveSort{..} -> True
-  A.Axiom{..} -> True
-  A.DataOrRecSig{..} -> True
-  A.GeneralizableVar -> True
-  -- ** TODO: handle in the future
-  A.Constructor{..} -> True
-  -- A.Constructor{..} | conErasure -> True
-  -- ** compile everything else
-  _ -> False
+ignoreDef :: A.Definition -> TCM Bool
+ignoreDef d@A.Defn{..} = do
+  builtins <- getBuiltins
+  return $ case theDef of
+    -- ** ignore builtin definitions
+    _ | defName `elem` builtins -> True
+    -- ** erasure
+    _ | A.hasQuantity0 d -> True
+    -- ** ignore functions that are @0/pattern-lambdas/with-generated
+    A.Function{..} | {-funErasure ||-} isJust funExtLam || isJust funWith -> True
+    -- ** ignored these kind of definitions
+    A.Constructor{..} {-| conErasure-} -> True
+    A.Primitive{..} -> True
+    A.PrimitiveSort{..} -> True
+    A.DataOrRecSig{..} -> True
+    A.GeneralizableVar -> True
+    -- ** compile everything else
+    _ -> False
+  where
+    builtinIds :: [A.BuiltinId]
+    builtinIds
+      = [ A.builtinLevel
+        -- , A.builtinLevelUniv
+        ]
+      -- <> A.builtinsNoDef
+      -- <> A.sizeBuiltins
 
-type FnAccum = ([String], [R.Arg ()], R.Ty (), R.Expr ())
+    getBuiltins :: TCM [QName]
+    getBuiltins = mapMaybeM A.getBuiltinName' builtinIds
 
 -- | Compiling definitions.
 instance A.Definition ~> R.Item where
@@ -239,55 +249,66 @@ instance A.Definition ~> R.Item where
     where
     dx = unqualR defName
 
+    -- ** helper for functions and axioms
+    goFn :: C (R.Expr ()) -> (A.ListTel, A.Type) -> C (R.Item ())
+    goFn goBody acc = do
+      (ps, as, resTy, body) <- goFn' acc
+      let fn -- | null ps && null as = {-RConst-}RStatic dx resTy body
+             | otherwise = RFn -- (if null as then RConstFn else RFn)
+                              dx
+                              (RTyParam . R.mkIdent <$> ps)
+                              (RFnTy as resTy)
+                              (RBlock body)
+      report $ " fn: " <> ppR fn
+      return fn
+      where
+      goFn' :: (A.ListTel, A.Type) -> C ([String], [R.Arg ()], R.Ty (), R.Expr ())
+      goFn' (d:tel, resTy) = do
+        d' <- renameTelArg d
+        (ps0, as0) <- goTelArg d'
+        (ps, as, resTy, body) <- A.addContext d' (goFn' (tel, resTy))
+        return $ (ps0 <> ps, as0 <> as, resTy, body)
+      goFn' ([], resTy) = do
+        resTy' <- go resTy
+        body <- goBody
+        return ([], [], resTy', body)
+
+      goTelArg :: A.Dom (String, A.Type) -> C ([String], [R.Arg ()])
+      goTelArg d@(A.unDom -> (x, ty))
+        | isJust $ A.isSort $ A.unEl ty
+        = return ([x], [])
+        | A.hasQuantity0 d
+        = return ([], [])
+        | otherwise
+        = do isLvl <- A.isLevelType ty
+             ty' <- go ty
+             return ([], [RArg (R.mkIdent x) ty' | not isLvl])
+
+      renameTelArg :: A.Dom (String, A.Type) -> C (A.Dom (String, A.Type))
+      renameTelArg d@(unDom -> (x, ty))
+        | "_" <- x
+        = do x' <- freshVarInCtx
+             return $ d {A.unDom = (x', ty)}
+        | otherwise
+        = return d
+
     goD :: A.Defn :~> R.Item
     goD = \case
       A.AbstractDefn defn -> goD defn
 
-      -- A.Function{..} | d ^. funInline
-      def@(A.Function{..}) -> do
+      A.Axiom{..} -> do
         report $ " type: " <> pp defType
         (tel, resTy) <- telListView defType
-        tterm <- liftTCM $ A.toTreeless defName
+        goFn (return $ rPanic "POSTULATE") (tel, resTy)
+
+      -- A.Function{..} | d ^. funInline
+      A.Function{..} -> do
+        report $ " type: " <> pp defType
+        (tel, resTy) <- telListView defType
+        tterm <- liftTCM $ stripTopTLams <$> A.toTreeless defName
         report $ " tterm: " <> pp tterm
-        (tyParams, args, resTy, body) <- goFn (tel, resTy, tterm)
-        report $ " fnTy: " <> ppR (RFnTy args resTy)
-        let fn | null args = RConst dx resTy body
-               | otherwise = RFn dx (RTyParam . R.mkIdent <$> tyParams)
-                              (RFnTy args resTy)
-                              (RBlock body)
-        report $ " fn: " <> ppR fn
-        return fn
+        goFn (go tterm) (tel, resTy)
         where
-        goA :: A.Dom (String, A.Type) -> C ([String], [R.Arg ()])
-        goA d@(A.unDom -> (x, ty))
-          | isJust $ A.isSort $ A.unEl ty
-          = return ([x], [])
-          | A.hasQuantity0 d
-          = return ([], [])
-          | otherwise
-          = do isLvl <- A.isLevelType ty
-               ty' <- go ty
-               return ([], [RArg (R.mkIdent x) ty' | not isLvl])
-
-        goFn :: (A.ListTel, A.Type, A.TTerm) -> C FnAccum
-        goFn (d:tel, resTy, body) = do
-          d' <- renameArg d
-          (ps0, as0) <- goA d'
-          (ps, as, resTy, body) <- A.addContext d' (goFn (tel, resTy, body))
-          return $ (ps0 <> ps, as0 <> as, resTy, body)
-        goFn ([], resTy, body) = do
-          resTy' <- go resTy
-          body' <- go (stripTopTLams body)
-          return ([], [], resTy', body')
-
-        renameArg :: A.Dom (String, A.Type) -> C (A.Dom (String, A.Type))
-        renameArg d@(unDom -> (x, ty))
-          | "_" <- x
-          = do x' <- freshVarInCtx
-               return $ d {A.unDom = (x', ty)}
-          | otherwise
-          = return d
-
         stripTopTLams :: A.TTerm -> A.TTerm
         stripTopTLams = \case
           A.TLam t -> stripTopTLams t
@@ -297,7 +318,7 @@ instance A.Definition ~> R.Item where
         -- cs <- zip dataCons <$> traverse typeOfConst dataCons)
         cs <- concat <$> forM dataCons (\dc -> do
           cDef <- A.instantiateDef =<< getConstInfo dc
-          return [ (dc, A.defType cDef) | not (A.hasQuantity0 cDef)]
+          return [ (dc, A.defType cDef) | hasQuantityNon0 cDef]
           )
         A.TelV tel _ <- A.telViewUpTo dataPars defType
         params   <- extractTyParams tel
@@ -339,7 +360,7 @@ instance A.Definition ~> R.Item where
         report $ " fs: " <> pp fs
         let params = extractTyParams tel
         report $ " params: " <> show params
-        fields <- A.addContext tel (goFs $ unDom <$> filter (not . A.hasQuantity0) fs)
+        fields <- A.addContext tel (goFs $ unDom <$> filter hasQuantityNon0 fs)
         report $ " fields: " <> show fields
         let unusedParams = filter (unusedIn fields) params
         setUnusedTyParams defName (ppR <$> unusedParams)
@@ -351,7 +372,7 @@ instance A.Definition ~> R.Item where
 
         where
         extractTyParams :: A.ListTel -> [R.Ident]
-        extractTyParams = map (R.mkIdent . fst . A.unDom) . filter (not . A.hasQuantity0)
+        extractTyParams = map (R.mkIdent . fst . A.unDom) . filter hasQuantityNon0
 
         goFs :: [(String, A.Type)] :~>* R.StructField
         goFs [] = return []
@@ -362,14 +383,6 @@ instance A.Definition ~> R.Item where
         goF :: (String, A.Type) :~> R.StructField
         goF (x, ty) = RNamedField (R.mkIdent $ transcribe x) <$> go ty
 
-    -- A.Constructor{..} -> do
-    --   let cn = conName conSrcCon
-    --   d <- theDef <$> getConstInfo conData
-    --   return $ case d of
-    --     A.Datatype{..} ->
-    --       let Just i x= elemIndex (unqual cn) (unqual <$> dataCons)
-    --       in  Constructor (pp conData) (toInteger ix)
-    --     A.Record{..} -> Constructor (pp conData) 0
       d -> panic "unsupported definition" d
      where
       phantomField :: [R.Ident] -> R.Ty ()
@@ -416,10 +429,6 @@ instance A.Type ~> R.Ty where
       return $ RTyRef (R.mkIdent x)
     ty -> panic "unsupported type" ty
 
--- | Compiling a collection of (tagged) Agda types into Rust struct fields.
--- instance [(A.QName, A.Type)] ~>* R.StructField where
-
-
 -- | Compiling Agda constructors into Rust variants.
 instance (A.QName, A.Type) ~> R.Variant where
   go (c, ty) = inConstructor c $ do
@@ -463,17 +472,16 @@ instance A.TTerm ~> R.Expr where
       report $ "* compiling case expression:\n" <> pp t
       (x, ty) <- lookupCtx scrutinee
       report $ " scrutinee: " <> x
-      report $ " scrutineeTy: " <> pp ty
       arms <- traverse go alts
       -- report $ " arms: " <> ppShow arms
       defArm <- case defCase of
         A.TError _ -> do
-          let catchAll = RMacroCall (RRef "panic") (RStrTok "IMPOSSIBLE")
+          report $ " scrutineeTy: " <> pp ty
           shouldCatchAll <- A.reduce (unEl ty) >>= \case
             A.Def qn _ -> (theDef <$> getConstInfo qn) >>= \case
               A.Datatype{} -> hasUnusedTyParams qn
               _ -> return False
-          return [RArm RWildP catchAll | shouldCatchAll]
+          return [RArm RWildP (rPanic "IMPOSSIBLE") | shouldCatchAll]
         t -> do
           catchAll <- go t
           -- report $ " catchAll: " <> ppShow catchAll
@@ -498,7 +506,10 @@ instance A.TTerm ~> R.Expr where
 
     goHead :: A.TTerm -> C (Maybe A.QName, ([R.Expr ()] -> R.Expr ()))
     goHead = \case
-      A.TDef qn -> return (Nothing, rCall (unqualR qn))
+      A.TDef qn -> do
+        -- toConst <- isNullary =<< A.typeOfConst qn
+        -- return (Nothing, (if toConst then rCall else RCall) (unqualR qn))
+        return (Nothing, RCall (unqualR qn))
       A.TCon cn -> do
         report $ "* compiling head of application (constructor: " <> pp cn <> ")"
         isRec <- A.isRecordConstructor cn
@@ -518,8 +529,11 @@ instance A.TTerm ~> R.Expr where
         -- | A.PIf <- prim
         -- , [] <- xs
       A.TVar n -> do
-        f <- R.mkIdent <$> lookupCtxVar n
-        return (Nothing, rCall f)
+        -- f <- R.mkIdent <$> lookupCtxVar n
+        -- return (Nothing, rCall f)
+        (f, ty) <- lookupCtx n
+        toConst <- isNullary ty
+        return (Nothing, (if toConst then rCall else RCall) (R.mkIdent f))
       hd -> panic "unsupported head" (ppShow hd)
 
     getBinOp :: A.TPrim -> Maybe R.BinOp
@@ -566,7 +580,7 @@ instance A.TAlt ~> R.Arm where
           (_, vargs, _) <- viewTy =<< A.typeOfConst con
           vargs' <- populateArgNames vargs
           report $ " vargs': " <> pp vargs'
-          let xs = transcribe . fst . unDom <$> filter (not . A.hasQuantity0) (take n vargs')
+          let xs = transcribe . fst . unDom <$> filter hasQuantityNon0 (take n vargs')
           Just (qn, _) <- A.isRecordConstructor con
           hasPhantomField <- hasUnusedTyParams qn
           let pats = RId . R.mkIdent <$> xs <> ["_phantom" | hasPhantomField]
@@ -581,7 +595,7 @@ instance A.TAlt ~> R.Arm where
           path <- qualR con
           (_, vargs, _) <- viewTy =<< A.typeOfConst con
           vargs' <- populateArgNames vargs
-          let xs = take n (fst . unDom <$> filter (not . A.hasQuantity0) vargs')
+          let xs = take n (fst . unDom <$> filter hasQuantityNon0 vargs')
           let pats = RId . R.mkIdent <$> xs
           report $ " pat: " <> pp con <> "(" <> show n <> ")"
                 <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"

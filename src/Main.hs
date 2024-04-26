@@ -1,3 +1,4 @@
+{-# LANGUAGE DoAndIfThenElse #-}
 module Main where
 
 import Data.Maybe ( fromMaybe, catMaybes )
@@ -140,14 +141,14 @@ defRange :: Definition -> Range
 defRange = nameBindingSite . qnameName . defName
 
 compile :: Options -> ModuleEnv -> IsMain -> Definition -> TCM (Maybe CompiledDef)
-compile opts tlm _ def@(Defn{..})
-  | ignoreDef def
-  = return Nothing
-  | otherwise
+compile opts tlm _ def@(Defn{..}) = do
+  shouldIgnore <- ignoreDef def
+  if shouldIgnore then do
+    report ("*** ignoring definition: " <> pp defName) >> return Nothing
+  else withCurrentModule (qnameModule defName) $ do
   -- $ getUniqueCompilerPragma "AGDA2RUST" defName >>= \case
   --     Nothing -> return []
   --     Just (CompilerPragma _ _) -> ...
-  = withCurrentModule (qnameModule defName) $ do
     s <- liftIO readState
     (cdef, s') <- runC s (convert def)
     liftIO $ writeState s'

@@ -126,8 +126,11 @@ freshVarInCtx = freshVar <$> currentCtxVars
 
 -- ** arguments & visibility
 
+hasQuantityNon0 :: A.LensQuantity a => a -> Bool
+hasQuantityNon0 = not . A.hasQuantity0
+
 shouldKeep :: (A.LensQuantity a, A.LensHiding a) => a -> Bool
-shouldKeep = A.visible /\ (not . A.hasQuantity0)
+shouldKeep = A.visible /\ hasQuantityNon0
 
 vArgs :: [A.Arg a] -> [a]
 vArgs = fmap unArg . filter shouldKeep
@@ -169,6 +172,9 @@ resTy :: A.PureTCM m => A.Type -> m A.Type
 resTy ty = do
   (_ , _, ty) <- viewTy ty
   return ty
+
+isNullary :: A.PureTCM m => A.Type -> m Bool
+isNullary ty = null . filter hasQuantityNon0 . fst <$> telListView ty
 
 -- filterTel :: (Dom Type -> Bool) -> A.Telescope -> A.Telescope
 -- filterTel p = \case

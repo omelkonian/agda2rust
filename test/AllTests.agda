@@ -9,6 +9,8 @@ import Nat0
 import List0
 import Singleton
 import RunTimeIrrelevance
+import Postulates
+import Constants
 
 -- ** FUTURE
 -- import NonLinearFun
@@ -32,6 +34,8 @@ mod List0; use List0::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};
 mod Singleton; use Singleton::The::{the};
 mod RunTimeIrrelevance;
 use RunTimeIrrelevance::BST::{Leaf,Node};
+mod Postulates;
+mod Constants;
 // mod NonLinearFun; use NonLinearFun::double;
 
 fn ᐁ<T>(x : T) -> Box<T> {
@@ -46,7 +50,8 @@ fn __<T>() -> PhantomData<T> {
 fn main() {
   println!(
     "{} | {} | {} | {} | {} | {} | {} | {} | | {} | {} | {} | {} | {} \
-     | {:?} | {:?} | {:?} | {:?} | {} | {} | {} | {} | {} | {} | {:?} | {:?} | {:?}",
+     | {:?} | {:?} | {:?} | {:?} | {} | {} | {} | {} | {} | {} | {:?} | {:?} | {:?} \
+     | {} | {} ",
     // *** Identity ***
     Identity::id(42),
     Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(42),
@@ -85,15 +90,18 @@ fn main() {
     // *** Erasure ***
     RunTimeIrrelevance::erasedFunArg(41),
     RunTimeIrrelevance::erasedHigherOrderFunArg(41),
-    RunTimeIrrelevance::erasedRec,
+    RunTimeIrrelevance::erasedRec(),
     RunTimeIrrelevance::succ(RunTimeIrrelevance::ErasedField {x: 41}),
     RunTimeIrrelevance::erasedRecParam(RunTimeIrrelevance::ErasedRecParam {y: 42}),
-    RunTimeIrrelevance::erasedData,
+    RunTimeIrrelevance::erasedData(),
     RunTimeIrrelevance::erasedClause(RunTimeIrrelevance::ErasedCon::mk(42)),
     RunTimeIrrelevance::erasedConArg(RunTimeIrrelevance::ErasedConArg::mk(42)),
-    Node(4, ᐁ(Node(2, ᐁ(Leaf()), ᐁ(Leaf()))), ᐁ(Leaf()))
+    Node(4, ᐁ(Node(2, ᐁ(Leaf()), ᐁ(Leaf()))), ᐁ(Leaf())),
+    // *** Postulates ***
+    Postulates::testMax(),
+    Constants::testNaught(),
     // *** Non-linear functions ***
-    // double(21)
+    // double(21),
   );
 }
 #-}

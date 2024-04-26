@@ -5,9 +5,13 @@ pub enum Maybe<  A,> {
   Just(A),
 }
 
-pub const m0: Maybe<i32> = Maybe::Nothing();
+pub fn m0() -> Maybe<i32> {
+  Maybe::Nothing()
+}
 
-pub const m1: Maybe<i32> = Maybe::Just(1);
+pub fn m1() -> Maybe<i32> {
+  Maybe::Just(1)
+}
 
 pub fn fromMaybeNat(x0: Maybe<i32>) -> i32 {
   match x0 {
