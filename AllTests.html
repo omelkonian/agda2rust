@@ -10,92 +10,100 @@
 <a id="119" class="Keyword">import</a> <a id="126" href="List0.html" class="Module">List0</a>
 <a id="132" class="Keyword">import</a> <a id="139" href="Singleton.html" class="Module">Singleton</a>
 <a id="149" class="Keyword">import</a> <a id="156" href="RunTimeIrrelevance.html" class="Module">RunTimeIrrelevance</a>
+<a id="175" class="Keyword">import</a> <a id="182" href="Postulates.html" class="Module">Postulates</a>
+<a id="193" class="Keyword">import</a> <a id="200" href="Constants.html" class="Module">Constants</a>
 
-<a id="176" class="Comment">-- ** FUTURE</a>
-<a id="189" class="Comment">-- import NonLinearFun</a>
-<a id="212" class="Comment">-- import Eq</a>
-<a id="225" class="Comment">-- import Eq0</a>
-<a id="239" class="Comment">-- import Vec</a>
-<a id="253" class="Comment">-- import Erasure</a>
-<a id="271" class="Comment">-- import CompileTimeIrrelevance</a>
-<a id="304" class="Comment">-- import FFI</a>
+<a id="211" class="Comment">-- ** FUTURE</a>
+<a id="224" class="Comment">-- import NonLinearFun</a>
+<a id="247" class="Comment">-- import Eq</a>
+<a id="260" class="Comment">-- import Eq0</a>
+<a id="274" class="Comment">-- import Vec</a>
+<a id="288" class="Comment">-- import Erasure</a>
+<a id="306" class="Comment">-- import CompileTimeIrrelevance</a>
+<a id="339" class="Comment">-- import FFI</a>
 
-<a id="319" class="Symbol">{-#</a> <a id="323" class="Keyword">FOREIGN</a> <a id="331" class="Pragma">AGDA2RUST</a>
-<a id="341" class="Pragma">mod</a> <a id="345" class="Pragma">Identity;</a>
-<a id="355" class="Pragma">mod</a> <a id="359" class="Pragma">Numbers;</a>
-<a id="368" class="Pragma">mod</a> <a id="372" class="Pragma">Simplification;</a>
-<a id="388" class="Pragma">mod</a> <a id="392" class="Pragma">Product;</a>
-<a id="401" class="Pragma">mod</a> <a id="405" class="Pragma">Either;</a>
-<a id="413" class="Pragma">mod</a> <a id="417" class="Pragma">Maybe;</a> <a id="424" class="Pragma">use</a> <a id="428" class="Pragma">Maybe::Maybe::{Just};</a>
-<a id="450" class="Pragma">mod</a> <a id="454" class="Pragma">Exp;</a> <a id="459" class="Pragma">use</a> <a id="463" class="Pragma">Exp::Exp::{Plus,Int,Var};</a>
-<a id="489" class="Pragma">mod</a> <a id="493" class="Pragma">Nat0;</a> <a id="499" class="Pragma">use</a> <a id="503" class="Pragma">Nat0::Nat::{zero,suc};</a>
-<a id="526" class="Pragma">mod</a> <a id="530" class="Pragma">List0;</a> <a id="537" class="Pragma">use</a> <a id="541" class="Pragma">List0::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};</a>
-<a id="575" class="Pragma">mod</a> <a id="579" class="Pragma">Singleton;</a> <a id="590" class="Pragma">use</a> <a id="594" class="Pragma">Singleton::The::{the};</a>
-<a id="617" class="Pragma">mod</a> <a id="621" class="Pragma">RunTimeIrrelevance;</a>
-<a id="641" class="Pragma">use</a> <a id="645" class="Pragma">RunTimeIrrelevance::BST::{Leaf,Node};</a>
-<a id="683" class="Pragma">//</a> <a id="686" class="Pragma">mod</a> <a id="690" class="Pragma">NonLinearFun;</a> <a id="704" class="Pragma">use</a> <a id="708" class="Pragma">NonLinearFun::double;</a>
+<a id="354" class="Symbol">{-#</a> <a id="358" class="Keyword">FOREIGN</a> <a id="366" class="Pragma">AGDA2RUST</a>
+<a id="376" class="Pragma">mod</a> <a id="380" class="Pragma">Identity;</a>
+<a id="390" class="Pragma">mod</a> <a id="394" class="Pragma">Numbers;</a>
+<a id="403" class="Pragma">mod</a> <a id="407" class="Pragma">Simplification;</a>
+<a id="423" class="Pragma">mod</a> <a id="427" class="Pragma">Product;</a>
+<a id="436" class="Pragma">mod</a> <a id="440" class="Pragma">Either;</a>
+<a id="448" class="Pragma">mod</a> <a id="452" class="Pragma">Maybe;</a> <a id="459" class="Pragma">use</a> <a id="463" class="Pragma">Maybe::Maybe::{Just};</a>
+<a id="485" class="Pragma">mod</a> <a id="489" class="Pragma">Exp;</a> <a id="494" class="Pragma">use</a> <a id="498" class="Pragma">Exp::Exp::{Plus,Int,Var};</a>
+<a id="524" class="Pragma">mod</a> <a id="528" class="Pragma">Nat0;</a> <a id="534" class="Pragma">use</a> <a id="538" class="Pragma">Nat0::Nat::{zero,suc};</a>
+<a id="561" class="Pragma">mod</a> <a id="565" class="Pragma">List0;</a> <a id="572" class="Pragma">use</a> <a id="576" class="Pragma">List0::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};</a>
+<a id="610" class="Pragma">mod</a> <a id="614" class="Pragma">Singleton;</a> <a id="625" class="Pragma">use</a> <a id="629" class="Pragma">Singleton::The::{the};</a>
+<a id="652" class="Pragma">mod</a> <a id="656" class="Pragma">RunTimeIrrelevance;</a>
+<a id="676" class="Pragma">use</a> <a id="680" class="Pragma">RunTimeIrrelevance::BST::{Leaf,Node};</a>
+<a id="718" class="Pragma">mod</a> <a id="722" class="Pragma">Postulates;</a>
+<a id="734" class="Pragma">mod</a> <a id="738" class="Pragma">Constants;</a>
+<a id="749" class="Pragma">//</a> <a id="752" class="Pragma">mod</a> <a id="756" class="Pragma">NonLinearFun;</a> <a id="770" class="Pragma">use</a> <a id="774" class="Pragma">NonLinearFun::double;</a>
 
-<a id="731" class="Pragma">fn</a> <a id="734" class="Pragma">ᐁ&lt;T&gt;(x</a> <a id="741" class="Pragma">:</a> <a id="743" class="Pragma">T)</a> <a id="746" class="Pragma">-&gt;</a> <a id="749" class="Pragma">Box&lt;T&gt;</a> <a id="756" class="Pragma">{</a>
-  <a id="760" class="Pragma">return</a> <a id="767" class="Pragma">Box::new(x);</a>
-<a id="780" class="Pragma">}</a>
+<a id="797" class="Pragma">fn</a> <a id="800" class="Pragma">ᐁ&lt;T&gt;(x</a> <a id="807" class="Pragma">:</a> <a id="809" class="Pragma">T)</a> <a id="812" class="Pragma">-&gt;</a> <a id="815" class="Pragma">Box&lt;T&gt;</a> <a id="822" class="Pragma">{</a>
+  <a id="826" class="Pragma">return</a> <a id="833" class="Pragma">Box::new(x);</a>
+<a id="846" class="Pragma">}</a>
 
-<a id="783" class="Pragma">use</a> <a id="787" class="Pragma">std::marker::{PhantomData};</a>
-<a id="815" class="Pragma">fn</a> <a id="818" class="Pragma">__&lt;T&gt;()</a> <a id="826" class="Pragma">-&gt;</a> <a id="829" class="Pragma">PhantomData&lt;T&gt;</a> <a id="844" class="Pragma">{</a>
-  <a id="848" class="Pragma">return</a> <a id="855" class="Pragma">PhantomData;</a>
-<a id="868" class="Pragma">}</a>
+<a id="849" class="Pragma">use</a> <a id="853" class="Pragma">std::marker::{PhantomData};</a>
+<a id="881" class="Pragma">fn</a> <a id="884" class="Pragma">__&lt;T&gt;()</a> <a id="892" class="Pragma">-&gt;</a> <a id="895" class="Pragma">PhantomData&lt;T&gt;</a> <a id="910" class="Pragma">{</a>
+  <a id="914" class="Pragma">return</a> <a id="921" class="Pragma">PhantomData;</a>
+<a id="934" class="Pragma">}</a>
 
-<a id="871" class="Pragma">fn</a> <a id="874" class="Pragma">main()</a> <a id="881" class="Pragma">{</a>
-  <a id="885" class="Pragma">println!(</a>
-    <a id="899" class="Pragma">&quot;{}</a> <a id="903" class="Pragma">|</a> <a id="905" class="Pragma">{}</a> <a id="908" class="Pragma">|</a> <a id="910" class="Pragma">{}</a> <a id="913" class="Pragma">|</a> <a id="915" class="Pragma">{}</a> <a id="918" class="Pragma">|</a> <a id="920" class="Pragma">{}</a> <a id="923" class="Pragma">|</a> <a id="925" class="Pragma">{}</a> <a id="928" class="Pragma">|</a> <a id="930" class="Pragma">{}</a> <a id="933" class="Pragma">|</a> <a id="935" class="Pragma">{}</a> <a id="938" class="Pragma">|</a> <a id="940" class="Pragma">|</a> <a id="942" class="Pragma">{}</a> <a id="945" class="Pragma">|</a> <a id="947" class="Pragma">{}</a> <a id="950" class="Pragma">|</a> <a id="952" class="Pragma">{}</a> <a id="955" class="Pragma">|</a> <a id="957" class="Pragma">{}</a> <a id="960" class="Pragma">|</a> <a id="962" class="Pragma">{}</a> <a id="965" class="Pragma">\</a>
-     <a id="972" class="Pragma">|</a> <a id="974" class="Pragma">{:?}</a> <a id="979" class="Pragma">|</a> <a id="981" class="Pragma">{:?}</a> <a id="986" class="Pragma">|</a> <a id="988" class="Pragma">{:?}</a> <a id="993" class="Pragma">|</a> <a id="995" class="Pragma">{:?}</a> <a id="1000" class="Pragma">|</a> <a id="1002" class="Pragma">{}</a> <a id="1005" class="Pragma">|</a> <a id="1007" class="Pragma">{}</a> <a id="1010" class="Pragma">|</a> <a id="1012" class="Pragma">{}</a> <a id="1015" class="Pragma">|</a> <a id="1017" class="Pragma">{}</a> <a id="1020" class="Pragma">|</a> <a id="1022" class="Pragma">{}</a> <a id="1025" class="Pragma">|</a> <a id="1027" class="Pragma">{}</a> <a id="1030" class="Pragma">|</a> <a id="1032" class="Pragma">{:?}</a> <a id="1037" class="Pragma">|</a> <a id="1039" class="Pragma">{:?}</a> <a id="1044" class="Pragma">|</a> <a id="1046" class="Pragma">{:?}&quot;,</a>
-    <a id="1057" class="Pragma">//</a> <a id="1060" class="Pragma">***</a> <a id="1064" class="Pragma">Identity</a> <a id="1073" class="Pragma">***</a>
-    <a id="1081" class="Pragma">Identity::id(42),</a>
-    <a id="1103" class="Pragma">Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(42),</a>
-    <a id="1141" class="Pragma">Identity::idH(42),</a>
-    <a id="1164" class="Pragma">//</a> <a id="1167" class="Pragma">Base</a> <a id="1172" class="Pragma">types</a>
-    <a id="1182" class="Pragma">Numbers::add(40,2),</a>
-    <a id="1206" class="Pragma">Simplification::increment(41),</a>
-    <a id="1241" class="Pragma">//</a> <a id="1244" class="Pragma">***</a> <a id="1248" class="Pragma">Recs</a> <a id="1253" class="Pragma">***</a>
-    <a id="1261" class="Pragma">Product::mapSnd(</a>
-      <a id="1284" class="Pragma">|x|</a> <a id="1288" class="Pragma">x</a> <a id="1290" class="Pragma">+</a> <a id="1292" class="Pragma">1</a>
-      <a id="1300" class="Pragma">,</a> <a id="1302" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="1319" class="Pragma">{projՖ8321Ֆ:</a> <a id="1332" class="Pragma">0,</a> <a id="1335" class="Pragma">projՖ8322Ֆ:</a> <a id="1347" class="Pragma">41}</a>
-    <a id="1355" class="Pragma">).projՖ8322Ֆ,</a>
-    <a id="1373" class="Pragma">Product::projՖ8321Ֆ(Product::mapFst(</a>
-      <a id="1416" class="Pragma">|x|</a> <a id="1420" class="Pragma">x</a> <a id="1422" class="Pragma">+</a> <a id="1424" class="Pragma">1</a>
-      <a id="1432" class="Pragma">,</a> <a id="1434" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="1451" class="Pragma">{projՖ8321Ֆ:</a> <a id="1464" class="Pragma">41,</a> <a id="1468" class="Pragma">projՖ8322Ֆ:</a> <a id="1480" class="Pragma">40}</a>
-    <a id="1488" class="Pragma">)),</a>
-    <a id="1496" class="Pragma">Product::fst(Product::mapFst(</a>
-      <a id="1532" class="Pragma">|x|</a> <a id="1536" class="Pragma">x</a> <a id="1538" class="Pragma">+</a> <a id="1540" class="Pragma">1</a>
-      <a id="1548" class="Pragma">,</a> <a id="1550" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="1567" class="Pragma">{projՖ8321Ֆ:</a> <a id="1580" class="Pragma">41,</a> <a id="1584" class="Pragma">projՖ8322Ֆ:</a> <a id="1596" class="Pragma">40}</a>
-    <a id="1604" class="Pragma">)),</a>
-    <a id="1612" class="Pragma">//</a> <a id="1615" class="Pragma">***</a> <a id="1619" class="Pragma">ADTs</a> <a id="1624" class="Pragma">***</a>
-    <a id="1632" class="Pragma">Either::fromEither::&lt;i32,</a> <a id="1658" class="Pragma">i32&gt;(41,</a> <a id="1667" class="Pragma">Either::Either::Left(42)),</a>
-    <a id="1698" class="Pragma">Either::fromOnlyLeft::&lt;i32,</a> <a id="1726" class="Pragma">i32&gt;(Either::OnlyLeft::Left(42)),</a>
-    <a id="1764" class="Pragma">Either::fromOnlyLeftR::&lt;i32,</a> <a id="1793" class="Pragma">i32&gt;(Either::OnlyLeftR</a> <a id="1816" class="Pragma">{left:</a> <a id="1823" class="Pragma">42,</a> <a id="1827" class="Pragma">_phantom:</a> <a id="1837" class="Pragma">__()}),</a>
-    <a id="1849" class="Pragma">Maybe::fromMaybe(41,</a> <a id="1870" class="Pragma">Just(42)),</a>
-    <a id="1885" class="Pragma">//</a> <a id="1888" class="Pragma">***</a> <a id="1892" class="Pragma">Resursive</a> <a id="1902" class="Pragma">ADTs</a> <a id="1907" class="Pragma">***</a>
-    <a id="1915" class="Pragma">Exp::eval(|x|</a> <a id="1929" class="Pragma">x,</a> <a id="1932" class="Pragma">Plus(ᐁ(Int(5)),ᐁ(Var(37)))),</a>
-    <a id="1965" class="Pragma">suc(ᐁ(suc(ᐁ(suc(ᐁ(suc(ᐁ(zero())))))))),</a>
-    <a id="2009" class="Pragma">Nat0::_Ֆ43Ֆ_(suc(ᐁ(zero())),</a> <a id="2038" class="Pragma">suc(ᐁ(zero()))),</a>
-    <a id="2059" class="Pragma">List0::map(|x|</a> <a id="2074" class="Pragma">x</a> <a id="2076" class="Pragma">+</a> <a id="2078" class="Pragma">1,</a> <a id="2081" class="Pragma">List0::_Ֆ43ՖՖ43Ֆ_(</a>
-      <a id="2106" class="Pragma">_Ֆ8759Ֆ_(3,</a> <a id="2118" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ())),</a>
-      <a id="2140" class="Pragma">_Ֆ8759Ֆ_(1,</a> <a id="2152" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ()))</a>
-    <a id="2171" class="Pragma">)),</a>
-    <a id="2179" class="Pragma">//</a> <a id="2182" class="Pragma">***</a> <a id="2186" class="Pragma">Value-dependent</a> <a id="2202" class="Pragma">types</a> <a id="2208" class="Pragma">***</a>
-    <a id="2216" class="Pragma">the(42),</a>
-    <a id="2229" class="Pragma">//</a> <a id="2232" class="Pragma">***</a> <a id="2236" class="Pragma">Erasure</a> <a id="2244" class="Pragma">***</a>
-    <a id="2252" class="Pragma">RunTimeIrrelevance::erasedFunArg(41),</a>
-    <a id="2294" class="Pragma">RunTimeIrrelevance::erasedHigherOrderFunArg(41),</a>
-    <a id="2347" class="Pragma">RunTimeIrrelevance::erasedRec,</a>
-    <a id="2382" class="Pragma">RunTimeIrrelevance::succ(RunTimeIrrelevance::ErasedField</a> <a id="2439" class="Pragma">{x:</a> <a id="2443" class="Pragma">41}),</a>
-    <a id="2453" class="Pragma">RunTimeIrrelevance::erasedRecParam(RunTimeIrrelevance::ErasedRecParam</a> <a id="2523" class="Pragma">{y:</a> <a id="2527" class="Pragma">42}),</a>
-    <a id="2537" class="Pragma">RunTimeIrrelevance::erasedData,</a>
-    <a id="2573" class="Pragma">RunTimeIrrelevance::erasedClause(RunTimeIrrelevance::ErasedCon::mk(42)),</a>
-    <a id="2650" class="Pragma">RunTimeIrrelevance::erasedConArg(RunTimeIrrelevance::ErasedConArg::mk(42)),</a>
-    <a id="2730" class="Pragma">Node(4,</a> <a id="2738" class="Pragma">ᐁ(Node(2,</a> <a id="2748" class="Pragma">ᐁ(Leaf()),</a> <a id="2759" class="Pragma">ᐁ(Leaf()))),</a> <a id="2772" class="Pragma">ᐁ(Leaf()))</a>
-    <a id="2787" class="Pragma">//</a> <a id="2790" class="Pragma">***</a> <a id="2794" class="Pragma">Non-linear</a> <a id="2805" class="Pragma">functions</a> <a id="2815" class="Pragma">***</a>
-    <a id="2823" class="Pragma">//</a> <a id="2826" class="Pragma">double(21)</a>
-  <a id="2839" class="Pragma">);</a>
-<a id="2842" class="Pragma">}</a>
-<a id="2844" class="Symbol">#-}</a>
+<a id="937" class="Pragma">fn</a> <a id="940" class="Pragma">main()</a> <a id="947" class="Pragma">{</a>
+  <a id="951" class="Pragma">println!(</a>
+    <a id="965" class="Pragma">&quot;{}</a> <a id="969" class="Pragma">|</a> <a id="971" class="Pragma">{}</a> <a id="974" class="Pragma">|</a> <a id="976" class="Pragma">{}</a> <a id="979" class="Pragma">|</a> <a id="981" class="Pragma">{}</a> <a id="984" class="Pragma">|</a> <a id="986" class="Pragma">{}</a> <a id="989" class="Pragma">|</a> <a id="991" class="Pragma">{}</a> <a id="994" class="Pragma">|</a> <a id="996" class="Pragma">{}</a> <a id="999" class="Pragma">|</a> <a id="1001" class="Pragma">{}</a> <a id="1004" class="Pragma">|</a> <a id="1006" class="Pragma">|</a> <a id="1008" class="Pragma">{}</a> <a id="1011" class="Pragma">|</a> <a id="1013" class="Pragma">{}</a> <a id="1016" class="Pragma">|</a> <a id="1018" class="Pragma">{}</a> <a id="1021" class="Pragma">|</a> <a id="1023" class="Pragma">{}</a> <a id="1026" class="Pragma">|</a> <a id="1028" class="Pragma">{}</a> <a id="1031" class="Pragma">\</a>
+     <a id="1038" class="Pragma">|</a> <a id="1040" class="Pragma">{:?}</a> <a id="1045" class="Pragma">|</a> <a id="1047" class="Pragma">{:?}</a> <a id="1052" class="Pragma">|</a> <a id="1054" class="Pragma">{:?}</a> <a id="1059" class="Pragma">|</a> <a id="1061" class="Pragma">{:?}</a> <a id="1066" class="Pragma">|</a> <a id="1068" class="Pragma">{}</a> <a id="1071" class="Pragma">|</a> <a id="1073" class="Pragma">{}</a> <a id="1076" class="Pragma">|</a> <a id="1078" class="Pragma">{}</a> <a id="1081" class="Pragma">|</a> <a id="1083" class="Pragma">{}</a> <a id="1086" class="Pragma">|</a> <a id="1088" class="Pragma">{}</a> <a id="1091" class="Pragma">|</a> <a id="1093" class="Pragma">{}</a> <a id="1096" class="Pragma">|</a> <a id="1098" class="Pragma">{:?}</a> <a id="1103" class="Pragma">|</a> <a id="1105" class="Pragma">{:?}</a> <a id="1110" class="Pragma">|</a> <a id="1112" class="Pragma">{:?}</a> <a id="1117" class="Pragma">\</a>
+     <a id="1124" class="Pragma">|</a> <a id="1126" class="Pragma">{}</a> <a id="1129" class="Pragma">|</a> <a id="1131" class="Pragma">{}</a> <a id="1134" class="Pragma">&quot;,</a>
+    <a id="1141" class="Pragma">//</a> <a id="1144" class="Pragma">***</a> <a id="1148" class="Pragma">Identity</a> <a id="1157" class="Pragma">***</a>
+    <a id="1165" class="Pragma">Identity::id(42),</a>
+    <a id="1187" class="Pragma">Identity::idՖ10216Ֆ_Ֆ10217Ֆ_(42),</a>
+    <a id="1225" class="Pragma">Identity::idH(42),</a>
+    <a id="1248" class="Pragma">//</a> <a id="1251" class="Pragma">Base</a> <a id="1256" class="Pragma">types</a>
+    <a id="1266" class="Pragma">Numbers::add(40,2),</a>
+    <a id="1290" class="Pragma">Simplification::increment(41),</a>
+    <a id="1325" class="Pragma">//</a> <a id="1328" class="Pragma">***</a> <a id="1332" class="Pragma">Recs</a> <a id="1337" class="Pragma">***</a>
+    <a id="1345" class="Pragma">Product::mapSnd(</a>
+      <a id="1368" class="Pragma">|x|</a> <a id="1372" class="Pragma">x</a> <a id="1374" class="Pragma">+</a> <a id="1376" class="Pragma">1</a>
+      <a id="1384" class="Pragma">,</a> <a id="1386" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="1403" class="Pragma">{projՖ8321Ֆ:</a> <a id="1416" class="Pragma">0,</a> <a id="1419" class="Pragma">projՖ8322Ֆ:</a> <a id="1431" class="Pragma">41}</a>
+    <a id="1439" class="Pragma">).projՖ8322Ֆ,</a>
+    <a id="1457" class="Pragma">Product::projՖ8321Ֆ(Product::mapFst(</a>
+      <a id="1500" class="Pragma">|x|</a> <a id="1504" class="Pragma">x</a> <a id="1506" class="Pragma">+</a> <a id="1508" class="Pragma">1</a>
+      <a id="1516" class="Pragma">,</a> <a id="1518" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="1535" class="Pragma">{projՖ8321Ֆ:</a> <a id="1548" class="Pragma">41,</a> <a id="1552" class="Pragma">projՖ8322Ֆ:</a> <a id="1564" class="Pragma">40}</a>
+    <a id="1572" class="Pragma">)),</a>
+    <a id="1580" class="Pragma">Product::fst(Product::mapFst(</a>
+      <a id="1616" class="Pragma">|x|</a> <a id="1620" class="Pragma">x</a> <a id="1622" class="Pragma">+</a> <a id="1624" class="Pragma">1</a>
+      <a id="1632" class="Pragma">,</a> <a id="1634" class="Pragma">Product::_Ֆ215Ֆ_</a> <a id="1651" class="Pragma">{projՖ8321Ֆ:</a> <a id="1664" class="Pragma">41,</a> <a id="1668" class="Pragma">projՖ8322Ֆ:</a> <a id="1680" class="Pragma">40}</a>
+    <a id="1688" class="Pragma">)),</a>
+    <a id="1696" class="Pragma">//</a> <a id="1699" class="Pragma">***</a> <a id="1703" class="Pragma">ADTs</a> <a id="1708" class="Pragma">***</a>
+    <a id="1716" class="Pragma">Either::fromEither::&lt;i32,</a> <a id="1742" class="Pragma">i32&gt;(41,</a> <a id="1751" class="Pragma">Either::Either::Left(42)),</a>
+    <a id="1782" class="Pragma">Either::fromOnlyLeft::&lt;i32,</a> <a id="1810" class="Pragma">i32&gt;(Either::OnlyLeft::Left(42)),</a>
+    <a id="1848" class="Pragma">Either::fromOnlyLeftR::&lt;i32,</a> <a id="1877" class="Pragma">i32&gt;(Either::OnlyLeftR</a> <a id="1900" class="Pragma">{left:</a> <a id="1907" class="Pragma">42,</a> <a id="1911" class="Pragma">_phantom:</a> <a id="1921" class="Pragma">__()}),</a>
+    <a id="1933" class="Pragma">Maybe::fromMaybe(41,</a> <a id="1954" class="Pragma">Just(42)),</a>
+    <a id="1969" class="Pragma">//</a> <a id="1972" class="Pragma">***</a> <a id="1976" class="Pragma">Resursive</a> <a id="1986" class="Pragma">ADTs</a> <a id="1991" class="Pragma">***</a>
+    <a id="1999" class="Pragma">Exp::eval(|x|</a> <a id="2013" class="Pragma">x,</a> <a id="2016" class="Pragma">Plus(ᐁ(Int(5)),ᐁ(Var(37)))),</a>
+    <a id="2049" class="Pragma">suc(ᐁ(suc(ᐁ(suc(ᐁ(suc(ᐁ(zero())))))))),</a>
+    <a id="2093" class="Pragma">Nat0::_Ֆ43Ֆ_(suc(ᐁ(zero())),</a> <a id="2122" class="Pragma">suc(ᐁ(zero()))),</a>
+    <a id="2143" class="Pragma">List0::map(|x|</a> <a id="2158" class="Pragma">x</a> <a id="2160" class="Pragma">+</a> <a id="2162" class="Pragma">1,</a> <a id="2165" class="Pragma">List0::_Ֆ43ՖՖ43Ֆ_(</a>
+      <a id="2190" class="Pragma">_Ֆ8759Ֆ_(3,</a> <a id="2202" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ())),</a>
+      <a id="2224" class="Pragma">_Ֆ8759Ֆ_(1,</a> <a id="2236" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ()))</a>
+    <a id="2255" class="Pragma">)),</a>
+    <a id="2263" class="Pragma">//</a> <a id="2266" class="Pragma">***</a> <a id="2270" class="Pragma">Value-dependent</a> <a id="2286" class="Pragma">types</a> <a id="2292" class="Pragma">***</a>
+    <a id="2300" class="Pragma">the(42),</a>
+    <a id="2313" class="Pragma">//</a> <a id="2316" class="Pragma">***</a> <a id="2320" class="Pragma">Erasure</a> <a id="2328" class="Pragma">***</a>
+    <a id="2336" class="Pragma">RunTimeIrrelevance::erasedFunArg(41),</a>
+    <a id="2378" class="Pragma">RunTimeIrrelevance::erasedHigherOrderFunArg(41),</a>
+    <a id="2431" class="Pragma">RunTimeIrrelevance::erasedRec(),</a>
+    <a id="2468" class="Pragma">RunTimeIrrelevance::succ(RunTimeIrrelevance::ErasedField</a> <a id="2525" class="Pragma">{x:</a> <a id="2529" class="Pragma">41}),</a>
+    <a id="2539" class="Pragma">RunTimeIrrelevance::erasedRecParam(RunTimeIrrelevance::ErasedRecParam</a> <a id="2609" class="Pragma">{y:</a> <a id="2613" class="Pragma">42}),</a>
+    <a id="2623" class="Pragma">RunTimeIrrelevance::erasedData(),</a>
+    <a id="2661" class="Pragma">RunTimeIrrelevance::erasedClause(RunTimeIrrelevance::ErasedCon::mk(42)),</a>
+    <a id="2738" class="Pragma">RunTimeIrrelevance::erasedConArg(RunTimeIrrelevance::ErasedConArg::mk(42)),</a>
+    <a id="2818" class="Pragma">Node(4,</a> <a id="2826" class="Pragma">ᐁ(Node(2,</a> <a id="2836" class="Pragma">ᐁ(Leaf()),</a> <a id="2847" class="Pragma">ᐁ(Leaf()))),</a> <a id="2860" class="Pragma">ᐁ(Leaf())),</a>
+    <a id="2876" class="Pragma">//</a> <a id="2879" class="Pragma">***</a> <a id="2883" class="Pragma">Postulates</a> <a id="2894" class="Pragma">***</a>
+    <a id="2902" class="Pragma">Postulates::testMax(),</a>
+    <a id="2929" class="Pragma">Constants::testNaught(),</a>
+    <a id="2958" class="Pragma">//</a> <a id="2961" class="Pragma">***</a> <a id="2965" class="Pragma">Non-linear</a> <a id="2976" class="Pragma">functions</a> <a id="2986" class="Pragma">***</a>
+    <a id="2994" class="Pragma">//</a> <a id="2997" class="Pragma">double(21),</a>
+  <a id="3011" class="Pragma">);</a>
+<a id="3014" class="Pragma">}</a>
+<a id="3016" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/AllTests.unicode.html"/></div></body></html>
