@@ -3,13 +3,51 @@
 
 <a id="48" class="Keyword">data</a> <a id="Exp"></a><a id="53" href="Exp.html#53" class="Datatype">Exp</a> <a id="57" class="Symbol">(</a><a id="58" href="Exp.html#58" class="Bound">V</a> <a id="60" class="Symbol">:</a> <a id="62" href="Agda.Primitive.html#388" class="Primitive">Set</a><a id="65" class="Symbol">)</a> <a id="67" class="Symbol">:</a> <a id="69" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="73" class="Keyword">where</a>
   <a id="Exp.Plus"></a><a id="81" href="Exp.html#81" class="InductiveConstructor">Plus</a> <a id="86" class="Symbol">:</a> <a id="88" href="Exp.html#53" class="Datatype">Exp</a> <a id="92" href="Exp.html#58" class="Bound">V</a> <a id="94" class="Symbol">→</a> <a id="96" href="Exp.html#53" class="Datatype">Exp</a> <a id="100" href="Exp.html#58" class="Bound">V</a> <a id="102" class="Symbol">→</a> <a id="104" href="Exp.html#53" class="Datatype">Exp</a> <a id="108" href="Exp.html#58" class="Bound">V</a>
-  <a id="Exp.Int"></a><a id="112" href="Exp.html#112" class="InductiveConstructor">Int</a> <a id="116" class="Symbol">:</a> <a id="118" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a> <a id="122" class="Symbol">→</a> <a id="124" href="Exp.html#53" class="Datatype">Exp</a> <a id="128" href="Exp.html#58" class="Bound">V</a>
-  <a id="Exp.Var"></a><a id="132" href="Exp.html#132" class="InductiveConstructor">Var</a> <a id="136" class="Symbol">:</a> <a id="138" href="Exp.html#58" class="Bound">V</a> <a id="140" class="Symbol">→</a> <a id="142" href="Exp.html#53" class="Datatype">Exp</a> <a id="146" href="Exp.html#58" class="Bound">V</a>
+  <a id="Exp.Int"></a><a id="112" href="Exp.html#112" class="InductiveConstructor">Int</a>  <a id="117" class="Symbol">:</a> <a id="119" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a> <a id="123" class="Symbol">→</a> <a id="125" href="Exp.html#53" class="Datatype">Exp</a> <a id="129" href="Exp.html#58" class="Bound">V</a>
+  <a id="Exp.Var"></a><a id="133" href="Exp.html#133" class="InductiveConstructor">Var</a>  <a id="138" class="Symbol">:</a> <a id="140" href="Exp.html#58" class="Bound">V</a> <a id="142" class="Symbol">→</a> <a id="144" href="Exp.html#53" class="Datatype">Exp</a> <a id="148" href="Exp.html#58" class="Bound">V</a>
 
-<a id="149" class="Keyword">private</a> <a id="157" class="Keyword">variable</a> <a id="166" href="Exp.html#166" class="Generalizable">A</a> <a id="168" class="Symbol">:</a> <a id="170" href="Agda.Primitive.html#388" class="Primitive">Set</a>
+<a id="exampleExp"></a><a id="151" href="Exp.html#151" class="Function">exampleExp</a> <a id="162" class="Symbol">:</a> <a id="164" href="Exp.html#53" class="Datatype">Exp</a> <a id="168" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a>
+<a id="172" href="Exp.html#151" class="Function">exampleExp</a> <a id="183" class="Symbol">=</a> <a id="185" href="Exp.html#81" class="InductiveConstructor">Plus</a> <a id="190" class="Symbol">(</a><a id="191" href="Exp.html#112" class="InductiveConstructor">Int</a> <a id="195" class="Number">5</a><a id="196" class="Symbol">)</a> <a id="198" class="Symbol">(</a><a id="199" href="Exp.html#133" class="InductiveConstructor">Var</a> <a id="203" class="Number">37</a><a id="205" class="Symbol">)</a>
 
-<a id="eval"></a><a id="175" href="Exp.html#175" class="Function">eval</a> <a id="180" class="Symbol">:</a> <a id="182" class="Symbol">(</a><a id="183" href="Exp.html#166" class="Generalizable">A</a> <a id="185" class="Symbol">→</a> <a id="187" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a><a id="190" class="Symbol">)</a> <a id="192" class="Symbol">→</a> <a id="194" href="Exp.html#53" class="Datatype">Exp</a> <a id="198" href="Exp.html#166" class="Generalizable">A</a> <a id="200" class="Symbol">→</a> <a id="202" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a>
-<a id="206" href="Exp.html#175" class="Function">eval</a> <a id="211" href="Exp.html#211" class="Bound">env</a> <a id="215" class="Symbol">(</a><a id="216" href="Exp.html#81" class="InductiveConstructor">Plus</a> <a id="221" href="Exp.html#221" class="Bound">a</a> <a id="223" href="Exp.html#223" class="Bound">b</a><a id="224" class="Symbol">)</a> <a id="226" class="Symbol">=</a> <a id="228" href="Exp.html#175" class="Function">eval</a> <a id="233" href="Exp.html#211" class="Bound">env</a> <a id="237" href="Exp.html#221" class="Bound">a</a> <a id="239" href="Agda.Builtin.Nat.html#336" class="Primitive Operator">+</a> <a id="241" href="Exp.html#175" class="Function">eval</a> <a id="246" href="Exp.html#211" class="Bound">env</a> <a id="250" href="Exp.html#223" class="Bound">b</a>
-<a id="252" href="Exp.html#175" class="Function">eval</a> <a id="257" href="Exp.html#257" class="Bound">env</a> <a id="261" class="Symbol">(</a><a id="262" href="Exp.html#112" class="InductiveConstructor">Int</a> <a id="266" href="Exp.html#266" class="Bound">n</a><a id="267" class="Symbol">)</a> <a id="269" class="Symbol">=</a> <a id="271" href="Exp.html#266" class="Bound">n</a>
-<a id="273" href="Exp.html#175" class="Function">eval</a> <a id="278" href="Exp.html#278" class="Bound">env</a> <a id="282" class="Symbol">(</a><a id="283" href="Exp.html#132" class="InductiveConstructor">Var</a> <a id="287" href="Exp.html#287" class="Bound">x</a><a id="288" class="Symbol">)</a> <a id="290" class="Symbol">=</a> <a id="292" href="Exp.html#278" class="Bound">env</a> <a id="296" href="Exp.html#287" class="Bound">x</a>
+<a id="208" class="Keyword">private</a> <a id="216" class="Keyword">variable</a> <a id="225" href="Exp.html#225" class="Generalizable">A</a> <a id="227" class="Symbol">:</a> <a id="229" href="Agda.Primitive.html#388" class="Primitive">Set</a>
+
+<a id="eval"></a><a id="234" href="Exp.html#234" class="Function">eval</a> <a id="239" class="Symbol">:</a> <a id="241" class="Symbol">(</a><a id="242" href="Exp.html#225" class="Generalizable">A</a> <a id="244" class="Symbol">→</a> <a id="246" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a><a id="249" class="Symbol">)</a> <a id="251" class="Symbol">→</a> <a id="253" href="Exp.html#53" class="Datatype">Exp</a> <a id="257" href="Exp.html#225" class="Generalizable">A</a> <a id="259" class="Symbol">→</a> <a id="261" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a>
+<a id="265" href="Exp.html#234" class="Function">eval</a> <a id="270" href="Exp.html#270" class="Bound">env</a> <a id="274" class="Symbol">(</a><a id="275" href="Exp.html#81" class="InductiveConstructor">Plus</a> <a id="280" href="Exp.html#280" class="Bound">a</a> <a id="282" href="Exp.html#282" class="Bound">b</a><a id="283" class="Symbol">)</a> <a id="285" class="Symbol">=</a> <a id="287" href="Exp.html#234" class="Function">eval</a> <a id="292" href="Exp.html#270" class="Bound">env</a> <a id="296" href="Exp.html#280" class="Bound">a</a> <a id="298" href="Agda.Builtin.Nat.html#336" class="Primitive Operator">+</a> <a id="300" href="Exp.html#234" class="Function">eval</a> <a id="305" href="Exp.html#270" class="Bound">env</a> <a id="309" href="Exp.html#282" class="Bound">b</a>
+<a id="311" href="Exp.html#234" class="Function">eval</a> <a id="316" href="Exp.html#316" class="Bound">env</a> <a id="320" class="Symbol">(</a><a id="321" href="Exp.html#112" class="InductiveConstructor">Int</a> <a id="325" href="Exp.html#325" class="Bound">n</a><a id="326" class="Symbol">)</a>    <a id="331" class="Symbol">=</a> <a id="333" href="Exp.html#325" class="Bound">n</a>
+<a id="335" href="Exp.html#234" class="Function">eval</a> <a id="340" href="Exp.html#340" class="Bound">env</a> <a id="344" class="Symbol">(</a><a id="345" href="Exp.html#133" class="InductiveConstructor">Var</a> <a id="349" href="Exp.html#349" class="Bound">x</a><a id="350" class="Symbol">)</a>    <a id="355" class="Symbol">=</a> <a id="357" href="Exp.html#340" class="Bound">env</a> <a id="361" href="Exp.html#349" class="Bound">x</a>
+
+<a id="364" class="Comment">-- data Bool : Set where</a>
+<a id="389" class="Comment">--   T F : Bool</a>
+
+<a id="406" class="Comment">-- data GExp : Set → Set₁ where</a>
+<a id="438" class="Comment">--   -- ** constants</a>
+<a id="459" class="Comment">--   nat  : Nat  → GExp Nat</a>
+<a id="487" class="Comment">--   bool : Bool → GExp Bool</a>
+<a id="516" class="Comment">--   -- ** variables</a>
+<a id="537" class="Comment">--   var  : Nat → GExp Nat</a>
+<a id="564" class="Comment">--   -- ** compound expressions</a>
+<a id="596" class="Comment">--   plus : GExp Nat → GExp Nat → GExp Nat</a>
+<a id="639" class="Comment">--   if   : GExp Bool → GExp A → GExp A → GExp A</a>
+
+<a id="689" class="Comment">-- geval : (Nat → Nat) → GExp A → A</a>
+<a id="725" class="Comment">-- geval env (nat n)    = n</a>
+<a id="753" class="Comment">-- geval env (bool b)   = b</a>
+<a id="781" class="Comment">-- geval env (var x)    = env x</a>
+<a id="813" class="Comment">-- geval env (plus a b) = geval env a + geval env b</a>
+<a id="865" class="Comment">-- geval env (if b l r) with geval env b</a>
+<a id="906" class="Comment">-- ... | T = geval env l</a>
+<a id="931" class="Comment">-- ... | F = geval env r</a>
+
+<a id="957" class="Symbol">{-#</a> <a id="961" class="Keyword">FOREIGN</a> <a id="969" class="Pragma">AGDA2RUST</a>
+<a id="979" class="Pragma">fn</a> <a id="982" class="Pragma">ᐁ&lt;T&gt;(x</a> <a id="989" class="Pragma">:</a> <a id="991" class="Pragma">T)</a> <a id="994" class="Pragma">-&gt;</a> <a id="997" class="Pragma">Box&lt;T&gt;</a> <a id="1004" class="Pragma">{</a> <a id="1006" class="Pragma">return</a> <a id="1013" class="Pragma">Box::new(x);</a> <a id="1026" class="Pragma">}</a>
+
+<a id="1029" class="Pragma">use</a> <a id="1033" class="Pragma">self::Exp::{Plus,Int,Var};</a>
+
+<a id="1061" class="Pragma">pub</a> <a id="1065" class="Pragma">fn</a> <a id="1068" class="Pragma">main()</a> <a id="1075" class="Pragma">{</a>
+  <a id="1079" class="Pragma">println!(&quot;{}:</a> <a id="1093" class="Pragma">{}</a> <a id="1096" class="Pragma">|</a> <a id="1098" class="Pragma">{}&quot;,</a> <a id="1103" class="Pragma">module_path!(),</a>
+    <a id="1123" class="Pragma">eval(|x|</a> <a id="1132" class="Pragma">x,</a> <a id="1135" class="Pragma">exampleExp()),</a>
+    <a id="1154" class="Pragma">eval(|x|</a> <a id="1163" class="Pragma">x</a> <a id="1165" class="Pragma">+</a> <a id="1167" class="Pragma">1,</a> <a id="1170" class="Pragma">Plus(ᐁ(Int(5)),ᐁ(Var(36)))),</a>
+  <a id="1201" class="Pragma">);</a>
+<a id="1204" class="Pragma">}</a>
+<a id="1206" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/Exp.unicode.html"/></div></body></html>

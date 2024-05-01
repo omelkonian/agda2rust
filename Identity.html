@@ -7,4 +7,14 @@
 
 <a id="idH"></a><a id="79" href="Identity.html#79" class="Function">idH</a> <a id="83" class="Symbol">:</a> <a id="85" class="Symbol">(</a><a id="86" href="Identity.html#86" class="Bound">A</a> <a id="88" class="Symbol">:</a> <a id="90" href="Agda.Primitive.html#388" class="Primitive">Set</a><a id="93" class="Symbol">)</a> <a id="95" class="Symbol">→</a> <a id="97" class="Symbol">{</a><a id="98" href="Identity.html#86" class="Bound">A</a><a id="99" class="Symbol">}</a> <a id="101" class="Symbol">→</a> <a id="103" href="Identity.html#86" class="Bound">A</a>
 <a id="105" href="Identity.html#79" class="Function">idH</a> <a id="109" class="Symbol">_</a> <a id="111" class="Symbol">{</a><a id="112" href="Identity.html#112" class="Bound">x</a><a id="113" class="Symbol">}</a> <a id="115" class="Symbol">=</a> <a id="117" href="Identity.html#112" class="Bound">x</a>
+
+<a id="120" class="Symbol">{-#</a> <a id="124" class="Keyword">FOREIGN</a> <a id="132" class="Pragma">AGDA2RUST</a>
+<a id="142" class="Pragma">pub</a> <a id="146" class="Pragma">fn</a> <a id="149" class="Pragma">main()</a> <a id="156" class="Pragma">{</a>
+  <a id="160" class="Pragma">println!(&quot;{}:</a> <a id="174" class="Pragma">{}</a> <a id="177" class="Pragma">|</a> <a id="179" class="Pragma">{}</a> <a id="182" class="Pragma">|</a> <a id="184" class="Pragma">{}&quot;,</a> <a id="189" class="Pragma">module_path!(),</a>
+    <a id="209" class="Pragma">id(42),</a>
+    <a id="221" class="Pragma">idՖ10216Ֆ_Ֆ10217Ֆ_(42),</a>
+    <a id="249" class="Pragma">idH(42)</a>
+  <a id="259" class="Pragma">);</a>
+<a id="262" class="Pragma">}</a>
+<a id="264" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/Identity.unicode.html"/></div></body></html>

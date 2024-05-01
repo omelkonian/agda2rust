@@ -12,4 +12,17 @@
 <a id="155" href="Postulates.html#141" class="Function">testMax</a> <a id="163" class="Keyword">with</a> <a id="168" class="Number">0</a>
 <a id="170" href="Postulates.html#141" class="Function">...</a> <a id="174" class="Symbol">|</a> <a id="176" href="Agda.Builtin.Nat.html#221" class="InductiveConstructor">zero</a>  <a id="182" class="Symbol">=</a> <a id="184" class="Number">42</a>
 <a id="187" href="Postulates.html#141" class="Function">...</a> <a id="191" class="Symbol">|</a> <a id="193" href="Agda.Builtin.Nat.html#234" class="InductiveConstructor">suc</a> <a id="197" class="Symbol">_</a> <a id="199" class="Symbol">=</a> <a id="201" href="Postulates.html#113" class="Function">max</a> <a id="205" class="Number">42</a>
+
+<a id="209" class="Comment">-- postulate Key : Set</a>
+
+<a id="233" class="Comment">-- idKey : Key → Key</a>
+<a id="254" class="Comment">-- idKey k = k</a>
+
+<a id="270" class="Symbol">{-#</a> <a id="274" class="Keyword">FOREIGN</a> <a id="282" class="Pragma">AGDA2RUST</a>
+<a id="292" class="Pragma">pub</a> <a id="296" class="Pragma">fn</a> <a id="299" class="Pragma">main()</a> <a id="306" class="Pragma">{</a>
+  <a id="310" class="Pragma">println!(&quot;{}:</a> <a id="324" class="Pragma">{}&quot;,</a> <a id="329" class="Pragma">module_path!(),</a>
+    <a id="349" class="Pragma">testMax(),</a>
+  <a id="362" class="Pragma">);</a>
+<a id="365" class="Pragma">}</a>
+<a id="367" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/Postulates.unicode.html"/></div></body></html>

@@ -115,6 +115,23 @@
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a></span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> fst<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>(x0<span class="op">:</span> _×_<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>) <span class="op">-&gt;</span> A <span class="op">{</span></span>
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>  proj₁(x0)</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>  <span class="pp">println!</span>(<span class="st">&quot;{}: {} | {} | {}&quot;</span><span class="op">,</span> <span class="pp">module_path!</span>()<span class="op">,</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>    mapSnd(</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>      <span class="op">|</span>x<span class="op">|</span> x <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>      <span class="op">,</span> _×_ <span class="op">{</span>proj₁<span class="op">:</span> <span class="dv">0</span><span class="op">,</span> proj₂<span class="op">:</span> <span class="dv">41</span><span class="op">}</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>    )<span class="op">.</span>proj₂<span class="op">,</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a>    proj₁(mapFst(</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a>      <span class="op">|</span>x<span class="op">|</span> x <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a>      <span class="op">,</span> _×_ <span class="op">{</span>proj₁<span class="op">:</span> <span class="dv">41</span><span class="op">,</span> proj₂<span class="op">:</span> <span class="dv">40</span><span class="op">}</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true"></a>    ))<span class="op">,</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true"></a>    fst(mapFst(</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true"></a>      <span class="op">|</span>x<span class="op">|</span> x <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true"></a>      <span class="op">,</span> _×_ <span class="op">{</span>proj₁<span class="op">:</span> <span class="dv">41</span><span class="op">,</span> proj₂<span class="op">:</span> <span class="dv">40</span><span class="op">}</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true"></a>    ))<span class="op">,</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true"></a>)<span class="op">;</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>

@@ -18,4 +18,17 @@
 
 <a id="add3b"></a><a id="247" href="Numbers.html#247" class="Function">add3b</a> <a id="253" class="Symbol">:</a> <a id="255" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a> <a id="259" class="Symbol">→</a> <a id="261" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a> <a id="265" class="Symbol">→</a> <a id="267" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a> <a id="271" class="Symbol">→</a> <a id="273" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a>
 <a id="277" href="Numbers.html#247" class="Function">add3b</a> <a id="283" href="Numbers.html#283" class="Bound">x</a> <a id="285" href="Numbers.html#285" class="Bound">y</a> <a id="287" href="Numbers.html#287" class="Bound">z</a> <a id="289" class="Symbol">=</a> <a id="291" href="Numbers.html#155" class="Function">add</a> <a id="295" href="Numbers.html#283" class="Bound">x</a> <a id="297" class="Symbol">(</a><a id="298" href="Numbers.html#155" class="Function">add</a> <a id="302" href="Numbers.html#285" class="Bound">y</a> <a id="304" href="Numbers.html#287" class="Bound">z</a><a id="305" class="Symbol">)</a>
+
+<a id="308" class="Symbol">{-#</a> <a id="312" class="Keyword">FOREIGN</a> <a id="320" class="Pragma">AGDA2RUST</a>
+<a id="330" class="Pragma">pub</a> <a id="334" class="Pragma">fn</a> <a id="337" class="Pragma">main()</a> <a id="344" class="Pragma">{</a>
+  <a id="348" class="Pragma">println!(&quot;{}:</a> <a id="362" class="Pragma">{}</a> <a id="365" class="Pragma">|</a> <a id="367" class="Pragma">{}</a> <a id="370" class="Pragma">|</a> <a id="372" class="Pragma">{}</a> <a id="375" class="Pragma">|</a> <a id="377" class="Pragma">{}</a> <a id="380" class="Pragma">|</a> <a id="382" class="Pragma">{}</a> <a id="385" class="Pragma">|</a> <a id="387" class="Pragma">{}&quot;,</a> <a id="392" class="Pragma">module_path!(),</a>
+    <a id="412" class="Pragma">answer(),</a>
+    <a id="426" class="Pragma">suc(41),</a>
+    <a id="439" class="Pragma">add_answer(0),</a>
+    <a id="458" class="Pragma">add(40,</a> <a id="466" class="Pragma">2),</a>
+    <a id="474" class="Pragma">add3(40,</a> <a id="483" class="Pragma">1,</a> <a id="486" class="Pragma">1),</a>
+    <a id="494" class="Pragma">add3b(40,</a> <a id="504" class="Pragma">1,</a> <a id="507" class="Pragma">1)</a>
+  <a id="512" class="Pragma">);</a>
+<a id="515" class="Pragma">}</a>
+<a id="517" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/Numbers.unicode.html"/></div></body></html>

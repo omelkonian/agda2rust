@@ -13,4 +13,19 @@
 <a id="map"></a><a id="252" href="List0.html#252" class="Function">map</a> <a id="256" class="Symbol">:</a> <a id="258" class="Symbol">(</a><a id="259" href="List0.html#156" class="Generalizable">A</a> <a id="261" class="Symbol">→</a> <a id="263" href="List0.html#158" class="Generalizable">B</a><a id="264" class="Symbol">)</a> <a id="266" class="Symbol">→</a> <a id="268" href="List0.html#49" class="Datatype">List</a> <a id="273" href="List0.html#156" class="Generalizable">A</a> <a id="275" class="Symbol">→</a> <a id="277" href="List0.html#49" class="Datatype">List</a> <a id="282" href="List0.html#158" class="Generalizable">B</a>
 <a id="284" href="List0.html#252" class="Function">map</a> <a id="288" href="List0.html#288" class="Bound">f</a> <a id="290" href="List0.html#86" class="InductiveConstructor">[]</a> <a id="293" class="Symbol">=</a> <a id="295" href="List0.html#86" class="InductiveConstructor">[]</a>
 <a id="298" href="List0.html#252" class="Function">map</a> <a id="302" href="List0.html#302" class="Bound">f</a> <a id="304" class="Symbol">(</a><a id="305" href="List0.html#305" class="Bound">x</a> <a id="307" href="List0.html#101" class="InductiveConstructor Operator">∷</a> <a id="309" href="List0.html#309" class="Bound">xs</a><a id="311" class="Symbol">)</a> <a id="313" class="Symbol">=</a> <a id="315" href="List0.html#302" class="Bound">f</a> <a id="317" href="List0.html#305" class="Bound">x</a> <a id="319" href="List0.html#101" class="InductiveConstructor Operator">∷</a> <a id="321" href="List0.html#252" class="Function">map</a> <a id="325" href="List0.html#302" class="Bound">f</a> <a id="327" href="List0.html#309" class="Bound">xs</a>
+
+<a id="331" class="Symbol">{-#</a> <a id="335" class="Keyword">FOREIGN</a> <a id="343" class="Pragma">AGDA2RUST</a>
+<a id="353" class="Pragma">fn</a> <a id="356" class="Pragma">ᐁ&lt;T&gt;(x</a> <a id="363" class="Pragma">:</a> <a id="365" class="Pragma">T)</a> <a id="368" class="Pragma">-&gt;</a> <a id="371" class="Pragma">Box&lt;T&gt;</a> <a id="378" class="Pragma">{</a> <a id="380" class="Pragma">return</a> <a id="387" class="Pragma">Box::new(x);</a> <a id="400" class="Pragma">}</a>
+
+<a id="403" class="Pragma">use</a> <a id="407" class="Pragma">self::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};</a>
+
+<a id="441" class="Pragma">pub</a> <a id="445" class="Pragma">fn</a> <a id="448" class="Pragma">main()</a> <a id="455" class="Pragma">{</a>
+  <a id="459" class="Pragma">println!(&quot;{}:</a> <a id="473" class="Pragma">{:?}&quot;,</a> <a id="480" class="Pragma">module_path!(),</a>
+    <a id="500" class="Pragma">map(|x|</a> <a id="508" class="Pragma">x</a> <a id="510" class="Pragma">+</a> <a id="512" class="Pragma">1,</a> <a id="515" class="Pragma">_Ֆ43ՖՖ43Ֆ_(</a>
+      <a id="533" class="Pragma">_Ֆ8759Ֆ_(3,</a> <a id="545" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ())),</a>
+      <a id="567" class="Pragma">_Ֆ8759Ֆ_(1,</a> <a id="579" class="Pragma">ᐁ(Ֆ91ՖՖ93Ֆ()))</a>
+    <a id="598" class="Pragma">)),</a>
+  <a id="604" class="Pragma">);</a>
+<a id="607" class="Pragma">}</a>
+<a id="609" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/List0.unicode.html"/></div></body></html>

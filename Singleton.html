@@ -1,10 +1,22 @@
 <!DOCTYPE HTML>
 <html><head><meta charset="utf-8"><title>Singleton</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Agda.Builtin.Nat.html" class="Module">Agda.Builtin.Nat</a> <a id="30" class="Keyword">using</a> <a id="36" class="Symbol">()</a>
 
-<a id="40" class="Symbol">{-#</a> <a id="44" class="Keyword">FOREIGN</a> <a id="52" class="Pragma">AGDA2RUST</a> <a id="62" class="Pragma">#[derive(Debug)]</a> <a id="79" class="Symbol">#-}</a>
+<a id="40" class="Symbol">{-#</a> <a id="44" class="Keyword">FOREIGN</a> <a id="52" class="Pragma">AGDA2RUST</a>
+<a id="62" class="Pragma">#[derive(Debug)]</a>
+<a id="79" class="Symbol">#-}</a>
 <a id="83" class="Keyword">data</a> <a id="The"></a><a id="88" href="Singleton.html#88" class="Datatype">The</a> <a id="92" class="Symbol">{</a><a id="93" href="Singleton.html#93" class="Bound">ℓ</a><a id="94" class="Symbol">}{</a><a id="96" href="Singleton.html#96" class="Bound">A</a> <a id="98" class="Symbol">:</a> <a id="100" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="104" href="Singleton.html#93" class="Bound">ℓ</a><a id="105" class="Symbol">}</a> <a id="107" class="Symbol">:</a> <a id="109" href="Singleton.html#96" class="Bound">A</a> <a id="111" class="Symbol">→</a> <a id="113" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="117" href="Singleton.html#93" class="Bound">ℓ</a> <a id="119" class="Keyword">where</a>
   <a id="The.the"></a><a id="127" href="Singleton.html#127" class="InductiveConstructor">the</a> <a id="131" class="Symbol">:</a> <a id="133" class="Symbol">(</a><a id="134" href="Singleton.html#134" class="Bound">a</a> <a id="136" class="Symbol">:</a> <a id="138" href="Singleton.html#96" class="Bound">A</a><a id="139" class="Symbol">)</a> <a id="141" class="Symbol">→</a> <a id="143" href="Singleton.html#88" class="Datatype">The</a> <a id="147" href="Singleton.html#134" class="Bound">a</a>
 
 <a id="150" href="Singleton.html#150" class="Function">_</a> <a id="152" class="Symbol">:</a> <a id="154" href="Singleton.html#88" class="Datatype">The</a> <a id="158" class="Number">42</a>
 <a id="161" class="Symbol">_</a> <a id="163" class="Symbol">=</a> <a id="165" href="Singleton.html#127" class="InductiveConstructor">the</a> <a id="169" class="Number">42</a>
+
+<a id="173" class="Symbol">{-#</a> <a id="177" class="Keyword">FOREIGN</a> <a id="185" class="Pragma">AGDA2RUST</a>
+<a id="195" class="Pragma">use</a> <a id="199" class="Pragma">self::The::{the};</a>
+
+<a id="218" class="Pragma">pub</a> <a id="222" class="Pragma">fn</a> <a id="225" class="Pragma">main()</a> <a id="232" class="Pragma">{</a>
+  <a id="236" class="Pragma">println!(&quot;{}:</a> <a id="250" class="Pragma">{:?}&quot;,</a> <a id="257" class="Pragma">module_path!(),</a>
+    <a id="277" class="Pragma">the(42),</a>
+  <a id="288" class="Pragma">);</a>
+<a id="291" class="Pragma">}</a>
+<a id="293" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/Singleton.unicode.html"/></div></body></html>

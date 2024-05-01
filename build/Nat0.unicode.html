@@ -89,6 +89,17 @@
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="pp">Nat::</span>zero() <span class="op">=&gt;</span> x1<span class="op">,</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>    <span class="pp">Nat::</span>suc(x2) <span class="op">=&gt;</span> <span class="op">{</span> <span class="kw">let</span> x2 <span class="op">=</span> <span class="op">*</span>x2<span class="op">;</span> <span class="pp">Nat::</span>suc(<span class="dt">Box</span><span class="pp">::</span>new(_+_(x2<span class="op">,</span> x1))) <span class="op">},</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  <span class="op">}</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="kw">fn</span> ᐁ<span class="op">&lt;</span>T<span class="op">&gt;</span>(x <span class="op">:</span> T) <span class="op">-&gt;</span> <span class="dt">Box</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span> <span class="kw">return</span> <span class="dt">Box</span><span class="pp">::</span>new(x)<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="kw">use</span> <span class="kw">self</span><span class="pp">::Nat::</span><span class="op">{</span>zero<span class="op">,</span>suc<span class="op">};</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>  <span class="pp">println!</span>(<span class="st">&quot;{}: {:?} | {:?}&quot;</span><span class="op">,</span> <span class="pp">module_path!</span>()<span class="op">,</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>    suc(ᐁ(suc(ᐁ(suc(ᐁ(suc(ᐁ(zero()))))))))<span class="op">,</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>    _+_(suc(ᐁ(zero()))<span class="op">,</span> suc(ᐁ(zero())))<span class="op">,</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>  )<span class="op">;</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>

@@ -88,6 +88,12 @@
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> testMax() <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  <span class="op">{</span> <span class="kw">let</span> x0 <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="kw">match</span> x0 <span class="op">{</span> <span class="dv">0</span> <span class="op">=&gt;</span> <span class="dv">42</span><span class="op">,</span> _ <span class="op">=&gt;</span> max(<span class="dv">42</span>) <span class="op">}</span> <span class="op">}</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  <span class="pp">println!</span>(<span class="st">&quot;{}: {}&quot;</span><span class="op">,</span> <span class="pp">module_path!</span>()<span class="op">,</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>    testMax()<span class="op">,</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>  )<span class="op">;</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>

@@ -89,7 +89,7 @@
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="pp">List::</span>Ֆ91ՖՖ93Ֆ() <span class="op">=&gt;</span> x1<span class="op">,</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>    <span class="pp">List::</span>_Ֆ8759Ֆ_(x<span class="op">,</span> xs) <span class="op">=&gt;</span> <span class="op">{</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>      <span class="kw">let</span> xs <span class="op">=</span> <span class="op">*</span>xs<span class="op">;</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>      <span class="pp">List::</span>_Ֆ8759Ֆ_(x<span class="op">,</span> <span class="dt">Box</span><span class="pp">::</span>new(_Ֆ43ՖՖ43Ֆ_(xs<span class="op">,</span> x1)))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>      <span class="pp">List::</span>_Ֆ8759Ֆ_(x<span class="op">,</span> <span class="dt">Box</span><span class="pp">::</span>new(<span class="pp">_Ֆ43ՖՖ43Ֆ_::</span><span class="op">&lt;</span>A<span class="op">&gt;</span>(xs<span class="op">,</span> x1)))</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>    <span class="op">},</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  <span class="op">}</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="op">}</span></span>
@@ -99,9 +99,22 @@
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>    <span class="pp">List::</span>Ֆ91ՖՖ93Ֆ() <span class="op">=&gt;</span> <span class="pp">List::</span>Ֆ91ՖՖ93Ֆ()<span class="op">,</span></span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>    <span class="pp">List::</span>_Ֆ8759Ֆ_(x<span class="op">,</span> xs) <span class="op">=&gt;</span> <span class="op">{</span></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>      <span class="kw">let</span> xs <span class="op">=</span> <span class="op">*</span>xs<span class="op">;</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>      <span class="pp">List::</span>_Ֆ8759Ֆ_(x0(x)<span class="op">,</span> <span class="dt">Box</span><span class="pp">::</span>new(map(x0<span class="op">,</span> xs)))</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>      <span class="pp">List::</span>_Ֆ8759Ֆ_(x0(x)<span class="op">,</span> <span class="dt">Box</span><span class="pp">::</span>new(<span class="pp">map::</span><span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>(x0<span class="op">,</span> xs)))</span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>    <span class="op">},</span></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>  <span class="op">}</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a><span class="kw">fn</span> ᐁ<span class="op">&lt;</span>T<span class="op">&gt;</span>(x <span class="op">:</span> T) <span class="op">-&gt;</span> <span class="dt">Box</span><span class="op">&lt;</span>T<span class="op">&gt;</span> <span class="op">{</span> <span class="kw">return</span> <span class="dt">Box</span><span class="pp">::</span>new(x)<span class="op">;</span> <span class="op">}</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a><span class="kw">use</span> <span class="kw">self</span><span class="pp">::List::</span><span class="op">{</span>Ֆ91ՖՖ93Ֆ<span class="op">,</span>_Ֆ8759Ֆ_<span class="op">};</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>  <span class="pp">println!</span>(<span class="st">&quot;{}: {:?}&quot;</span><span class="op">,</span> <span class="pp">module_path!</span>()<span class="op">,</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>    map(<span class="op">|</span>x<span class="op">|</span> x <span class="op">+</span> <span class="dv">1</span><span class="op">,</span> _Ֆ43ՖՖ43Ֆ_(</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>      _Ֆ8759Ֆ_(<span class="dv">3</span><span class="op">,</span> ᐁ(Ֆ91ՖՖ93Ֆ()))<span class="op">,</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>      _Ֆ8759Ֆ_(<span class="dv">1</span><span class="op">,</span> ᐁ(Ֆ91ՖՖ93Ֆ()))</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>    ))<span class="op">,</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>  )<span class="op">;</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>

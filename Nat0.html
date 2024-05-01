@@ -7,4 +7,17 @@
 <a id="_+_"></a><a id="98" href="Nat0.html#98" class="Function Operator">_+_</a> <a id="102" class="Symbol">:</a> <a id="104" href="Nat0.html#49" class="Datatype">Nat</a> <a id="108" class="Symbol">→</a> <a id="110" href="Nat0.html#49" class="Datatype">Nat</a> <a id="114" class="Symbol">→</a> <a id="116" href="Nat0.html#49" class="Datatype">Nat</a>
 <a id="120" href="Nat0.html#67" class="InductiveConstructor">zero</a>  <a id="126" href="Nat0.html#98" class="Function Operator">+</a> <a id="128" href="Nat0.html#128" class="Bound">m</a> <a id="130" class="Symbol">=</a> <a id="132" href="Nat0.html#128" class="Bound">m</a>
 <a id="134" href="Nat0.html#80" class="InductiveConstructor">suc</a> <a id="138" href="Nat0.html#138" class="Bound">n</a> <a id="140" href="Nat0.html#98" class="Function Operator">+</a> <a id="142" href="Nat0.html#142" class="Bound">m</a> <a id="144" class="Symbol">=</a> <a id="146" href="Nat0.html#80" class="InductiveConstructor">suc</a> <a id="150" class="Symbol">(</a><a id="151" href="Nat0.html#138" class="Bound">n</a> <a id="153" href="Nat0.html#98" class="Function Operator">+</a> <a id="155" href="Nat0.html#142" class="Bound">m</a><a id="156" class="Symbol">)</a>
+
+<a id="159" class="Symbol">{-#</a> <a id="163" class="Keyword">FOREIGN</a> <a id="171" class="Pragma">AGDA2RUST</a>
+<a id="181" class="Pragma">fn</a> <a id="184" class="Pragma">ᐁ&lt;T&gt;(x</a> <a id="191" class="Pragma">:</a> <a id="193" class="Pragma">T)</a> <a id="196" class="Pragma">-&gt;</a> <a id="199" class="Pragma">Box&lt;T&gt;</a> <a id="206" class="Pragma">{</a> <a id="208" class="Pragma">return</a> <a id="215" class="Pragma">Box::new(x);</a> <a id="228" class="Pragma">}</a>
+
+<a id="231" class="Pragma">use</a> <a id="235" class="Pragma">self::Nat::{zero,suc};</a>
+
+<a id="259" class="Pragma">pub</a> <a id="263" class="Pragma">fn</a> <a id="266" class="Pragma">main()</a> <a id="273" class="Pragma">{</a>
+  <a id="277" class="Pragma">println!(&quot;{}:</a> <a id="291" class="Pragma">{:?}</a> <a id="296" class="Pragma">|</a> <a id="298" class="Pragma">{:?}&quot;,</a> <a id="305" class="Pragma">module_path!(),</a>
+    <a id="325" class="Pragma">suc(ᐁ(suc(ᐁ(suc(ᐁ(suc(ᐁ(zero())))))))),</a>
+    <a id="369" class="Pragma">_Ֆ43Ֆ_(suc(ᐁ(zero())),</a> <a id="392" class="Pragma">suc(ᐁ(zero()))),</a>
+  <a id="411" class="Pragma">);</a>
+<a id="414" class="Pragma">}</a>
+<a id="416" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/Nat0.unicode.html"/></div></body></html>
