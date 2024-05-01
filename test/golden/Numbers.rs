@@ -24,3 +24,13 @@ pub fn add3b(x0: i32, x1: i32, x2: i32) -> i32 {
   add(x0, add(x1, x2))
 }
 
+pub fn main() {
+  println!("{}: {} | {} | {} | {} | {} | {}", module_path!(),
+    answer(),
+    suc(41),
+    add_answer(0),
+    add(40, 2),
+    add3(40, 1, 1),
+    add3b(40, 1, 1)
+  );
+}

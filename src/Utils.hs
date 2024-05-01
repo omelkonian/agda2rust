@@ -7,6 +7,9 @@ import Unicode.Char.Identifiers ( isXIDStart, isXIDContinue )
 import Data.Char ( ord )
 
 -- ** basics
+enumerate0 :: [a] -> [(Int, a)]
+enumerate0 = zip [0..]
+
 enumerate :: [a] -> [(Int, a)]
 enumerate = zip [1..]
 

@@ -68,3 +68,23 @@ erasedConArg (mk n _) = n
 data BST (@0 lower upper : Nat) : Set where
   Leaf : (@0 pf : lower ≤ upper) → BST lower upper
   Node : (x : Nat) (l : BST lower x) (r : BST x upper) → BST lower upper
+
+{-# FOREIGN AGDA2RUST
+fn ᐁ<T>(x : T) -> Box<T> { return Box::new(x); }
+
+use self::BST::{Leaf,Node};
+
+pub fn main() {
+  println!("{}: {} | {} | {} | {} | {} | {} | {:?} | {:?} | {:?}", module_path!(),
+    erasedFunArg(41),
+    erasedHigherOrderFunArg(41),
+    erasedRec(),
+    succ(ErasedField {x: 41}),
+    erasedRecParam(ErasedRecParam {y: 42}),
+    erasedData(),
+    erasedClause(ErasedCon::mk(42)),
+    erasedConArg(ErasedConArg::mk(42)),
+    Node(4, ᐁ(Node(2, ᐁ(Leaf()), ᐁ(Leaf()))), ᐁ(Leaf())),
+  );
+}
+#-}

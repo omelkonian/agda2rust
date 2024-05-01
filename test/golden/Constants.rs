@@ -20,3 +20,8 @@ pub fn testNaught() -> i32 {
   justify(naught(), 42)
 }
 
+pub fn main() {
+  println!("{}: {}", module_path!(),
+    testNaught(),
+  );
+}

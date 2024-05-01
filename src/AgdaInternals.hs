@@ -150,7 +150,7 @@ compilerPipeline v q =
     [ compilerPass "builtin" (30 + v) "builtin translation" $ const translateBuiltins
     , FixedPoint 5 $ Sequential
       [ compilerPass "simpl"  (30 + v) "simplification"     $ const simplifyTTerm
-      , compilerPass "erase"  (30 + v) "erasure"            $ eraseTerms q
+      -- , compilerPass "erase"  (30 + v) "erasure"            $ eraseTerms q
       , compilerPass "uncase" (30 + v) "uncase"             $ const caseToSeq
       -- , compilerPass "aspat"  (30 + v) "@-pattern recovery" $ const recoverAsPatterns
       ]

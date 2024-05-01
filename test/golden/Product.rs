@@ -39,3 +39,19 @@ pub fn fst<A, B>(x0: _Ֆ215Ֆ_<A, B>) -> A {
   projՖ8321Ֆ(x0)
 }
 
+pub fn main() {
+  println!("{}: {} | {} | {}", module_path!(),
+    mapSnd(
+      |x| x + 1
+      , _Ֆ215Ֆ_ {projՖ8321Ֆ: 0, projՖ8322Ֆ: 41}
+    ).projՖ8322Ֆ,
+    projՖ8321Ֆ(mapFst(
+      |x| x + 1
+      , _Ֆ215Ֆ_ {projՖ8321Ֆ: 41, projՖ8322Ֆ: 40}
+    )),
+    fst(mapFst(
+      |x| x + 1
+      , _Ֆ215Ֆ_ {projՖ8321Ֆ: 41, projՖ8322Ֆ: 40}
+    )),
+);
+}

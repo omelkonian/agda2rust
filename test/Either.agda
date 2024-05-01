@@ -20,3 +20,16 @@ open OnlyLeftR public
 
 fromOnlyLeftR : ∀ {A B : Set} → OnlyLeftR A B → A
 fromOnlyLeftR r = r .left
+
+{-# FOREIGN AGDA2RUST
+use std::marker::{PhantomData};
+fn __<T>() -> PhantomData<T> { return PhantomData; }
+
+pub fn main() {
+  println!("{}: {} | {} | {}", module_path!(),
+    fromEither::<i32, i32>(41, Either::Left(42)),
+    fromOnlyLeft::<i32, i32>(OnlyLeft::Left(42)),
+    fromOnlyLeftR::<i32, i32>(OnlyLeftR {left: 42, _phantom: __()}),
+  );
+}
+#-}

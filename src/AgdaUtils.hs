@@ -1,65 +1,70 @@
-{-# LANGUAGE FlexibleContexts, OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts, OverloadedStrings, DoAndIfThenElse #-}
 
 -- | Agda utilities.
 module AgdaUtils where
 
+import Control.Monad.Error.Class ( MonadError(throwError) )
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
 import Control.Arrow ( first )
 
 import Data.List ( partition )
 import qualified Data.List.NonEmpty as NE ( fromList )
+import Data.Maybe ( isJust )
 
 -- * abstract syntax
-import qualified Agda.Syntax.Abstract.Name as A
+import Agda.Syntax.Abstract.Name
   ( qnameToList0 )
 -- * internal syntax
 import Agda.Syntax.Common ( unArg )
-import qualified Agda.Syntax.Common as A
-import qualified Agda.Syntax.Internal as A
-import qualified Agda.Syntax.Literal as A
+import Agda.Syntax.Common
+import Agda.Syntax.Internal
+import Agda.Syntax.Literal
 import Agda.Syntax.Internal
   ( QName, absName, qnameName, qnameModule, Abs(..), unAbs, unEl, unDom
   , nameId, conName, dbPatVarIndex, pDom, telToList, telFromList )
 import Agda.Syntax.Translation.InternalToAbstract ( NamedClause(..) )
 -- * treeless syntax
-import qualified Agda.Compiler.ToTreeless as A
+import Agda.Compiler.ToTreeless
   hiding ( toTreeless )
-import qualified AgdaInternals as A
+import AgdaInternals
   ( toTreeless )
-import qualified Agda.Syntax.Treeless as A
+import Agda.Syntax.Treeless
   ( TTerm(..), TPrim(..), TAlt(..), EvaluationStrategy(..), isPrimEq )
 import Agda.Compiler.Treeless.Pretty ()
-import qualified Agda.Compiler.Treeless.EliminateLiteralPatterns as A
+import Agda.Compiler.Treeless.EliminateLiteralPatterns
   ( eliminateLiteralPatterns )
 -- * typechecking
-import qualified Agda.TypeChecking.Monad as A
+import Agda.TypeChecking.Monad
 import Agda.TypeChecking.Monad
   ( TCM, MonadTCM, liftTCM
   , theDef, defName
   , typeOfConst, getConstInfo
   , reportSLn, VerboseLevel )
 import Agda.TypeChecking.Free ( freeVars, VarCounts(..) )
-import qualified Agda.TypeChecking.Datatypes as A
+import Agda.TypeChecking.Datatypes
   ( getConstructorData, getConHead )
-import qualified Agda.TypeChecking.Records as A
+import Agda.TypeChecking.Records
   ( isRecord, isRecordConstructor, isRecordType )
-import qualified Agda.TypeChecking.Level as A
+import Agda.TypeChecking.Level
   ( isLevelType )
-import qualified Agda.TypeChecking.Substitute as A
+import Agda.TypeChecking.Substitute
   ( TelV(..) )
-import qualified Agda.TypeChecking.Telescope as A
+import Agda.TypeChecking.Telescope
   ( telViewPath, telViewUpTo )
 -- * reduction
-import qualified Agda.TypeChecking.Reduce as A
+import Agda.TypeChecking.Reduce
   ( reduce )
 -- * pretty-printing
-import Agda.Syntax.Common.Pretty as P
+import qualified Agda.Syntax.Common.Pretty as P
   ( Pretty, prettyShow, renderStyle, Style(..), Mode(..) )
 import Agda.TypeChecking.Pretty
   ( PrettyTCM(..), MonadPretty, fsep, punctuate, braces, parens, Doc )
 import qualified Agda.TypeChecking.Pretty as P
   hiding (text)
 import Text.Show.Pretty ( ppShow )
+
+import Agda.Utils.Monad ( mapMaybeM, partitionM )
+import Agda.Utils.Maybe ( boolToMaybe )
 
 import Utils
 
@@ -86,34 +91,40 @@ panic s t = error $
   where limit = take 500
 
 -- ** typechecking context
-currentCtx :: A.MonadTCEnv m => m [(String, A.Type)]
-currentCtx = fmap (first pp . unDom) <$> A.getContext
+currentCtx :: MonadTCEnv m => m [(String, Type)]
+currentCtx = fmap (first pp . unDom) <$> getContext
 
-reportCurrentCtx :: (MonadIO m, A.MonadTCEnv m) => m ()
+reportCurrentCtx :: (MonadIO m, MonadTCEnv m) => m ()
 reportCurrentCtx = currentCtx >>= \ctx ->
   report $ "currentCtx: " <> pp ctx
 
-lookupCtx :: A.MonadTCEnv m => Int -> m (String, A.Type)
+lookupCtx :: MonadTCEnv m => Int -> m (String, Type)
 lookupCtx i = first transcribe . (!! i) <$> currentCtx
 
-currentCtxVars :: A.MonadTCEnv m => m [String]
+currentCtxVars :: MonadTCEnv m => m [String]
 currentCtxVars = fmap fst <$> currentCtx
 
-lookupCtxVar :: A.MonadTCEnv m => Int -> m String
+lookupCtxVar :: MonadTCEnv m => Int -> m String
 lookupCtxVar i = transcribe . (!! i) <$> currentCtxVars
 
+currentCtxTys :: MonadTCEnv m => m [Type]
+currentCtxTys = fmap snd <$> currentCtx
+
+lookupCtxTy :: MonadTCEnv m => Int -> m Type
+lookupCtxTy i = (!! i) <$> currentCtxTys
+
 -- ** variables
-unqual :: A.QName -> String
+unqual :: QName -> String
 unqual = transcribe . pp . qnameName
 
-qParent :: A.QName -> A.QName
+qParent :: QName -> QName
 qParent =
-  A.qnameFromList . NE.fromList . reverse . drop 1 . reverse . A.qnameToList0
+  qnameFromList . NE.fromList . reverse . drop 1 . reverse . qnameToList0
 
 varPool :: [String]
 varPool = zipWith (<>) (repeat "x") (show <$> [0..])
 
-getVarPool :: A.MonadTCEnv m => m [String]
+getVarPool :: MonadTCEnv m => m [String]
 getVarPool = do
   xs <- currentCtxVars
   return $ filter (`elem` xs) varPool
@@ -121,67 +132,215 @@ getVarPool = do
 freshVar :: [String] -> String
 freshVar xs = head $ dropWhile (`elem` xs) varPool
 
-freshVarInCtx :: A.MonadTCEnv m => m String
+freshVarInCtx :: MonadTCEnv m => m String
 freshVarInCtx = freshVar <$> currentCtxVars
+
+freshVarsInCtx :: (MonadTCEnv m, MonadAddContext m) => Int -> m [String]
+freshVarsInCtx n | n < 0 = error $ "[freshVarsInCtx] negative number of variables"
+freshVarsInCtx 0 = return []
+freshVarsInCtx n = do
+  x <- freshVar <$> currentCtxVars
+  addContext [(x, defaultTy)] $
+    (x :) <$> freshVarsInCtx (n - 1)
 
 -- ** arguments & visibility
 
-hasQuantityNon0 :: A.LensQuantity a => a -> Bool
-hasQuantityNon0 = not . A.hasQuantity0
+hasQuantityNon0 :: LensQuantity a => a -> Bool
+hasQuantityNon0 = not . hasQuantity0
 
-shouldKeep :: (A.LensQuantity a, A.LensHiding a) => a -> Bool
-shouldKeep = A.visible /\ hasQuantityNon0
+shouldKeep :: (LensQuantity a, LensHiding a) => a -> Bool
+shouldKeep = visible /\ hasQuantityNon0
 
-vArgs :: [A.Arg a] -> [a]
+shouldKeepTyParam :: PureTCM m => Dom (ArgName, Type) -> m (Maybe ArgName)
+shouldKeepTyParam d@(unDom -> (x, ty)) = do
+  isSrt <- isSortResTy ty
+  return $ boolToMaybe (hasQuantityNon0 d && isSrt) x
+
+vArgs :: [Arg a] -> [a]
 vArgs = fmap unArg . filter shouldKeep
 
-vElims :: [A.Elim] -> [A.Term]
-vElims = vArgs . A.argsFromElims
+vElims :: [Elim] -> [Term]
+vElims = vArgs . argsFromElims
+
+isLevelTerm, isSortTerm :: Term -> Bool
+-- isTyParam = \case
+--   Var _ _   -> True
+--   Def _ _   -> True
+--   Con _ _ _ -> True
+--   Pi _ _    -> True
+--   Sort _    -> False
+--   _         -> False
+isLevelTerm = \case
+  Level _ -> True
+  _       -> False
+isSortTerm = isJust . isSort
+
+isLevelTy, isSortTy :: Type -> Bool
+isLevelTy = isLevelTerm . unEl
+isSortTy  = isSortTerm  . unEl
+
+isSortResTy :: PureTCM m => Type -> m Bool
+isSortResTy ty = isSortTy <$> resTy ty
+
+isSortM :: MonadTCEnv m => Term -> m Bool
+isSortM = \case
+  Sort _  -> return True
+  Var n _ -> isSortTy <$> lookupCtxTy n
+  _       -> return False
+
+-- typeOf :: (MonadTCEnv m) => Term -> m Type
+-- typeOf = \case
+--   Var n _ -> typeOfBV n
+--   Def n _ -> typeOfBV n
 
 -- ** erasure
-isErased :: A.TTerm -> Bool
-isErased = \case
-  A.TErased -> True
-  _         -> False
+isErasedTTerm :: TTerm -> Bool
+isErasedTTerm = \case
+  TErased -> True
+  TUnit   -> True
+  TSort   -> True
+  _       -> False
 
-onlyNonErased :: [A.TTerm] -> [A.TTerm]
-onlyNonErased = filter (not . isErased)
+onlyNonErased :: [TTerm] -> [TTerm]
+onlyNonErased = filter (not . isErasedTTerm)
+
+isTyParam :: MonadTCEnv m => TTerm -> m Bool
+isTyParam = \case
+  TVar i -> isSortTy <$> lookupCtxTy i
+  _      -> pure False
+
+separateTyParams :: MonadTCEnv m => [TTerm] -> m ([TTerm], [TTerm])
+separateTyParams = partitionM isTyParam
 
 -- ** types & telescopes
-isDependentArrow :: A.Dom A.Type -> Bool
-isDependentArrow ty = pp (A.domName ty) `notElem` ["_", "(nothing)"]
+isDependentArrow :: Dom Type -> Bool
+isDependentArrow ty = pp (domName ty) `notElem` ["_", "(nothing)"]
 
-telListView :: A.PureTCM m => A.Type -> m (A.ListTel, A.Type)
+-- _undefined :: MonadError e m => m a
+-- _undefined = throwError undefined
+
+typeFromTerm :: a -> Type'' Term a
+typeFromTerm = El (DummyS "???" :: Sort)
+
+defaultTy :: Dom Type
+defaultTy = defaultDom $ typeFromTerm (Dummy "???" [] :: Term)
+
+telListView :: PureTCM m => Type -> m (ListTel, Type)
 telListView t = do
-  A.TelV tel t <- A.telViewPath t
-  return (A.telToList tel, t)
+  TelV tel t <- telViewPath t
+  return (telToList tel, t)
 
-viewTy :: A.PureTCM m => A.Type -> m (A.ListTel, A.ListTel, A.Type)
+getArgTy :: PureTCM m => Type -> Int -> m Type
+getArgTy ty i = do
+  (tel, _) <- telListView ty
+  return $ (snd . unDom <$> tel) !! i
+
+viewTy :: PureTCM m => Type -> m (ListTel, ListTel, Type)
 viewTy ty = do
   (tel, resTy) <- telListView ty
-  -- let (vargs, hargs) = partition shouldKeep tel
-  let (vargs, hargs) = partition A.visible tel
-  return (hargs, vargs, resTy)
+  -- let (vas, has) = partition shouldKeep tel
+  let (vas, has) = partition visible tel
+  return (has, vas, resTy)
 
-vargTys :: A.PureTCM m => A.Type -> m A.ListTel
+argTys :: PureTCM m => Type -> m ListTel
+argTys ty = fst <$> telListView ty
+
+vargTys :: PureTCM m => Type -> m ListTel
 vargTys ty = do
-  (_ , vargs, _) <- viewTy ty
-  return vargs
+  (_ , vas, _) <- viewTy ty
+  return vas
 
-resTy :: A.PureTCM m => A.Type -> m A.Type
+resTy :: PureTCM m => Type -> m Type
 resTy ty = do
   (_ , _, ty) <- viewTy ty
   return ty
 
-isNullary :: A.PureTCM m => A.Type -> m Bool
+isNullary :: PureTCM m => Type -> m Bool
 isNullary ty = null . filter hasQuantityNon0 . fst <$> telListView ty
 
--- filterTel :: (Dom Type -> Bool) -> A.Telescope -> A.Telescope
+-- filterTel :: (Dom Type -> Bool) -> Telescope -> Telescope
 -- filterTel p = \case
---   A.EmptyTel -> A.EmptyTel
---   A.ExtendTel a tel
---     (if p a then A.ExtendTel
+--   EmptyTel -> EmptyTel
+--   ExtendTel a tel
+--     (if p a then ExtendTel
 --     | ->
 --     | otherwise -> traverseF (filterTel p) tel
+
+-- ** builtins
+getBuiltins :: TCM [QName]
+getBuiltins = mapMaybeM getBuiltinName' allBuiltinIds
+
+allBuiltinIds :: [BuiltinId]
+allBuiltinIds =
+  builtinsNoDef <>
+  [ builtinLevel,
+  -- builtinNat, builtinSuc, builtinZero, builtinNatPlus, builtinNatMinus,
+  -- builtinNatTimes, builtinNatDivSucAux, builtinNatModSucAux, builtinNatEquals,
+  -- builtinNatLess, builtinInteger, builtinIntegerPos, builtinIntegerNegSuc,
+  builtinWord64,
+  builtinFloat, builtinChar, builtinString, builtinUnit, builtinUnitUnit
+  -- builtinSigma,
+  -- builtinBool, builtinTrue, builtinFalse,
+  -- builtinList, builtinNil, builtinCons, builtinIO,
+  -- builtinMaybe, builtinNothing, builtinJust,
+  -- builtinPath, builtinPathP,
+  -- builtinItIsOne, builtinIsOne1, builtinIsOne2, builtinIsOneEmpty,
+  -- builtinSubIn,
+  -- builtinEquiv, builtinEquivFun, builtinEquivProof,
+  -- builtinTranspProof,
+  -- builtinInf, builtinSharp, builtinFlat,
+  -- builtinEquality, builtinRefl, builtinRewrite, builtinLevelMax,
+  -- builtinLevel, builtinLevelZero, builtinLevelSuc,
+  -- builtinFromNat, builtinFromNeg, builtinFromString,
+  -- builtinQName, builtinAgdaSort, builtinAgdaSortSet, builtinAgdaSortLit,
+  -- builtinAgdaSortProp, builtinAgdaSortPropLit, builtinAgdaSortInf,
+  -- builtinAgdaSortUnsupported,
+  -- builtinHiding, builtinHidden, builtinInstance, builtinVisible,
+  -- builtinRelevance, builtinRelevant, builtinIrrelevant,
+  -- builtinQuantity, builtinQuantity0, builtinQuantityω,
+  -- builtinModality, builtinModalityConstructor,
+  -- builtinAssoc, builtinAssocLeft, builtinAssocRight, builtinAssocNon,
+  -- builtinPrecedence, builtinPrecRelated, builtinPrecUnrelated,
+  -- builtinFixity, builtinFixityFixity,
+  -- builtinArgInfo, builtinArgArgInfo,
+  -- builtinArg, builtinArgArg,
+  -- builtinAbs, builtinAbsAbs, builtinAgdaTerm,
+  -- builtinAgdaTermVar, builtinAgdaTermLam, builtinAgdaTermExtLam,
+  -- builtinAgdaTermDef, builtinAgdaTermCon, builtinAgdaTermPi,
+  -- builtinAgdaTermSort, builtinAgdaTermLit, builtinAgdaTermUnsupported, builtinAgdaTermMeta,
+  -- builtinAgdaErrorPart, builtinAgdaErrorPartString, builtinAgdaErrorPartTerm, builtinAgdaErrorPartPatt, builtinAgdaErrorPartName,
+  -- builtinAgdaLiteral, builtinAgdaLitNat, builtinAgdaLitWord64, builtinAgdaLitFloat,
+  -- builtinAgdaLitChar, builtinAgdaLitString, builtinAgdaLitQName, builtinAgdaLitMeta,
+  -- builtinAgdaClause, builtinAgdaClauseClause, builtinAgdaClauseAbsurd, builtinAgdaPattern,
+  -- builtinAgdaPatVar, builtinAgdaPatCon, builtinAgdaPatDot, builtinAgdaPatLit,
+  -- builtinAgdaPatProj, builtinAgdaPatAbsurd,
+  -- builtinAgdaDefinitionFunDef,
+  -- builtinAgdaDefinitionDataDef, builtinAgdaDefinitionRecordDef,
+  -- builtinAgdaDefinitionDataConstructor, builtinAgdaDefinitionPostulate,
+  -- builtinAgdaDefinitionPrimitive, builtinAgdaDefinition,
+  -- builtinAgdaMeta,
+  -- builtinAgdaTCM, builtinAgdaTCMReturn, builtinAgdaTCMBind, builtinAgdaTCMUnify,
+  -- builtinAgdaTCMTypeError, builtinAgdaTCMInferType,
+  -- builtinAgdaTCMCheckType, builtinAgdaTCMNormalise, builtinAgdaTCMReduce,
+  -- builtinAgdaTCMCatchError,
+  -- builtinAgdaTCMGetContext, builtinAgdaTCMExtendContext, builtinAgdaTCMInContext,
+  -- builtinAgdaTCMFreshName, builtinAgdaTCMDeclareDef, builtinAgdaTCMDeclarePostulate, builtinAgdaTCMDeclareData, builtinAgdaTCMDefineData, builtinAgdaTCMDefineFun,
+  -- builtinAgdaTCMGetType, builtinAgdaTCMGetDefinition,
+  -- builtinAgdaTCMQuoteTerm, builtinAgdaTCMUnquoteTerm, builtinAgdaTCMQuoteOmegaTerm,
+  -- builtinAgdaTCMCommit, builtinAgdaTCMIsMacro, builtinAgdaTCMBlock,
+  -- builtinAgdaBlocker, builtinAgdaBlockerAll, builtinAgdaBlockerAny, builtinAgdaBlockerMeta,
+  -- builtinAgdaTCMFormatErrorParts, builtinAgdaTCMDebugPrint,
+  -- builtinAgdaTCMWithNormalisation, builtinAgdaTCMWithReconstructed,
+  -- builtinAgdaTCMWithExpandLast, builtinAgdaTCMWithReduceDefs,
+  -- builtinAgdaTCMAskNormalisation, builtinAgdaTCMAskReconstructed,
+  -- builtinAgdaTCMAskExpandLast, builtinAgdaTCMAskReduceDefs,
+  -- builtinAgdaTCMNoConstraints,
+  -- builtinAgdaTCMRunSpeculative,
+  -- builtinAgdaTCMExec,
+  -- builtinAgdaTCMGetInstances,
+  -- builtinAgdaTCMPragmaForeign,
+  -- builtinAgdaTCMPragmaCompile
+  ]
+
 
 

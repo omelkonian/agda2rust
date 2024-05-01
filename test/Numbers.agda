@@ -17,3 +17,16 @@ add3 x y z = x + y + z
 
 add3b : Nat → Nat → Nat → Nat
 add3b x y z = add x (add y z)
+
+{-# FOREIGN AGDA2RUST
+pub fn main() {
+  println!("{}: {} | {} | {} | {} | {} | {}", module_path!(),
+    answer(),
+    suc(41),
+    add_answer(0),
+    add(40, 2),
+    add3(40, 1, 1),
+    add3b(40, 1, 1)
+  );
+}
+#-}

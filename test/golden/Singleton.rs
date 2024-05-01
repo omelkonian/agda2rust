@@ -5,3 +5,10 @@ pub enum The<  A,> {
   the(A),
 }
 
+use self::The::{the};
+
+pub fn main() {
+  println!("{}: {:?}", module_path!(),
+    the(42),
+  );
+}

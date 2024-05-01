@@ -36,13 +36,15 @@ pattern RPathSeg' x ts = PathSegment x (Just ts) ()
 
 pattern RPath ps = Path False ps ()
 pattern RRef     x = RPath [RPathSeg x]
+-- pattern RRef' x ts = RPath [RPathSeg' x ts]
 pattern RExprRef x = RPathExpr (RRef x)
+pattern RExprRef' x ts = RPathExpr (RRef' x ts)
 pattern RTyRef   x = RPathTy   (RRef x)
+pattern RBorrow ty = Rptr Nothing Immutable ty ()
 
 pattern RRef'   x ts = RPath [RPathSeg' x (RAngles ts)]
-rRef' x ts
-  | null ts   = RRef x
-  | otherwise = RPath [RPathSeg' x (RAngles ts)]
+rRef' x ts | null ts   = RRef x
+           | otherwise = RRef' x ts
 
 pattern RTyRef' x ts = RPathTy (RRef' x ts)
 rTyRef' x ts = RPathTy (rRef' x ts)
@@ -55,25 +57,44 @@ pattern RForall tys = Generics [] tys REmptyWhere ()
 pattern REmptyGenerics = RForall []
 pattern RTyParam x = TyParam [] x [] Nothing ()
 
+rTyFromExp :: Expr () -> Ty ()
+rTyFromExp = \case
+  PathExpr [] self p () -> PathTy self p ()
+  RBox e -> rTyFromExp e
+  e -> error $ "[rTyFromExp] cannot type-convert " <> ppR e
+
+-- ** type aliases
+pattern RTyAlias x ty = TyAlias [] PublicV x ty REmptyGenerics ()
+
 -- ** function types
 pattern RFnTy as b = FnDecl as (Just b) False ()
-pattern RBareFn x a b =
-  BareFn Normal Rust [] (RFnTy [ Arg (Just (RId x)) a ()] b) ()
+pattern RBareFn x a b = BareFn Normal Rust [] (RFnTy [RArg x a] b) ()
+rBareFn x a b | BareFn Normal Rust [] (RFnTy as b') () <- b
+              = BareFn Normal Rust [] (RFnTy (RArg x a : as) b') ()
+              | otherwise
+              = RBareFn x a b
 pattern RFn' isConst x ps ty b =
   Fn [] PublicV x ty Normal isConst Rust (RForall ps) b ()
 pattern RFn x ps ty b = RFn' NotConst x ps ty b
 
 -- ** function calls
 pattern RCall f xs = Call [] (RExprRef f) xs ()
-rCall f xs
-  | null xs   = RExprRef f
-  | otherwise = Call [] (RExprRef f) xs ()
+rCall f xs | null xs   = RExprRef f
+           | otherwise = RCall f xs
+pattern RCall' f ts xs = Call [] (RExprRef' f ts) xs ()
+rCall' f ts xs | null ts   = RCall f xs -- rCall f xs
+               | otherwise = RCall' f ts xs
 
 pattern RCallCon con xs = Call [] con xs ()
 pattern RMkStruct path fs = Struct [] path fs Nothing ()
 
 pattern RMacroCall f xs = MacExpr [] (Mac f xs ()) ()
 rPanic s = RMacroCall (RRef "panic") (RStrTok s)
+
+-- ** closures
+pattern RInferArg x = RArg x (Infer ())
+pattern RLam xs e = Closure [] Movable Ref (FnDecl xs Nothing False ()) e ()
+rLam xs e = RLam (RInferArg <$> xs) e
 
 -- ** constants
 pattern RConstFn x ps ty b = RFn' Const x ps ty b
@@ -107,18 +128,17 @@ pattern RMatch scr arms = Match [] scr arms ()
 
 -- ** primitives
 pattern RLit l = Lit [] l ()
+rLit l | Str _ _ _ () <- l = MethodCall [] (RLit l) "to_string" Nothing [] ()
+       | otherwise         = RLit l
+
 pattern RBin op x y = Binary [] op x y ()
 pattern RAdd x y = RBin AddOp x y
 pattern RDeref x = Unary [] Deref (RExprRef x) ()
 
 -- ** pointers
 pattern RPointer ty = Rptr Nothing Immutable ty ()
-
-rBoxTy :: Ty () -> Ty ()
-rBoxTy ty = rTyRef' (mkIdent "Box") [ ty ]
-
-rBox :: Expr () -> Expr ()
-rBox e = RCallCon (RExprConRef (mkIdent "Box") (mkIdent "new")) [ e ]
+pattern RBoxTy   ty = RTyRef' "Box" [ ty ]
+pattern RBox     e  = RCallCon (RExprConRef "Box" "new") [ e ]
 
 -- ** pretty-printing
 ppR :: (Pretty a, Resolve a) => a -> String

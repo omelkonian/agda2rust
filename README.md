@@ -23,6 +23,7 @@ alongside the corresponding generated Rust code
 - [ ] primitives
   + [x] Nat->i32
     * [ ] avoid overflow
+  + [ ] fixed-sized arithmetic
   + [ ] ...
   + [ ] builtin modules
 - [x] functions
@@ -31,6 +32,7 @@ alongside the corresponding generated Rust code
   + [x] Let bindings
   + [x] Case expresssions
   + [x] higher-order functions
+- [ ] type aliases
 - [ ] datatypes
   + [x] polymorphic types / type variables
   + [x] constructors/variants
@@ -41,14 +43,14 @@ alongside the corresponding generated Rust code
 - [ ] records
   + [x] simple records
   + [ ] complex records
-- [ ] imports
+- [ ] imports (module-related)
   + [ ] private definitions (i.e. not `pub` for everything)
 - [x] Postulates
 - [x] FOREIGN pragmas
-  - [ ] FFI with postulates
+  + [ ] FFI with postulates
 - [x] Erasure (a.k.a. run-time irrelevance)
 - [ ] Compile-time irrelevance
-  - [ ] Prop universe
+  + [ ] Prop universe
 - [x] test suite
   + [x] golden files
   + [x] CI
@@ -57,3 +59,4 @@ alongside the corresponding generated Rust code
   + [ ] TUI?
 - [ ] Optional features
   + [ ] Inlining
+  + [ ] IO

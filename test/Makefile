@@ -1,4 +1,4 @@
-MAIN=AllTests
+MAIN=main
 .PHONY : default rust html compare test golden clean cleanHtml
 
 default : clean cleanHtml build/$(MAIN).rs compare test
@@ -34,8 +34,8 @@ test :
 
 golden :
 	@rm -rf golden/ && mkdir golden
-	@find build/ -name *.rs -exec cp --parents {} golden/ \;
-	@mv -f golden/build/* golden/
+	@find build/ -name '*.rs' -exec cp --parents {} golden/ \;
+	@mv -f golden/build/* golden/ && rm -rf golden/build/
 
 clean :
 	@rm -rf build/*

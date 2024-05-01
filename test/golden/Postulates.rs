@@ -12,3 +12,8 @@ pub fn testMax() -> i32 {
   { let x0 = 0; match x0 { 0 => 42, _ => max(42) } }
 }
 
+pub fn main() {
+  println!("{}: {}", module_path!(),
+    testMax(),
+  );
+}

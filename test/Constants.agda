@@ -17,3 +17,11 @@ justify (just x) _ = x
 
 testNaught : Nat
 testNaught = justify (naught {A = Nat}) 42
+
+{-# FOREIGN AGDA2RUST
+pub fn main() {
+  println!("{}: {}", module_path!(),
+    testNaught(),
+  );
+}
+#-}

@@ -39,3 +39,13 @@ pub fn fromOnlyLeftR<A, B>(x0: OnlyLeftR<A, B>) -> A {
   left(x0)
 }
 
+use std::marker::{PhantomData};
+fn __<T>() -> PhantomData<T> { return PhantomData; }
+
+pub fn main() {
+  println!("{}: {} | {} | {}", module_path!(),
+    fromEither::<i32, i32>(41, Either::Left(42)),
+    fromOnlyLeft::<i32, i32>(OnlyLeft::Left(42)),
+    fromOnlyLeftR::<i32, i32>(OnlyLeftR {left: 42, _phantom: __()}),
+  );
+}

@@ -4,3 +4,8 @@ pub fn increment(x0: i32) -> i32 {
   1 + x0
 }
 
+pub fn main() {
+  println!("{}: {}", module_path!(),
+    increment(41)
+  );
+}

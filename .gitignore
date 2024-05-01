@@ -5,6 +5,11 @@ dist
 dist-newstyle
 # Agda
 _build
+# Agda (GHC backend)
+MAlonzo/
+# Agda (JS backend)
+agda-rts.js
+jAgda*
 # Rust
 *.rlib
 target/

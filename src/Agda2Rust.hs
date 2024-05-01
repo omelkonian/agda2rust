@@ -3,13 +3,16 @@
 , ScopedTypeVariables
 , OverloadedStrings
 , DoAndIfThenElse
+, BlockArguments
+, MultiWayIf
 #-}
 module Agda2Rust where
 
 import System.IO.Unsafe ( unsafePerformIO )
 
+import Control.Monad.Error.Class ( MonadError(catchError) )
 import Control.Monad.IO.Class ( MonadIO(liftIO) )
-import Control.Monad ( unless, when, (<=<), forM )
+import Control.Monad ( unless, when, (<=<), forM, filterM )
 import Control.Arrow ( first )
 import Control.Monad.Reader ( ReaderT(runReaderT), asks, local )
 import Control.Monad.State ( StateT, runStateT, get, gets, put, modify )
@@ -47,7 +50,8 @@ import qualified Agda.Compiler.ToTreeless as A
 import qualified AgdaInternals as A
   ( toTreeless )
 import qualified Agda.Syntax.Treeless as A
-  ( TTerm(..), TPrim(..), TAlt(..), EvaluationStrategy(..), isPrimEq )
+  ( TTerm(..), TPrim(..), TAlt(..), EvaluationStrategy(..), isPrimEq
+  , tLamView, mkTApp, mkTLam )
 import Agda.Compiler.Treeless.Pretty ()
 import qualified Agda.Compiler.Treeless.EliminateLiteralPatterns as A
   ( eliminateLiteralPatterns )
@@ -65,8 +69,10 @@ import qualified Agda.TypeChecking.Records as A
   ( isRecord, isRecordConstructor, isRecordType )
 import qualified Agda.TypeChecking.Level as A
   ( isLevelType )
+import qualified Agda.TypeChecking.Sort as A
+  ( sortOf, sortOfType )
 import qualified Agda.TypeChecking.Substitute as A
-  ( TelV(..) )
+  ( TelV(..), raise )
 import qualified Agda.TypeChecking.Telescope as A
   ( telViewPath, telViewUpTo )
 -- * reduction
@@ -81,6 +87,7 @@ import qualified Agda.TypeChecking.Pretty as P
   hiding (text)
 -- * utils
 import Agda.Utils.Monad ( ifM, mapMaybeM, anyM )
+import Agda.Utils.List ( downFrom )
 import Text.Show.Pretty ( ppShow )
 
 -- * Rust
@@ -229,17 +236,6 @@ ignoreDef d@A.Defn{..} = do
     A.GeneralizableVar -> True
     -- ** compile everything else
     _ -> False
-  where
-    builtinIds :: [A.BuiltinId]
-    builtinIds
-      = [ A.builtinLevel
-        -- , A.builtinLevelUniv
-        ]
-      -- <> A.builtinsNoDef
-      -- <> A.sizeBuiltins
-
-    getBuiltins :: TCM [QName]
-    getBuiltins = mapMaybeM A.getBuiltinName' builtinIds
 
 -- | Compiling definitions.
 instance A.Definition ~> R.Item where
@@ -259,12 +255,14 @@ instance A.Definition ~> R.Item where
                               (RTyParam . R.mkIdent <$> ps)
                               (RFnTy as resTy)
                               (RBlock body)
-      report $ " fn: " <> ppR fn
+      -- report $ " fn: " <> ppR fn
       return fn
       where
       goFn' :: (A.ListTel, A.Type) -> C ([String], [R.Arg ()], R.Ty (), R.Expr ())
       goFn' (d:tel, resTy) = do
+        -- report $ "_telArg: " <> pp d
         d' <- renameTelArg d
+        -- report $ "_telArg': " <> pp d'
         (ps0, as0) <- goTelArg d'
         (ps, as, resTy, body) <- A.addContext d' (goFn' (tel, resTy))
         return $ (ps0 <> ps, as0 <> as, resTy, body)
@@ -274,15 +272,16 @@ instance A.Definition ~> R.Item where
         return ([], [], resTy', body)
 
       goTelArg :: A.Dom (String, A.Type) -> C ([String], [R.Arg ()])
-      goTelArg d@(A.unDom -> (x, ty))
-        | isJust $ A.isSort $ A.unEl ty
-        = return ([x], [])
-        | A.hasQuantity0 d
-        = return ([], [])
-        | otherwise
-        = do isLvl <- A.isLevelType ty
-             ty' <- go ty
-             return ([], [RArg (R.mkIdent x) ty' | not isLvl])
+      goTelArg d@(A.unDom -> (x, ty)) = do
+        -- let isSrt = isSortTy ty
+        isSrt <- isSortResTy ty
+        isLvl <- A.isLevelType ty
+        let shouldDrop = isLvl || A.hasQuantity0 d
+        if isSrt then
+          return ([x], [])
+        else do
+          ty' <- go ty
+          return ([], [RArg (R.mkIdent x) ty' | not shouldDrop])
 
       renameTelArg :: A.Dom (String, A.Type) -> C (A.Dom (String, A.Type))
       renameTelArg d@(unDom -> (x, ty))
@@ -296,15 +295,28 @@ instance A.Definition ~> R.Item where
     goD = \case
       A.AbstractDefn defn -> goD defn
 
+      -- ** postulates
       A.Axiom{..} -> do
         report $ " type: " <> pp defType
         (tel, resTy) <- telListView defType
         goFn (return $ rPanic "POSTULATE") (tel, resTy)
 
+      -- ** type aliases
+      A.Function{..}
+        | isSortTy defType
+        , [A.Clause{..}] <- funClauses
+        , A.EmptyTel <- clauseTel
+        , [] <- namedClausePats
+        , Just t <- clauseBody
+        -> RTyAlias dx <$> go (typeFromTerm t)
+
+      -- ** functions
       -- A.Function{..} | d ^. funInline
       A.Function{..} -> do
         report $ " type: " <> pp defType
         (tel, resTy) <- telListView defType
+        -- report $ " >>tel: " <> pp tel
+        -- report $ " >>resTy: " <> pp resTy
         tterm <- liftTCM $ stripTopTLams <$> A.toTreeless defName
         report $ " tterm: " <> pp tterm
         goFn (go tterm) (tel, resTy)
@@ -314,14 +326,17 @@ instance A.Definition ~> R.Item where
           A.TLam t -> stripTopTLams t
           t -> t
 
+      -- ** datatypes
       A.Datatype{..} -> inDatatype defName $ do
         -- cs <- zip dataCons <$> traverse typeOfConst dataCons)
         cs <- concat <$> forM dataCons (\dc -> do
           cDef <- A.instantiateDef =<< getConstInfo dc
           return [ (dc, A.defType cDef) | hasQuantityNon0 cDef]
           )
+        report $ " cs: " <> pp cs
         A.TelV tel _ <- A.telViewUpTo dataPars defType
-        params   <- extractTyParams tel
+        report $ " tel: " <> pp tel
+        params <- fmap R.mkIdent <$> mapMaybeM shouldKeepTyParam (A.telToList tel)
         variants <- A.addContext tel (gos cs)
         let unusedParams = filter (unusedIn variants) params
         setUnusedTyParams defName (ppR <$> unusedParams)
@@ -329,25 +344,8 @@ instance A.Definition ~> R.Item where
           [ RVariant "_Impossible" [ RField $ phantomField unusedParams ]
           | not (null unusedParams)
           ])
-        where
-        extractTyParams :: A.Telescope -> C [R.Ident]
-        extractTyParams tel = do
-          let xs = mapMaybe dropTyParam (A.telToList tel)
-          -- let xs = A.namedTelVars 0 tel
-          -- xs <- traverse goA =<< fmap unDom <$> vargTys ty
-          report $ "xs: " <> pp xs
-          return (R.mkIdent <$> xs)
-          where
-            dropTyParam :: A.Dom (String, A.Type) -> Maybe String
-            dropTyParam dst
-              | A.hasQuantity0 (A.domInfo dst)
-              = Nothing
-              | (s, ty) <- unDom dst
-              , Just _ <- A.isSort (unEl ty)
-              = Just s
-              | otherwise
-              = Nothing
 
+      -- ** records
       A.Record{..} -> do
         -- NB: incorporate conHead/namedCon in the future for accuracy
         --     + to solve the issue with private (non-public) fields
@@ -358,7 +356,7 @@ instance A.Definition ~> R.Item where
         let (tel, fs) = splitAt recPars (A.telToList recTel)
         report $ " tel: " <> pp tel
         report $ " fs: " <> pp fs
-        let params = extractTyParams tel
+        params <- fmap R.mkIdent <$> mapMaybeM shouldKeepTyParam tel
         report $ " params: " <> show params
         fields <- A.addContext tel (goFs $ unDom <$> filter hasQuantityNon0 fs)
         report $ " fields: " <> show fields
@@ -371,9 +369,6 @@ instance A.Definition ~> R.Item where
 
 
         where
-        extractTyParams :: A.ListTel -> [R.Ident]
-        extractTyParams = map (R.mkIdent . fst . A.unDom) . filter hasQuantityNon0
-
         goFs :: [(String, A.Type)] :~>* R.StructField
         goFs [] = return []
         goFs ((x, ty):fs) =
@@ -383,7 +378,7 @@ instance A.Definition ~> R.Item where
         goF :: (String, A.Type) :~> R.StructField
         goF (x, ty) = RNamedField (R.mkIdent $ transcribe x) <$> go ty
 
-      d -> panic "unsupported definition" d
+      d -> panic "definition" d
      where
       phantomField :: [R.Ident] -> R.Ty ()
       phantomField ps
@@ -396,50 +391,91 @@ instance A.Definition ~> R.Item where
 
 -- | Compiling types.
 instance A.Type ~> R.Ty where
-  go ty = asks curDatatype >>= \curD -> case unEl ty of
-    A.Def n as
-      | Just primTy <- R.mkIdent <$> goPrim n
-      -> do
-        unless (null as) $ panic "primitive types cannot have type parameters" ty
-        return $ RTyRef primTy
-      where
-      goPrim :: QName -> Maybe String
-      goPrim n = case pp n of
-        "Agda.Builtin.Nat.Nat" -> Just "i32"
-        _ -> Nothing
-    A.Def n es | as <- vElims es -> do
-      let toBox = curD == Just n
-      when toBox setBox
-      (if toBox then rBoxTy else id) . rTyRef' (unqualR n)
-        <$> gos (A.El (undefined :: A.Sort) <$> as)
+  go ty = asks curDatatype >>= \curD -> do
+    report $ " ** compiling type: " <> pp ty
+    -- typeT <- liftTCM $ A.closedTermToTreeless A.LazyEvaluation (unEl ty)
+    -- report $ " type (treeless): " <> pp typeT
+    case unEl ty of
 
-    A.Pi a b ->
-      if A.hasQuantity0 a then
-        ctx (go $ A.unAbs b)
-      else
-        RBareFn (R.mkIdent x) <$> go (A.unDom a) <*> ctx (go $ A.unAbs b)
-      where
-        x   = A.bareNameWithDefault (A.absName b) (A.domName a)
-        ctx = if isDependentArrow a then A.addContext [(x, a)] else id
+      -- ** primitive types
+      A.Def n as
+        | Just primTy <- R.mkIdent <$> goPrim n
+        -> do
+          unless (null as) $
+            panic "primitive type (with non-null type parameters)" ty
+          return $ RTyRef primTy
+        where
+        goPrim :: QName -> Maybe String
+        goPrim n = case pp n of
+          "Agda.Builtin.Nat.Nat" -> Just "i32"
+          "Agda.Builtin.Char.Char" -> Just "char"
+          "Agda.Builtin.Float.Float" -> Just "f64"
+          "Float0.Float" -> Just "f64"
+          -- "Agda.Builtin.String.String" -> Just "String"
+          -- "String0.String" -> Just "str"
+          _ -> Nothing
 
-    -- otherwise, error
-    A.Var i es -> do
-      x <- lookupCtxVar i
-      -- es' <- traverse go (vArgs es)
-      return $ RTyRef (R.mkIdent x)
-    ty -> panic "unsupported type" ty
+      -- ** defined types
+      A.Def n es | es <- A.argsFromElims es -> do
+        report $ " es: " <> pp es
+        dTy <- A.typeOfConst n
+        -- report $ " >> dTy: " <> pp dTy
+        as <- flip filterM (enumerate0 es) \(i, a) -> do
+          eTy <- getArgTy dTy i
+          isLvl <- A.isLevelType eTy
+          -- report $ " >> eTy: " <> pp eTy
+          -- let isSrt = isSortTy eTy
+          isSrt <- isSortResTy eTy
+          return $ hasQuantityNon0 a && not isLvl && isSrt
+        let toBox = curD == Just n
+        when toBox setBox
+        (if toBox then RBoxTy else id) . rTyRef' (unqualR n)
+          <$> gos (typeFromTerm . unArg . snd <$> as)
+
+      -- ** function types
+      A.Pi a b ->
+        if A.hasQuantity0 a then
+          ctx (go $ A.unAbs b)
+        else
+          rBareFn (R.mkIdent x) <$> go (A.unDom a) <*> ctx (go $ A.unAbs b)
+        where
+          x   = A.bareNameWithDefault (A.absName b) (A.domName a)
+          ctx = if isDependentArrow a then A.addContext [(x, a)] else id
+
+      -- ** variables
+      A.Var i es -> do
+        x <- lookupCtxVar i
+        -- es' <- traverse go (vArgs es)
+        return $ RTyRef (R.mkIdent x)
+
+      -- ** type lambdas
+      -- TODO: currently only supports const lambdas `λ _ -> ...`
+      A.Lam _ ty -> go (typeFromTerm $ A.unAbs ty)
+
+      -- otherwise, error
+      ty -> panic "type" ty
 
 -- | Compiling Agda constructors into Rust variants.
 instance (A.QName, A.Type) ~> R.Variant where
   go (c, ty) = inConstructor c $ do
-    as <- vargTys ty
-    RVariant (unqualR c) <$> goFs 1 (unDom <$> filter shouldKeep as)
+    report $ "** compiling constructor: " <> pp c
+    as <- argTys ty
+    -- as <- vargTys ty
+    report $ " as: " <> pp as
+    RVariant (unqualR c) <$> goFs 1 ({-unDom <$> filter shouldKeep-} as)
     where
-      goFs :: Int -> [(String, A.Type)] :~>* R.StructField
+      goFs :: Int -> [A.Dom (String, A.Type)] :~>* R.StructField
       goFs _ [] = return []
-      goFs i ((x, ty):fs) =
-        (:) <$> inArgument i (goF (x, ty))
-            <*> A.addContext (A.defaultDom (x, ty)) (goFs (i + 1) fs)
+      -- goFs i ((x, ty):fs) =
+      --   (:) <$> inArgument i (goF (x, ty))
+      --       <*> A.addContext (A.defaultDom (x, ty)) (goFs (i + 1) fs)
+      goFs i (a@(unDom -> (x, ty)):fs) =
+        let ctx = A.addContext a in
+        if shouldKeep a then
+          (:) <$> inArgument i (goF (x, ty))
+              <*> ctx (goFs (i + 1) fs)
+        else
+          ctx (goFs i fs)
 
       goF :: (String, A.Type) :~> R.StructField
       goF (x, ty) = RField <$> go ty
@@ -448,31 +484,43 @@ instance (A.QName, A.Type) ~> R.Variant where
 instance A.TTerm ~> R.Expr where
   go = boxTerm <=< (\case
     A.TVar i -> do
-      report $ "* compiling variable: " <> pp i
+      -- iTy <- lookupCtxTy i
+      report $ "* compiling variable: " <> pp i -- <> " : " <> pp iTy
       RExprRef . R.mkIdent <$> lookupCtxVar i
-    A.TLit l -> RLit <$> go l
-    t@(A.TDef qn) -> go (A.TApp t [])
-    t@(A.TCon qn) -> go (A.TApp t [])
-    A.TApp t ts -> do -- goHead t <*> gos (onlyNonErased ts)
+    A.TLit l -> rLit <$> go l
+    t@(A.TDef _)  -> go (A.TApp t [])
+    t@(A.TCon _)  -> go (A.TApp t [])
+    t@(A.TPrim _) -> go (etaExpand 2 t)
+      where
+      etaExpand n t = A.mkTLam n $ A.raise n t `A.mkTApp` map A.TVar (downFrom n)
+    A.TApp t (onlyNonErased -> ts) -> do -- goHead t <*> gos (onlyNonErased ts)
       report $ "* compiling application: " <> pp t <> " $ " <> pp ts
       (cn, h) <- goHead t
-      ts' <- maybe inNonConstructor inConstructor cn $ gos (onlyNonErased ts)
-      return $ h ts'
+      (ts', ps) <- separateTyParams ts `catchError` \_ -> pure (ts, [])
+      report $ "  ps: " <> pp ps
+      report $ "  ts': " <> pp ts'
+      ps' <- gos ps
+      ts'' <- maybe inNonConstructor inConstructor cn $ gos ts'
+      -- report $ "  ts'': " <> ppR ts''
+      return $ h ps' ts''
     A.TLam t -> do
-      ctx <- A.getContextTelescope
-      report $ "ctx: " <> pp ctx
-      panic "unsupported treeless term" (A.TLam t)
+      let (n, b) = A.tLamView (A.TLam t)
+      report $ " n: " <> pp n
+      report $ " b: " <> pp b
+      xs <- freshVarsInCtx n
+      report $ " xs: " <> pp xs
+      rLam (R.mkIdent <$> xs) <$> A.addContext (zip xs $ repeat defaultTy) (go b)
+      -- panic "treeless term" (A.TLam t)
     A.TLet t t' -> do
       x <- freshVarInCtx
-      let ty = undefined :: A.Type
       e  <- go t
-      e' <- A.addContext [(x, A.defaultDom ty)] $ go t'
+      e' <- A.addContext [(x, defaultTy)] $ go t'
       return $ rLet [(x, e)] e'
     t@(A.TCase scrutinee _ defCase alts) -> do
       report $ "* compiling case expression:\n" <> pp t
       (x, ty) <- lookupCtx scrutinee
       report $ " scrutinee: " <> x
-      arms <- traverse go alts
+      arms <- traverse go =<< filterM shouldKeepAlt alts
       -- report $ " arms: " <> ppShow arms
       defArm <- case defCase of
         A.TError _ -> do
@@ -497,19 +545,27 @@ instance A.TTerm ~> R.Expr where
       -- msg <- go $ A.LitString (T.pack $ ppShow err)
       let msg = ppShow err
       return $ RMacroCall (RRef "panic") (RStrTok msg)
-    t -> panic "unsupported treeless term" t)
+    t -> panic "treeless term" t)
     where
+    shouldKeepAlt :: A.TAlt -> C Bool
+    shouldKeepAlt = \case
+      A.TACon{..} -> do
+        cDef <- A.instantiateDef =<< getConstInfo aCon
+        return $ hasQuantityNon0 cDef
+      A.TAGuard{} -> pure True
+      A.TALit{}   -> pure True
+
     boxTerm :: R.Expr () :~> R.Expr
     boxTerm e = do
       toBox <- shouldBox
-      return $ (if toBox then rBox else id) e
+      return $ (if toBox then RBox else id) e
 
-    goHead :: A.TTerm -> C (Maybe A.QName, ([R.Expr ()] -> R.Expr ()))
+    goHead :: A.TTerm -> C (Maybe A.QName, ([R.Expr ()] -> [R.Expr ()] -> R.Expr ()))
     goHead = \case
       A.TDef qn -> do
         -- toConst <- isNullary =<< A.typeOfConst qn
         -- return (Nothing, (if toConst then rCall else RCall) (unqualR qn))
-        return (Nothing, RCall (unqualR qn))
+        return (Nothing, \ps -> rCall' (unqualR qn) (rTyFromExp <$> ps))
       A.TCon cn -> do
         report $ "* compiling head of application (constructor: " <> pp cn <> ")"
         isRec <- A.isRecordConstructor cn
@@ -518,14 +574,14 @@ instance A.TTerm ~> R.Expr where
           Right A.ConHead{..} <- A.getConHead cn
           h <- parentQualR cn
           let xs = unqualR . unArg <$> conFields
-          return (Just cn , \es -> RMkStruct h (zipWith (\x e -> R.Field x (Just e) ()) xs es))
+          return (Just cn , \_ es -> RMkStruct h (zipWith (\x e -> R.Field x (Just e) ()) xs es))
         else do
           h <- qualR cn
-          return (Just cn, \es -> RCallCon (RPathExpr h) es)
+          return (Just cn, \_ es -> RCallCon (RPathExpr h) es)
       A.TPrim prim | Just binOp <- getBinOp prim ->
-        return (Nothing, \[x, y] -> RBin binOp x y)
+        return (Nothing, \_ [x, y] -> RBin binOp x y)
       A.TPrim A.PSeq ->
-        return (Nothing, last)
+        return (Nothing, \_ -> last)
         -- | A.PIf <- prim
         -- , [] <- xs
       A.TVar n -> do
@@ -533,8 +589,8 @@ instance A.TTerm ~> R.Expr where
         -- return (Nothing, rCall f)
         (f, ty) <- lookupCtx n
         toConst <- isNullary ty
-        return (Nothing, (if toConst then rCall else RCall) (R.mkIdent f))
-      hd -> panic "unsupported head" (ppShow hd)
+        return (Nothing, \_ -> (if toConst then rCall else RCall) (R.mkIdent f))
+      hd -> panic "head" (ppShow hd)
 
     getBinOp :: A.TPrim -> Maybe R.BinOp
     getBinOp = \case
@@ -577,29 +633,29 @@ instance A.TAlt ~> R.Arm where
         Just _ -> do
           path <- parentQualR con
           report $ " path: " <> ppR path
-          (_, vargs, _) <- viewTy =<< A.typeOfConst con
-          vargs' <- populateArgNames vargs
-          report $ " vargs': " <> pp vargs'
-          let xs = transcribe . fst . unDom <$> filter hasQuantityNon0 (take n vargs')
+          (_, vas, _) <- viewTy =<< A.typeOfConst con
+          vas' <- populateArgNames vas
+          report $ " vas': " <> pp vas'
+          let xs = transcribe . fst . unDom <$> filter hasQuantityNon0 (take n vas')
           Just (qn, _) <- A.isRecordConstructor con
           hasPhantomField <- hasUnusedTyParams qn
           let pats = RId . R.mkIdent <$> xs <> ["_phantom" | hasPhantomField]
           report $ " pat: " <> pp con <> "(" <> show n <> ")"
                 <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
-          body'  <- A.addContext vargs' (go body)
+          body'  <- A.addContext vas' (go body)
           report $ " body: " <> pp body <> " ~> " <> ppR body'
           return $ RArm (RStructP path (RNoFieldP <$> pats)) body'
 
         -- compiling match on a data/enum value
         Nothing -> do
           path <- qualR con
-          (_, vargs, _) <- viewTy =<< A.typeOfConst con
-          vargs' <- populateArgNames vargs
-          let xs = take n (fst . unDom <$> filter hasQuantityNon0 vargs')
+          (_, vas, _) <- viewTy =<< A.typeOfConst con
+          vas' <- populateArgNames vas
+          let xs = take n (fst . unDom <$> filter hasQuantityNon0 vas')
           let pats = RId . R.mkIdent <$> xs
           report $ " pat: " <> pp con <> "(" <> show n <> ")"
                 <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
-          body'  <- unboxPats con n xs =<< A.addContext vargs' (go body)
+          body'  <- unboxPats con n xs =<< A.addContext vas' (go body)
           report $ " body: " <> pp body <> " ~> " <> ppR body'
           return $ RArm (RTupleP path pats) body'
       where
@@ -640,7 +696,7 @@ instance A.Literal ~> R.Lit where
     A.LitFloat  d -> R.Float d R.Unsuffixed ()
     A.LitString s -> R.Str (T.unpack s) R.Cooked R.Unsuffixed ()
     A.LitChar   c -> R.Char c R.Unsuffixed ()
-    l -> panic "unsupported literal" l
+    l -> panic "literal" l
 
 unqualR :: A.QName -> R.Ident
 unqualR = R.mkIdent . unqual
