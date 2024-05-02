@@ -83,13 +83,13 @@
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="kw">pub</span> proj₂<span class="op">:</span> B<span class="op">,</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="op">}</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> proj₁<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>(r<span class="op">:</span> _×_<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>) <span class="op">-&gt;</span> A <span class="op">{</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> _×_·proj₁<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>(r<span class="op">:</span> _×_<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>) <span class="op">-&gt;</span> A <span class="op">{</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  <span class="kw">match</span> r <span class="op">{</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>    _×_ <span class="op">{</span> proj₁<span class="op">,</span> proj₂ <span class="op">}</span> <span class="op">=&gt;</span> proj₁<span class="op">,</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>  <span class="op">}</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="op">}</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> proj₂<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>(r<span class="op">:</span> _×_<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>) <span class="op">-&gt;</span> B <span class="op">{</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> _×_·proj₂<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>(r<span class="op">:</span> _×_<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>) <span class="op">-&gt;</span> B <span class="op">{</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  <span class="kw">match</span> r <span class="op">{</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>    _×_ <span class="op">{</span> proj₁<span class="op">,</span> proj₂ <span class="op">}</span> <span class="op">=&gt;</span> proj₂<span class="op">,</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>  <span class="op">}</span></span>
@@ -114,16 +114,16 @@
 <span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a><span class="op">}</span></span>
 <span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a></span>
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> fst<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>(x0<span class="op">:</span> _×_<span class="op">&lt;</span>A<span class="op">,</span> B<span class="op">&gt;</span>) <span class="op">-&gt;</span> A <span class="op">{</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>  proj₁(x0)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>  _×_·proj₁(x0)</span>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a><span class="op">}</span></span>
 <span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a></span>
 <span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> main() <span class="op">{</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>  <span class="pp">println!</span>(<span class="st">&quot;{}: {} | {} | {}&quot;</span><span class="op">,</span> <span class="pp">module_path!</span>()<span class="op">,</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>  <span class="pp">println!</span>(<span class="st">&quot;{}:</span><span class="sc">\t</span><span class="st"> {} | {} | {}&quot;</span><span class="op">,</span> <span class="pp">module_path!</span>()<span class="op">,</span></span>
 <span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>    mapSnd(</span>
 <span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>      <span class="op">|</span>x<span class="op">|</span> x <span class="op">+</span> <span class="dv">1</span></span>
 <span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>      <span class="op">,</span> _×_ <span class="op">{</span>proj₁<span class="op">:</span> <span class="dv">0</span><span class="op">,</span> proj₂<span class="op">:</span> <span class="dv">41</span><span class="op">}</span></span>
 <span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>    )<span class="op">.</span>proj₂<span class="op">,</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a>    proj₁(mapFst(</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a>    _×_·proj₁(mapFst(</span>
 <span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a>      <span class="op">|</span>x<span class="op">|</span> x <span class="op">+</span> <span class="dv">1</span></span>
 <span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a>      <span class="op">,</span> _×_ <span class="op">{</span>proj₁<span class="op">:</span> <span class="dv">41</span><span class="op">,</span> proj₂<span class="op">:</span> <span class="dv">40</span><span class="op">}</span></span>
 <span id="cb1-51"><a href="#cb1-51" aria-hidden="true"></a>    ))<span class="op">,</span></span>

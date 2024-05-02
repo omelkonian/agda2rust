@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Nat</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Agda.Builtin.Nat.html" class="Module">Agda.Builtin.Nat</a> <a id="30" class="Keyword">using</a> <a id="36" class="Symbol">(</a><a id="37" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a><a id="40" class="Symbol">;</a> <a id="42" href="Agda.Builtin.Nat.html#221" class="InductiveConstructor">zero</a><a id="46" class="Symbol">;</a> <a id="48" href="Agda.Builtin.Nat.html#234" class="InductiveConstructor">suc</a><a id="51" class="Symbol">)</a>
+
+<a id="_+_"></a><a id="54" href="Nat.html#54" class="Function Operator">_+_</a> <a id="58" class="Symbol">:</a> <a id="60" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a> <a id="64" class="Symbol">→</a> <a id="66" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a> <a id="70" class="Symbol">→</a> <a id="72" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a>
+<a id="76" href="Agda.Builtin.Nat.html#221" class="InductiveConstructor">zero</a>  <a id="82" href="Nat.html#54" class="Function Operator">+</a> <a id="84" href="Nat.html#84" class="Bound">m</a> <a id="86" class="Symbol">=</a> <a id="88" href="Nat.html#84" class="Bound">m</a>
+<a id="90" href="Agda.Builtin.Nat.html#234" class="InductiveConstructor">suc</a> <a id="94" href="Nat.html#94" class="Bound">n</a> <a id="96" href="Nat.html#54" class="Function Operator">+</a> <a id="98" href="Nat.html#98" class="Bound">m</a> <a id="100" class="Symbol">=</a> <a id="102" href="Agda.Builtin.Nat.html#234" class="InductiveConstructor">suc</a> <a id="106" class="Symbol">(</a><a id="107" href="Nat.html#94" class="Bound">n</a> <a id="109" href="Nat.html#54" class="Function Operator">+</a> <a id="111" href="Nat.html#98" class="Bound">m</a><a id="112" class="Symbol">)</a>
+
+<a id="testNat"></a><a id="115" href="Nat.html#115" class="Function">testNat</a> <a id="123" class="Symbol">:</a> <a id="125" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a>
+<a id="129" href="Nat.html#115" class="Function">testNat</a> <a id="137" class="Symbol">=</a> <a id="139" class="Number">40</a> <a id="142" href="Nat.html#54" class="Function Operator">+</a> <a id="144" class="Number">2</a>
+
+<a id="147" class="Symbol">{-#</a> <a id="151" class="Keyword">FOREIGN</a> <a id="159" class="Pragma">AGDA2RUST</a>
+<a id="169" class="Pragma">pub</a> <a id="173" class="Pragma">fn</a> <a id="176" class="Pragma">main</a> <a id="181" class="Pragma">()</a> <a id="184" class="Pragma">{</a>
+  <a id="188" class="Pragma">println!(&quot;{}:\t</a> <a id="204" class="Pragma">{}&quot;,</a> <a id="209" class="Pragma">module_path!(),</a>
+    <a id="229" class="Pragma">testNat()</a>
+  <a id="241" class="Pragma">);</a>
+<a id="244" class="Pragma">}</a>
+<a id="246" class="Symbol">#-}</a>
+</pre><div class="split right"><embed src="build/Nat.unicode.html"/></div></body></html>

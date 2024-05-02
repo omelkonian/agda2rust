@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Bool00</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Keyword">data</a> <a id="Bool"></a><a id="6" href="Bool00.html#6" class="Datatype">Bool</a> <a id="11" class="Symbol">:</a> <a id="13" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="17" class="Keyword">where</a>
+  <a id="Bool.false"></a><a id="25" href="Bool00.html#25" class="InductiveConstructor">false</a> <a id="Bool.true"></a><a id="31" href="Bool00.html#31" class="InductiveConstructor">true</a> <a id="36" class="Symbol">:</a> <a id="38" href="Bool00.html#6" class="Datatype">Bool</a>
+
+<a id="_∧_"></a><a id="44" href="Bool00.html#44" class="Function Operator">_∧_</a> <a id="48" class="Symbol">:</a> <a id="50" href="Bool00.html#6" class="Datatype">Bool</a> <a id="55" class="Symbol">→</a> <a id="57" href="Bool00.html#6" class="Datatype">Bool</a> <a id="62" class="Symbol">→</a> <a id="64" href="Bool00.html#6" class="Datatype">Bool</a>
+<a id="69" href="Bool00.html#44" class="Function Operator">_∧_</a> <a id="73" class="Symbol">=</a> <a id="75" class="Symbol">λ</a> <a id="77" class="Keyword">where</a>
+  <a id="85" href="Bool00.html#31" class="InductiveConstructor">true</a> <a id="90" href="Bool00.html#31" class="InductiveConstructor">true</a> <a id="95" class="Symbol">→</a> <a id="97" href="Bool00.html#31" class="InductiveConstructor">true</a>
+  <a id="104" class="CatchallClause Symbol">_</a><a id="105" class="CatchallClause">    </a><a id="109" class="CatchallClause Symbol">_</a>    <a id="114" class="Symbol">→</a> <a id="116" href="Bool00.html#25" class="InductiveConstructor">false</a>
+
+<a id="123" class="Comment">-- make sure reserved Rust names do not conflict</a>
+<a id="r#true"></a><a id="172" href="Bool00.html#172" class="Function">r#true</a>  <a id="180" class="Symbol">=</a> <a id="182" href="Bool00.html#31" class="InductiveConstructor">true</a>
+<a id="r#false"></a><a id="187" href="Bool00.html#187" class="Function">r#false</a> <a id="195" class="Symbol">=</a> <a id="197" href="Bool00.html#25" class="InductiveConstructor">false</a>
+
+<a id="testBool"></a><a id="204" href="Bool00.html#204" class="Function">testBool</a> <a id="213" class="Symbol">:</a> <a id="215" href="Bool00.html#6" class="Datatype">Bool</a>
+<a id="220" href="Bool00.html#204" class="Function">testBool</a> <a id="229" class="Symbol">=</a> <a id="231" href="Bool00.html#172" class="Function">r#true</a> <a id="238" href="Bool00.html#44" class="Function Operator">∧</a> <a id="240" href="Bool00.html#187" class="Function">r#false</a>
+
+<a id="249" class="Keyword">open</a> <a id="254" class="Keyword">import</a> <a id="261" href="Agda.Builtin.Nat.html" class="Module">Agda.Builtin.Nat</a> <a id="278" class="Keyword">using</a> <a id="284" class="Symbol">(</a><a id="285" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a><a id="288" class="Symbol">)</a>
+
+<a id="bool2Nat"></a><a id="291" href="Bool00.html#291" class="Function">bool2Nat</a> <a id="300" class="Symbol">:</a> <a id="302" href="Bool00.html#6" class="Datatype">Bool</a> <a id="307" class="Symbol">→</a> <a id="309" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a>
+<a id="313" href="Bool00.html#291" class="Function">bool2Nat</a> <a id="322" class="Symbol">=</a> <a id="324" class="Symbol">λ</a> <a id="326" class="Keyword">where</a>
+  <a id="334" href="Bool00.html#31" class="InductiveConstructor">true</a>  <a id="340" class="Symbol">→</a> <a id="342" class="Number">0</a>
+  <a id="346" href="Bool00.html#25" class="InductiveConstructor">false</a> <a id="352" class="Symbol">→</a> <a id="354" class="Number">42</a>
+
+<a id="358" class="Symbol">{-#</a> <a id="362" class="Keyword">FOREIGN</a> <a id="370" class="Pragma">AGDA2RUST</a>
+<a id="380" class="Pragma">pub</a> <a id="384" class="Pragma">fn</a> <a id="387" class="Pragma">main</a> <a id="392" class="Pragma">()</a> <a id="395" class="Pragma">{</a>
+  <a id="399" class="Pragma">println!(&quot;{}:\t</a> <a id="415" class="Pragma">{:?}&quot;,</a> <a id="422" class="Pragma">module_path!(),</a>
+    <a id="442" class="Pragma">bool2Nat(testBool())</a>
+  <a id="465" class="Pragma">);</a>
+<a id="468" class="Pragma">}</a>
+<a id="470" class="Symbol">#-}</a>
+</pre><div class="split right"><embed src="build/Bool00.unicode.html"/></div></body></html>

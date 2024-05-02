@@ -1,0 +1,14 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>String</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Agda.Builtin.String.html" class="Module">Agda.Builtin.String</a> <a id="33" class="Keyword">using</a> <a id="39" class="Symbol">(</a><a id="40" href="Agda.Builtin.String.html#335" class="Postulate">String</a><a id="46" class="Symbol">)</a>
+
+<a id="s42"></a><a id="49" href="String.html#49" class="Function">s42</a> <a id="53" class="Symbol">:</a> <a id="55" href="Agda.Builtin.String.html#335" class="Postulate">String</a>
+<a id="62" href="String.html#49" class="Function">s42</a> <a id="66" class="Symbol">=</a> <a id="68" class="String">&quot;42&quot;</a>
+
+<a id="74" class="Symbol">{-#</a> <a id="78" class="Keyword">FOREIGN</a> <a id="86" class="Pragma">AGDA2RUST</a>
+<a id="96" class="Pragma">pub</a> <a id="100" class="Pragma">fn</a> <a id="103" class="Pragma">main</a> <a id="108" class="Pragma">()</a> <a id="111" class="Pragma">{</a>
+  <a id="115" class="Pragma">println!(&quot;{}:\t</a> <a id="131" class="Pragma">{}&quot;,</a> <a id="136" class="Pragma">module_path!(),</a>
+    <a id="156" class="Pragma">s42()</a>
+  <a id="164" class="Pragma">);</a>
+<a id="167" class="Pragma">}</a>
+<a id="169" class="Symbol">#-}</a>
+</pre><div class="split right"><embed src="build/String.unicode.html"/></div></body></html>

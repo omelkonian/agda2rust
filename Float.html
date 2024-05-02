@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Float</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Agda.Builtin.Float.html" class="Module">Agda.Builtin.Float</a> <a id="32" class="Keyword">using</a> <a id="38" class="Symbol">(</a><a id="39" href="Agda.Builtin.Float.html#353" class="Postulate">Float</a><a id="44" class="Symbol">)</a>
+
+<a id="idFloat"></a><a id="47" href="Float.html#47" class="Function">idFloat</a> <a id="55" class="Symbol">:</a> <a id="57" href="Agda.Builtin.Float.html#353" class="Postulate">Float</a> <a id="63" class="Symbol">→</a> <a id="65" href="Agda.Builtin.Float.html#353" class="Postulate">Float</a>
+<a id="71" href="Float.html#47" class="Function">idFloat</a> <a id="79" href="Float.html#79" class="Bound">f</a> <a id="81" class="Symbol">=</a> <a id="83" href="Float.html#79" class="Bound">f</a>
+
+<a id="testFloat"></a><a id="86" href="Float.html#86" class="Function">testFloat</a> <a id="96" class="Symbol">:</a> <a id="98" href="Agda.Builtin.Float.html#353" class="Postulate">Float</a>
+<a id="104" href="Float.html#86" class="Function">testFloat</a> <a id="114" class="Symbol">=</a> <a id="116" href="Float.html#47" class="Function">idFloat</a> <a id="124" class="Number">4.2</a>
+
+<a id="129" class="Symbol">{-#</a> <a id="133" class="Keyword">FOREIGN</a> <a id="141" class="Pragma">AGDA2RUST</a>
+<a id="151" class="Pragma">pub</a> <a id="155" class="Pragma">fn</a> <a id="158" class="Pragma">main</a> <a id="163" class="Pragma">()</a> <a id="166" class="Pragma">{</a>
+  <a id="170" class="Pragma">println!(&quot;{}:\t</a> <a id="186" class="Pragma">{}&quot;,</a> <a id="191" class="Pragma">module_path!(),</a>
+    <a id="211" class="Pragma">idFloat(testFloat())</a>
+  <a id="234" class="Pragma">);</a>
+<a id="237" class="Pragma">}</a>
+<a id="239" class="Symbol">#-}</a>
+</pre><div class="split right"><embed src="build/Float.unicode.html"/></div></body></html>
