@@ -13,7 +13,7 @@ fn ᐁ<T>(x : T) -> Box<T> { return Box::new(x); }
 use self::Nat::{zero,suc};
 
 pub fn main() {
-  println!("{}: {:?} | {:?}", module_path!(),
+  println!("{}:\t {:?} | {:?}", module_path!(),
     suc(ᐁ(suc(ᐁ(suc(ᐁ(suc(ᐁ(zero())))))))),
     _Ֆ43Ֆ_(suc(ᐁ(zero())), suc(ᐁ(zero()))),
   );

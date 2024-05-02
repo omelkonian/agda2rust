@@ -26,7 +26,7 @@ use std::marker::{PhantomData};
 fn __<T>() -> PhantomData<T> { return PhantomData; }
 
 pub fn main() {
-  println!("{}: {} | {} | {}", module_path!(),
+  println!("{}:\t {} | {} | {}", module_path!(),
     fromEither::<i32, i32>(41, Either::Left(42)),
     fromOnlyLeft::<i32, i32>(OnlyLeft::Left(42)),
     fromOnlyLeftR::<i32, i32>(OnlyLeftR {left: 42, _phantom: __()}),

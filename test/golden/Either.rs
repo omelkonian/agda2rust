@@ -29,21 +29,21 @@ pub struct OnlyLeftR<A, B> {
   pub _phantom: std::marker::PhantomData<(B,)>,
 }
 
-pub fn left<A, B>(r: OnlyLeftR<A, B>) -> A {
+pub fn OnlyLeftR·left<A, B>(r: OnlyLeftR<A, B>) -> A {
   match r {
     OnlyLeftR { left, _phantom } => left,
   }
 }
 
 pub fn fromOnlyLeftR<A, B>(x0: OnlyLeftR<A, B>) -> A {
-  left(x0)
+  OnlyLeftR·left(x0)
 }
 
 use std::marker::{PhantomData};
 fn __<T>() -> PhantomData<T> { return PhantomData; }
 
 pub fn main() {
-  println!("{}: {} | {} | {}", module_path!(),
+  println!("{}:\t {} | {} | {}", module_path!(),
     fromEither::<i32, i32>(41, Either::Left(42)),
     fromOnlyLeft::<i32, i32>(OnlyLeft::Left(42)),
     fromOnlyLeftR::<i32, i32>(OnlyLeftR {left: 42, _phantom: __()}),

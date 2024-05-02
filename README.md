@@ -54,9 +54,13 @@ alongside the corresponding generated Rust code
 - [x] test suite
   + [x] golden files
   + [x] CI
+- [ ] Compiler instructions
+  + [ ] Inlining
+  + [ ] COMPILE rename
+  + [ ] COMPILE derive
+  + [ ] COMPILE ignore
 - [ ] interface
   + [ ] emacs mode?
   + [ ] TUI?
 - [ ] Optional features
-  + [ ] Inlining
   + [ ] IO

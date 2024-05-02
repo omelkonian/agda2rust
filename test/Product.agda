@@ -17,12 +17,12 @@ fst = proj₁
 
 {-# FOREIGN AGDA2RUST
 pub fn main() {
-  println!("{}: {} | {} | {}", module_path!(),
+  println!("{}:\t {} | {} | {}", module_path!(),
     mapSnd(
       |x| x + 1
       , _Ֆ215Ֆ_ {projՖ8321Ֆ: 0, projՖ8322Ֆ: 41}
     ).projՖ8322Ֆ,
-    projՖ8321Ֆ(mapFst(
+    _Ֆ215Ֆ_·projՖ8321Ֆ(mapFst(
       |x| x + 1
       , _Ֆ215Ֆ_ {projՖ8321Ֆ: 41, projՖ8322Ֆ: 40}
     )),

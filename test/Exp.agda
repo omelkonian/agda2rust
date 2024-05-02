@@ -43,7 +43,7 @@ fn ᐁ<T>(x : T) -> Box<T> { return Box::new(x); }
 use self::Exp::{Plus,Int,Var};
 
 pub fn main() {
-  println!("{}: {} | {}", module_path!(),
+  println!("{}:\t {} | {}", module_path!(),
     eval(|x| x, exampleExp()),
     eval(|x| x + 1, Plus(ᐁ(Int(5)),ᐁ(Var(36)))),
   );

@@ -5,13 +5,13 @@ pub struct _Ֆ215Ֆ_<A, B> {
   pub projՖ8322Ֆ: B,
 }
 
-pub fn projՖ8321Ֆ<A, B>(r: _Ֆ215Ֆ_<A, B>) -> A {
+pub fn _Ֆ215Ֆ_·projՖ8321Ֆ<A, B>(r: _Ֆ215Ֆ_<A, B>) -> A {
   match r {
     _Ֆ215Ֆ_ { projՖ8321Ֆ, projՖ8322Ֆ } => projՖ8321Ֆ,
   }
 }
 
-pub fn projՖ8322Ֆ<A, B>(r: _Ֆ215Ֆ_<A, B>) -> B {
+pub fn _Ֆ215Ֆ_·projՖ8322Ֆ<A, B>(r: _Ֆ215Ֆ_<A, B>) -> B {
   match r {
     _Ֆ215Ֆ_ { projՖ8321Ֆ, projՖ8322Ֆ } => projՖ8322Ֆ,
   }
@@ -36,16 +36,16 @@ pub fn mapSnd<B, C, A>(x0: fn(_: B) -> C, x1: _Ֆ215Ֆ_<A, B>) -> _Ֆ215Ֆ_<A, C
 }
 
 pub fn fst<A, B>(x0: _Ֆ215Ֆ_<A, B>) -> A {
-  projՖ8321Ֆ(x0)
+  _Ֆ215Ֆ_·projՖ8321Ֆ(x0)
 }
 
 pub fn main() {
-  println!("{}: {} | {} | {}", module_path!(),
+  println!("{}:\t {} | {} | {}", module_path!(),
     mapSnd(
       |x| x + 1
       , _Ֆ215Ֆ_ {projՖ8321Ֆ: 0, projՖ8322Ֆ: 41}
     ).projՖ8322Ֆ,
-    projՖ8321Ֆ(mapFst(
+    _Ֆ215Ֆ_·projՖ8321Ֆ(mapFst(
       |x| x + 1
       , _Ֆ215Ֆ_ {projՖ8321Ֆ: 41, projՖ8322Ֆ: 40}
     )),

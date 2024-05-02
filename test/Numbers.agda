@@ -20,7 +20,7 @@ add3b x y z = add x (add y z)
 
 {-# FOREIGN AGDA2RUST
 pub fn main() {
-  println!("{}: {} | {} | {} | {} | {} | {}", module_path!(),
+  println!("{}:\t {} | {} | {} | {} | {} | {}", module_path!(),
     answer(),
     suc(41),
     add_answer(0),

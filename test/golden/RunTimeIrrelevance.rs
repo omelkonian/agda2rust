@@ -16,7 +16,7 @@ pub struct ErasedField {
   pub x: i32,
 }
 
-pub fn x(r: ErasedField) -> i32 {
+pub fn ErasedField·x(r: ErasedField) -> i32 {
   match r {
     ErasedField { x } => x,
   }
@@ -32,7 +32,7 @@ pub struct ErasedRecParam {
   pub y: i32,
 }
 
-pub fn y(r: ErasedRecParam) -> i32 {
+pub fn ErasedRecParam·y(r: ErasedRecParam) -> i32 {
   match r {
     ErasedRecParam { y } => y,
   }

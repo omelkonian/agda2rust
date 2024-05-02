@@ -25,7 +25,7 @@ pub fn add3b(x0: i32, x1: i32, x2: i32) -> i32 {
 }
 
 pub fn main() {
-  println!("{}: {} | {} | {} | {} | {} | {}", module_path!(),
+  println!("{}:\t {} | {} | {} | {} | {} | {}", module_path!(),
     answer(),
     suc(41),
     add_answer(0),

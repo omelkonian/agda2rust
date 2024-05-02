@@ -21,6 +21,8 @@ rLet xs e =
   in
     BlockExpr [] (Block (ps ++ [NoSemi e ()]) Normal ()) ()
 
+pattern RMod x i = Mod [] PublicV x (Just [i]) ()
+
 -- ** names & variables
 pattern RId x = IdentP (ByValue Immutable) x Nothing ()
 
@@ -130,6 +132,9 @@ pattern RMatch scr arms = Match [] scr arms ()
 pattern RLit l = Lit [] l ()
 rLit l | Str _ _ _ () <- l = MethodCall [] (RLit l) "to_string" Nothing [] ()
        | otherwise         = RLit l
+pattern RLitBool b = RLit (Bool b Unsuffixed ())
+pattern RLitTrue  = RLitBool True
+pattern RLitFalse = RLitBool False
 
 pattern RBin op x y = Binary [] op x y ()
 pattern RAdd x y = RBin AddOp x y

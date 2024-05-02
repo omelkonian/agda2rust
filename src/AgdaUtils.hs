@@ -50,7 +50,9 @@ import Agda.TypeChecking.Level
 import Agda.TypeChecking.Substitute
   ( TelV(..) )
 import Agda.TypeChecking.Telescope
-  ( telViewPath, telViewUpTo )
+  ( telViewPath, telViewUpTo, telView )
+import Agda.TypeChecking.Primitive
+  ( isBuiltin )
 -- * reduction
 import Agda.TypeChecking.Reduce
   ( reduce )
@@ -63,7 +65,7 @@ import qualified Agda.TypeChecking.Pretty as P
   hiding (text)
 import Text.Show.Pretty ( ppShow )
 
-import Agda.Utils.Monad ( mapMaybeM, partitionM )
+import Agda.Utils.Monad ( mapMaybeM, partitionM, ifM )
 import Agda.Utils.Maybe ( boolToMaybe )
 
 import Utils
@@ -99,19 +101,19 @@ reportCurrentCtx = currentCtx >>= \ctx ->
   report $ "currentCtx: " <> pp ctx
 
 lookupCtx :: MonadTCEnv m => Int -> m (String, Type)
-lookupCtx i = first transcribe . (!! i) <$> currentCtx
+lookupCtx i = first transcribe . (!! i) {-. reverse-} <$> currentCtx
 
 currentCtxVars :: MonadTCEnv m => m [String]
 currentCtxVars = fmap fst <$> currentCtx
 
 lookupCtxVar :: MonadTCEnv m => Int -> m String
-lookupCtxVar i = transcribe . (!! i) <$> currentCtxVars
+lookupCtxVar i = transcribe . (!! i) {-. reverse-} <$> currentCtxVars
 
 currentCtxTys :: MonadTCEnv m => m [Type]
 currentCtxTys = fmap snd <$> currentCtx
 
 lookupCtxTy :: MonadTCEnv m => Int -> m Type
-lookupCtxTy i = (!! i) <$> currentCtxTys
+lookupCtxTy i = (!! i) {-. reverse-} <$> currentCtxTys
 
 -- ** variables
 unqual :: QName -> String
@@ -227,7 +229,12 @@ defaultTy = defaultDom $ typeFromTerm (Dummy "???" [] :: Term)
 
 telListView :: PureTCM m => Type -> m (ListTel, Type)
 telListView t = do
-  TelV tel t <- telViewPath t
+  TelV tel t <- telView t -- telViewPath t
+  return (telToList tel, t)
+
+telListViewUpTo :: PureTCM m => Int -> Type -> m (ListTel, Type)
+telListViewUpTo n t = do
+  TelV tel t <- telViewUpTo n t
   return (telToList tel, t)
 
 getArgTy :: PureTCM m => Type -> Int -> m Type
@@ -266,21 +273,59 @@ isNullary ty = null . filter hasQuantityNon0 . fst <$> telListView ty
 --     | ->
 --     | otherwise -> traverseF (filterTel p) tel
 
+-- ** definitions
+
+isRecordProjection :: Defn -> Maybe (QName, QName)
+isRecordProjection d
+  | Function{..} <- d
+  , Right Projection{..} <- funProjection
+  , Just recName <- projProper
+  = Just (recName, projOrig)
+  | otherwise
+  = Nothing
+
 -- ** builtins
 getBuiltins :: TCM [QName]
 getBuiltins = mapMaybeM getBuiltinName' allBuiltinIds
+
+data BuiltinTy = Nat | Float | Char | String | Bool | Int
+
+isBuiltinDef :: QName -> TCM Bool
+isBuiltinDef n = (n `elem`) <$> getBuiltins
+
+isBuiltinTy :: (HasBuiltins m, MonadReduce m) => QName -> m (Maybe BuiltinTy)
+isBuiltinTy n
+  = builtinNat     .-> Nat
+  $ builtinFloat   .-> Float
+  $ builtinChar    .-> Char
+  $ builtinString  .-> String
+  $ builtinBool    .-> Bool
+  $ builtinInteger .-> Int
+  $ return Nothing
+  where (.->) def ty = ifM (isBuiltin n def) (return $ Just ty)
+
+data BuiltinTerm = TrueE | FalseE
+
+isBuiltinTerm :: (HasBuiltins m, MonadReduce m) => QName -> m (Maybe BuiltinTerm)
+isBuiltinTerm n
+  = builtinTrue   .-> TrueE
+  $ builtinFalse  .-> FalseE
+  $ return Nothing
+  where (.->) def ty = ifM (isBuiltin n def) (return $ Just ty)
 
 allBuiltinIds :: [BuiltinId]
 allBuiltinIds =
   builtinsNoDef <>
   [ builtinLevel,
-  -- builtinNat, builtinSuc, builtinZero, builtinNatPlus, builtinNatMinus,
+  builtinNat,
+  -- builtinSuc, builtinZero, builtinNatPlus, builtinNatMinus,
   -- builtinNatTimes, builtinNatDivSucAux, builtinNatModSucAux, builtinNatEquals,
-  -- builtinNatLess, builtinInteger, builtinIntegerPos, builtinIntegerNegSuc,
+  -- builtinNatLess,
+  builtinInteger, -- builtinIntegerPos, builtinIntegerNegSuc,
   builtinWord64,
-  builtinFloat, builtinChar, builtinString, builtinUnit, builtinUnitUnit
+  builtinFloat, builtinChar, builtinString, builtinUnit, builtinUnitUnit,
   -- builtinSigma,
-  -- builtinBool, builtinTrue, builtinFalse,
+  builtinBool, builtinTrue, builtinFalse,
   -- builtinList, builtinNil, builtinCons, builtinIO,
   -- builtinMaybe, builtinNothing, builtinJust,
   -- builtinPath, builtinPathP,
@@ -319,27 +364,27 @@ allBuiltinIds =
   -- builtinAgdaDefinitionDataConstructor, builtinAgdaDefinitionPostulate,
   -- builtinAgdaDefinitionPrimitive, builtinAgdaDefinition,
   -- builtinAgdaMeta,
-  -- builtinAgdaTCM, builtinAgdaTCMReturn, builtinAgdaTCMBind, builtinAgdaTCMUnify,
-  -- builtinAgdaTCMTypeError, builtinAgdaTCMInferType,
-  -- builtinAgdaTCMCheckType, builtinAgdaTCMNormalise, builtinAgdaTCMReduce,
-  -- builtinAgdaTCMCatchError,
-  -- builtinAgdaTCMGetContext, builtinAgdaTCMExtendContext, builtinAgdaTCMInContext,
-  -- builtinAgdaTCMFreshName, builtinAgdaTCMDeclareDef, builtinAgdaTCMDeclarePostulate, builtinAgdaTCMDeclareData, builtinAgdaTCMDefineData, builtinAgdaTCMDefineFun,
-  -- builtinAgdaTCMGetType, builtinAgdaTCMGetDefinition,
-  -- builtinAgdaTCMQuoteTerm, builtinAgdaTCMUnquoteTerm, builtinAgdaTCMQuoteOmegaTerm,
-  -- builtinAgdaTCMCommit, builtinAgdaTCMIsMacro, builtinAgdaTCMBlock,
-  -- builtinAgdaBlocker, builtinAgdaBlockerAll, builtinAgdaBlockerAny, builtinAgdaBlockerMeta,
-  -- builtinAgdaTCMFormatErrorParts, builtinAgdaTCMDebugPrint,
-  -- builtinAgdaTCMWithNormalisation, builtinAgdaTCMWithReconstructed,
-  -- builtinAgdaTCMWithExpandLast, builtinAgdaTCMWithReduceDefs,
-  -- builtinAgdaTCMAskNormalisation, builtinAgdaTCMAskReconstructed,
-  -- builtinAgdaTCMAskExpandLast, builtinAgdaTCMAskReduceDefs,
-  -- builtinAgdaTCMNoConstraints,
-  -- builtinAgdaTCMRunSpeculative,
-  -- builtinAgdaTCMExec,
-  -- builtinAgdaTCMGetInstances,
-  -- builtinAgdaTCMPragmaForeign,
-  -- builtinAgdaTCMPragmaCompile
+  builtinAgdaTCM, builtinAgdaTCMReturn, builtinAgdaTCMBind, builtinAgdaTCMUnify,
+  builtinAgdaTCMTypeError, builtinAgdaTCMInferType,
+  builtinAgdaTCMCheckType, builtinAgdaTCMNormalise, builtinAgdaTCMReduce,
+  builtinAgdaTCMCatchError,
+  builtinAgdaTCMGetContext, builtinAgdaTCMExtendContext, builtinAgdaTCMInContext,
+  builtinAgdaTCMFreshName, builtinAgdaTCMDeclareDef, builtinAgdaTCMDeclarePostulate, builtinAgdaTCMDeclareData, builtinAgdaTCMDefineData, builtinAgdaTCMDefineFun,
+  builtinAgdaTCMGetType, builtinAgdaTCMGetDefinition,
+  builtinAgdaTCMQuoteTerm, builtinAgdaTCMUnquoteTerm, builtinAgdaTCMQuoteOmegaTerm,
+  builtinAgdaTCMCommit, builtinAgdaTCMIsMacro, builtinAgdaTCMBlock,
+  builtinAgdaBlocker, builtinAgdaBlockerAll, builtinAgdaBlockerAny, builtinAgdaBlockerMeta,
+  builtinAgdaTCMFormatErrorParts, builtinAgdaTCMDebugPrint,
+  builtinAgdaTCMWithNormalisation, builtinAgdaTCMWithReconstructed,
+  builtinAgdaTCMWithExpandLast, builtinAgdaTCMWithReduceDefs,
+  builtinAgdaTCMAskNormalisation, builtinAgdaTCMAskReconstructed,
+  builtinAgdaTCMAskExpandLast, builtinAgdaTCMAskReduceDefs,
+  builtinAgdaTCMNoConstraints,
+  builtinAgdaTCMRunSpeculative,
+  builtinAgdaTCMExec,
+  builtinAgdaTCMGetInstances,
+  builtinAgdaTCMPragmaForeign,
+  builtinAgdaTCMPragmaCompile
   ]
 
 
