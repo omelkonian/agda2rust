@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Int</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Agda.Builtin.Int.html" class="Module">Agda.Builtin.Int</a> <a id="30" class="Keyword">using</a> <a id="36" class="Symbol">(</a><a id="37" href="Agda.Builtin.Int.html#245" class="Datatype">Int</a><a id="40" class="Symbol">;</a> <a id="42" href="Agda.Builtin.Int.html#263" class="InductiveConstructor">pos</a><a id="45" class="Symbol">;</a> <a id="47" href="Agda.Builtin.Int.html#290" class="InductiveConstructor">negsuc</a><a id="53" class="Symbol">)</a>
+
+<a id="pos42"></a><a id="56" href="Int.html#56" class="Function">pos42</a> <a id="neg42"></a><a id="62" href="Int.html#62" class="Function">neg42</a> <a id="68" class="Symbol">:</a> <a id="70" href="Agda.Builtin.Int.html#245" class="Datatype">Int</a>
+<a id="74" href="Int.html#56" class="Function">pos42</a> <a id="80" class="Symbol">=</a> <a id="82" href="Agda.Builtin.Int.html#263" class="InductiveConstructor">pos</a> <a id="86" class="Number">42</a>
+<a id="89" href="Int.html#62" class="Function">neg42</a> <a id="95" class="Symbol">=</a> <a id="97" href="Agda.Builtin.Int.html#290" class="InductiveConstructor">negsuc</a> <a id="104" class="Number">41</a>
+
+<a id="108" class="Symbol">{-#</a> <a id="112" class="Keyword">FOREIGN</a> <a id="120" class="Pragma">AGDA2RUST</a>
+<a id="130" class="Pragma">pub</a> <a id="134" class="Pragma">fn</a> <a id="137" class="Pragma">main</a> <a id="142" class="Pragma">()</a> <a id="145" class="Pragma">{</a>
+  <a id="149" class="Pragma">println!(&quot;{}:\t</a> <a id="165" class="Pragma">{}</a> <a id="168" class="Pragma">|</a> <a id="170" class="Pragma">{}&quot;,</a> <a id="175" class="Pragma">module_path!(),</a>
+    <a id="195" class="Pragma">pos42(),</a>
+    <a id="208" class="Pragma">neg42(),</a>
+  <a id="219" class="Pragma">);</a>
+<a id="222" class="Pragma">}</a>
+<a id="224" class="Symbol">#-}</a>
+</pre><div class="split right"><embed src="build/Int.unicode.html"/></div></body></html>
