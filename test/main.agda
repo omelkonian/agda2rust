@@ -1,6 +1,7 @@
 import Identity
 import Numbers
 import Simplification
+import Top
 import Product
 import Either
 import Maybe
@@ -21,6 +22,7 @@ import Prim
 import Bool00
 -- import Bool0
 import Bool
+import Int
 import TypeAliases
 import OverloadedConstructors
 import OverloadedFields
@@ -29,6 +31,7 @@ import OverloadedFields
 mod Identity;
 mod Numbers;
 mod Simplification;
+mod Top;
 mod Product;
 mod Either;
 mod Maybe;
@@ -49,6 +52,7 @@ mod Prim;
 mod Bool00;
 // mod Bool0;
 mod Bool;
+mod Int;
 mod TypeAliases;
 mod OverloadedConstructors;
 mod OverloadedFields;
@@ -57,6 +61,7 @@ fn main() {
   Identity::main();
   Numbers::main();
   Simplification::main();
+  Top::main();
   Product::main();
   Either::main();
   Maybe::main();
@@ -77,6 +82,7 @@ fn main() {
   Bool00::main();
   // Bool0::main();
   Bool::main();
+  Int::main();
   TypeAliases::main();
   OverloadedConstructors::main();
   OverloadedFields::main();

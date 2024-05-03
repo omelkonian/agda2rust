@@ -61,9 +61,10 @@ pattern RTyParam x = TyParam [] x [] Nothing ()
 
 rTyFromExp :: Expr () -> Ty ()
 rTyFromExp = \case
+  RCall f [] -> rTyFromExp (RExprRef f)
   PathExpr [] self p () -> PathTy self p ()
   RBox e -> rTyFromExp e
-  e -> error $ "[rTyFromExp] cannot type-convert " <> ppR e
+  e -> error $ "[rTyFromExp] cannot type-convert " <> show e
 
 -- ** type aliases
 pattern RTyAlias x ty = TyAlias [] PublicV x ty REmptyGenerics ()

@@ -20,12 +20,14 @@ alongside the corresponding generated Rust code
 - [ ] identifiers
   + [x] transcribe to valid Rust identifiers (e.g. remove Unicode somehow)
   + [ ] ensure qualification/scopes are OK
-- [ ] primitives
-  + [x] Nat->i32
+- [ ] primitives types
+  + [x] Nat
     * [ ] avoid overflow
-  + [ ] fixed-sized arithmetic
-  + [ ] ...
-  + [ ] builtin modules
+  + [x] Char
+  + [x] String
+  + [x] Bool
+  + [x] Int
+  + [ ] primitive functions
 - [x] functions
   + [x] function type signatures
   + [x] termrs (e.g. function bodys)

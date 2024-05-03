@@ -206,12 +206,13 @@ isErasedTTerm = \case
 onlyNonErased :: [TTerm] -> [TTerm]
 onlyNonErased = filter (not . isErasedTTerm)
 
-isTyParam :: MonadTCEnv m => TTerm -> m Bool
+isTyParam :: (ReadTCState m, HasConstInfo m, MonadTCEnv m) => TTerm -> m Bool
 isTyParam = \case
+  TDef n -> isSortTy <$> typeOfConst n
   TVar i -> isSortTy <$> lookupCtxTy i
   _      -> pure False
 
-separateTyParams :: MonadTCEnv m => [TTerm] -> m ([TTerm], [TTerm])
+separateTyParams :: (ReadTCState m, HasConstInfo m, MonadTCEnv m) => [TTerm] -> m ([TTerm], [TTerm])
 separateTyParams = partitionM isTyParam
 
 -- ** types & telescopes
