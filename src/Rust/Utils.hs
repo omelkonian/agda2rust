@@ -1,14 +1,11 @@
--- | Rust utilities.
+-- | Convenient smart constructors for Rust constructs.
 {-# LANGUAGE OverloadedStrings #-}
-module RustUtils where
+module Rust.Utils where
 
 import Data.Generics      ( Data, listify )
 import Data.List.NonEmpty ( NonEmpty((:|)) )
 
-import Language.Rust.Syntax
-import Language.Rust.Data.Ident
-import Language.Rust.Data.Position
-import Language.Rust.Pretty
+import Rust.Lib
 
 -- ** blocks
 pattern RBlock e = Block [NoSemi e ()] Normal ()

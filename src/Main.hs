@@ -1,4 +1,3 @@
-{-# LANGUAGE DoAndIfThenElse #-}
 module Main where
 
 import Data.Maybe ( fromMaybe, catMaybes )
@@ -21,30 +20,25 @@ import System.Console.GetOpt
 import Data.Version ( showVersion )
 import Paths_agda2rust ( version )
 
-import Agda.Syntax.Position ( Range(..), rStart, posLine )
-import Agda.Syntax.Common ( Ranged(..), Origin(..), getOrigin )
-import Agda.Syntax.Internal ( qnameName, qnameModule )
-import Agda.Syntax.TopLevelModuleName
-  ( TopLevelModuleName, moduleNameToFileName )
-
-import Agda.Compiler.Common ( curIF, compileDir )
-import Agda.Compiler.Backend
-  ( Backend(..), Backend'(..), Recompile(..), IsMain, nameBindingSite
+import Agda.Lib
+  ( Range(..), rStart, posLine
+  , qnameName, qnameModule
+  , Ranged(..), Origin(..), getOrigin
+  , TopLevelModuleName, moduleNameToFileName
+  , Definition(..)
+  , TCM, withCurrentModule, iInsideScope, setScope
+  , CompilerPragma(..), getUniqueCompilerPragma
+  , runAgda
+  , curIF, compileDir
+  , Backend(..), Backend'(..), Recompile(..), IsMain, nameBindingSite
   , iForeignCode, getForeignCodeStack, ForeignCode(..)
   , Flag
   )
-
-import Agda.TypeChecking.Monad.Base ( Definition(..) )
-import Agda.TypeChecking.Monad
-  ( TCM, withCurrentModule, iInsideScope, setScope
-  , CompilerPragma(..), getUniqueCompilerPragma )
-
-import Agda.Main ( runAgda )
+import Agda.Utils
 
 import qualified Language.Rust.Pretty as R
 
 import Utils ( report )
-import AgdaUtils ( pp, ppm )
 import Agda2Rust ( convert, ignoreDef, runC, runC0, initState, State )
 
 -- | State propagated across modules.

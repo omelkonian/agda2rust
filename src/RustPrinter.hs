@@ -5,10 +5,7 @@ import System.Environment ( getArgs )
 import Control.Monad ( void )
 import Text.Show.Pretty ( pPrint )
 
-import Language.Rust.Syntax ( SourceFile )
-import Language.Rust.Data.Position ( Span )
-import Language.Rust.Parser ( parse', readInputStream )
-import Language.Rust.Pretty ( pretty' )
+import Rust.Lib ( SourceFile, Span, parse', readInputStream, pretty' )
 
 main :: IO ()
 main = do

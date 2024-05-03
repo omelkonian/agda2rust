@@ -4,9 +4,10 @@
 , NamedFieldPuns
 , OverloadedStrings
 #-}
-{-# OPTIONS_GHC -Wunused-imports #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
-module AgdaInternals
+-- | Monkey-patching Agda's ToTreeless module to allow for custom pipelines.
+module Agda.ToTreeless
   ( toTreeless
   ) where
 

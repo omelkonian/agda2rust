@@ -21,15 +21,32 @@ executable agda2rust
   main-is:             Main.hs
   autogen-modules:     Paths_agda2rust
   other-modules:       Paths_agda2rust
-                       Agda2Rust
-                       AgdaInternals
                        Utils
-                       AgdaUtils
-                       RustUtils
+                       Agda.ToTreeless
+                       Agda.Lib
+                       Agda.Builtins
+                       Agda.Utils
+                       Agda
+                       Rust.Lib
+                       Rust.Utils
+                       Rust
+                       Agda2Rust.Monad
+                       Agda2Rust.Convert.Class
+                       Agda2Rust.Convert.Names
+                       Agda2Rust.Convert.Literals
+                       Agda2Rust.Convert.Builtins
+                       Agda2Rust.Convert.Terms
+                       Agda2Rust.Convert.Types
+                       Agda2Rust.Convert.Constructors
+                       Agda2Rust.Convert.Definitions
+                       Agda2Rust.Convert
+                       Agda2Rust
   default-extensions:
-    LambdaCase RecordWildCards PatternSynonyms PatternGuards TupleSections
-    ViewPatterns
+    LambdaCase RecordWildCards PatternSynonyms TupleSections
+    ViewPatterns PatternGuards
+    ScopedTypeVariables
     TypeFamilies TypeOperators TypeApplications FunctionalDependencies
+    DoAndIfThenElse BlockArguments
   ghc-options:         -rtsopts
   build-depends:       base >= 4.10 && < 4.18,
                        Agda >= 2.6.4 && < 2.6.5,
@@ -48,6 +65,7 @@ executable agda2rust
 executable rustp
   hs-source-dirs:      src
   main-is:             RustPrinter.hs
+  other-modules:       Rust.Lib
   build-depends:       base >= 4.10 && < 4.18,
                        language-rust,
                        pretty-show
