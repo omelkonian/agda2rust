@@ -127,7 +127,7 @@ instance A.TTerm ~> R.Expr where
         if isJust isRec then do
           Right A.ConHead{..} <- A.getConHead cn
           h <- parentQualR cn
-          let xs = unqualR . A.unArg <$> conFields
+          let xs = unqualR . A.unArg <$> filter hasQuantityNon0 conFields
           return (Just cn , \_ es -> RMkStruct h (zipWith (\x e -> R.Field x (Just e) ()) xs es))
         else if isJust isBlt then do
           let Just bltE = isBlt

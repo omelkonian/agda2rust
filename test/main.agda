@@ -26,6 +26,7 @@ import Int
 import TypeAliases
 import OverloadedConstructors
 import OverloadedFields
+import ErasedFields
 
 {-# FOREIGN AGDA2RUST
 mod Identity;
@@ -56,6 +57,7 @@ mod Int;
 mod TypeAliases;
 mod OverloadedConstructors;
 mod OverloadedFields;
+mod ErasedFields;
 
 fn main() {
   Identity::main();
@@ -86,5 +88,6 @@ fn main() {
   TypeAliases::main();
   OverloadedConstructors::main();
   OverloadedFields::main();
+  ErasedFields::main();
 }
 #-}
