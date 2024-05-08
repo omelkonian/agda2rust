@@ -18,12 +18,19 @@
 
 <a id="testNaught"></a><a id="279" href="Constants.html#279" class="Function">testNaught</a> <a id="290" class="Symbol">:</a> <a id="292" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a>
 <a id="296" href="Constants.html#279" class="Function">testNaught</a> <a id="307" class="Symbol">=</a> <a id="309" href="Constants.html#206" class="Function">justify</a> <a id="317" class="Symbol">(</a><a id="318" href="Constants.html#171" class="Function">naught</a> <a id="325" class="Symbol">{</a><a id="326" class="Argument">A</a> <a id="328" class="Symbol">=</a> <a id="330" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a><a id="333" class="Symbol">})</a> <a id="336" class="Number">42</a>
+<a id="339" class="Comment">-- {-# COMPILE AGDA2RUST testNaught const #-}</a>
+<a id="385" class="Comment">-- NB: cannot declare this as const or static due to Rust limitations</a>
 
-<a id="340" class="Symbol">{-#</a> <a id="344" class="Keyword">FOREIGN</a> <a id="352" class="Pragma">AGDA2RUST</a>
-<a id="362" class="Pragma">pub</a> <a id="366" class="Pragma">fn</a> <a id="369" class="Pragma">main()</a> <a id="376" class="Pragma">{</a>
-  <a id="380" class="Pragma">println!(&quot;{}:</a> <a id="394" class="Pragma">{}&quot;,</a> <a id="399" class="Pragma">module_path!(),</a>
-    <a id="419" class="Pragma">testNaught(),</a>
-  <a id="435" class="Pragma">);</a>
-<a id="438" class="Pragma">}</a>
-<a id="440" class="Symbol">#-}</a>
+<a id="the42"></a><a id="456" href="Constants.html#456" class="Function">the42</a> <a id="462" class="Symbol">:</a> <a id="464" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a>
+<a id="468" href="Constants.html#456" class="Function">the42</a> <a id="474" class="Symbol">=</a> <a id="476" class="Number">42</a>
+<a id="479" class="Symbol">{-#</a> <a id="483" class="Keyword">COMPILE</a> <a id="491" class="Keyword">AGDA2RUST</a> <a id="501" href="Constants.html#456" class="Function">the42</a> <a id="507" class="Pragma">const</a> <a id="513" class="Symbol">#-}</a>
+
+<a id="518" class="Symbol">{-#</a> <a id="522" class="Keyword">FOREIGN</a> <a id="530" class="Pragma">AGDA2RUST</a>
+<a id="540" class="Pragma">pub</a> <a id="544" class="Pragma">fn</a> <a id="547" class="Pragma">main()</a> <a id="554" class="Pragma">{</a>
+  <a id="558" class="Pragma">println!(&quot;{}:</a> <a id="572" class="Pragma">{}</a> <a id="575" class="Pragma">|</a> <a id="577" class="Pragma">{}&quot;,</a> <a id="582" class="Pragma">module_path!(),</a>
+    <a id="602" class="Pragma">testNaught(),</a>
+    <a id="620" class="Pragma">the42</a>
+  <a id="628" class="Pragma">);</a>
+<a id="631" class="Pragma">}</a>
+<a id="633" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/Constants.unicode.html"/></div></body></html>
