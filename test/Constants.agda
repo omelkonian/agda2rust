@@ -17,11 +17,18 @@ justify (just x) _ = x
 
 testNaught : Nat
 testNaught = justify (naught {A = Nat}) 42
+-- {-# COMPILE AGDA2RUST testNaught const #-}
+-- NB: cannot declare this as const or static due to Rust limitations
+
+the42 : Nat
+the42 = 42
+{-# COMPILE AGDA2RUST the42 const #-}
 
 {-# FOREIGN AGDA2RUST
 pub fn main() {
-  println!("{}: {}", module_path!(),
+  println!("{}: {} | {}", module_path!(),
     testNaught(),
+    the42
   );
 }
 #-}

@@ -22,15 +22,14 @@ data BuiltinTy = Nat | Float | Char | String | Bool | Int
 
 compileBuiltinTy :: A.Type -> [A.Arg A.Term] -> BuiltinTy -> C (R.Ty ())
 compileBuiltinTy ty as b = do
-    unless (null as) $
-      panic "primitive type (with non-null type parameters)" ty
-    return $ RTyRef $ case b of
-      Nat    -> "i32"
-      Float  -> "f64"
-      Char   -> "char"
-      String -> "String"
-      Bool   -> "bool"
-      Int    -> "i32"
+  unless (null as) $ panic "primitive type (with non-null type parameters)" ty
+  return $ RTyRef $ case b of
+    Nat    -> "i32"
+    Float  -> "f64"
+    Char   -> "char"
+    String -> "String"
+    Bool   -> "bool"
+    Int    -> "i32"
 
 isBuiltinTy ::
   (A.HasBuiltins m, A.MonadReduce m) => A.QName -> m (Maybe BuiltinTy)

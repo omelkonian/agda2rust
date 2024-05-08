@@ -5,7 +5,7 @@ pub fn idFloat(x0: f64) -> f64 {
 }
 
 pub fn testFloat() -> f64 {
-  4.2
+  idFloat(4.2)
 }
 
 pub fn main () {

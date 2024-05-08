@@ -165,6 +165,18 @@ isDependentArrow ty = pp (domName ty) `notElem` ["_", "(nothing)"]
 typeFromTerm :: a -> Type'' Term a
 typeFromTerm = El (DummyS "???" :: Sort)
 
+termFromTTerm :: TTerm -> Term
+termFromTTerm = \case
+  TVar n -> Var n []
+  TDef qn -> Def qn []
+  TLit lit -> Lit lit
+  -- TCon qn ->
+  -- TApp tterm as -> Def qn
+  t -> panic "tterm (to convert to term)" t
+
+typeFromTTerm :: TTerm -> Type
+typeFromTTerm = typeFromTerm . termFromTTerm
+
 defaultTy :: Dom Type
 defaultTy = defaultDom $ typeFromTerm (Dummy "???" [] :: Term)
 

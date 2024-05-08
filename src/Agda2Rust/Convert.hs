@@ -7,6 +7,7 @@ module Agda2Rust.Convert
   , module Agda2Rust.Convert.Types
   , module Agda2Rust.Convert.Constructors
   , module Agda2Rust.Convert.Definitions
+  , module Agda2Rust.Convert.FFI
   ) where
 
 import Agda2Rust.Convert.Class
@@ -17,3 +18,4 @@ import Agda2Rust.Convert.Terms
 import Agda2Rust.Convert.Types
 import Agda2Rust.Convert.Constructors
 import Agda2Rust.Convert.Definitions
+import Agda2Rust.Convert.FFI

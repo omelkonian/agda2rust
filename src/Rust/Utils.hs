@@ -143,6 +143,16 @@ pattern RPointer ty = Rptr Nothing Immutable ty ()
 pattern RBoxTy   ty = RTyRef' "Box" [ ty ]
 pattern RBox     e  = RCallCon (RExprConRef "Box" "new") [ e ]
 
+-- ** phantom data
+phantomField :: [Ident] -> Ty ()
+phantomField ps
+  = RPathTy
+  $ RPath
+    [ RPathSeg "std"
+    , RPathSeg "marker"
+    , RPathSeg' "PhantomData" (RAngles [TupTy (RTyRef <$> ps) ()])
+    ]
+
 -- ** pretty-printing
 ppR :: (Pretty a, Resolve a) => a -> String
 ppR = show . pretty'

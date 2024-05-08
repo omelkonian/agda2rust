@@ -17,17 +17,19 @@ import Agda2Rust.Monad
 import Agda2Rust.Convert.Class
 import Agda2Rust.Convert.Names
 import Agda2Rust.Convert.Builtins
+import Agda2Rust.Convert.FFI ( compileFFITy )
 
 -- | Compiling types.
 instance A.Type ~> R.Ty where
   go ty = asks curDatatype >>= \curD -> do
-    report $ " ** compiling type: " <> pp ty
+    -- report $ " ** compiling type: " <> pp ty
     -- typeT <- liftTCM $ A.closedTermToTreeless A.LazyEvaluation (unEl ty)
     -- report $ " type (treeless): " <> pp typeT
     case A.unEl ty of
       -- ** defined types
       A.Def n es | es <- A.argsFromElims es ->
-        ifJustM (isBuiltinTy n) (compileBuiltinTy ty es) $ do
+        ifJustM (isBuiltinTy n) (compileBuiltinTy ty es) $
+        ifJustM (getFFI n)      (compileFFITy ty es)     $ do
           report $ " es: " <> pp es
           dTy <- A.typeOfConst n
           -- report $ " >> dTy: " <> pp dTy

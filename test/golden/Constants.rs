@@ -20,8 +20,11 @@ pub fn testNaught() -> i32 {
   justify(naught(), 42)
 }
 
+pub const the42: i32 = 42;
+
 pub fn main() {
-  println!("{}: {}", module_path!(),
+  println!("{}: {} | {}", module_path!(),
     testNaught(),
+    the42
   );
 }

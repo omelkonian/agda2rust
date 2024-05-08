@@ -39,7 +39,7 @@ import Agda.Utils
 import qualified Language.Rust.Pretty as R
 
 import Utils ( report )
-import Agda2Rust ( convert, ignoreDef, runC, runC0, initState, State )
+import Agda2Rust ( convert, RDef(..), runC, runC0, initState, State )
 
 -- | State propagated across modules.
 stateFile :: FilePath
@@ -135,18 +135,13 @@ defRange :: Definition -> Range
 defRange = nameBindingSite . qnameName . defName
 
 compile :: Options -> ModuleEnv -> IsMain -> Definition -> TCM (Maybe CompiledDef)
-compile opts tlm _ def@(Defn{..}) = do
-  shouldIgnore <- ignoreDef def
-  if shouldIgnore then do
-    report ("*** ignoring definition: " <> pp defName) >> return Nothing
-  else withCurrentModule (qnameModule defName) $ do
-  -- $ getUniqueCompilerPragma "AGDA2RUST" defName >>= \case
-  --     Nothing -> return []
-  --     Just (CompilerPragma _ _) -> ...
-    s <- liftIO readState
-    (cdef, s') <- runC s (convert def)
-    liftIO $ writeState s'
-    return $ Just $ Ranged (defRange def) $ show (R.pretty' cdef)
+compile opts tlm _ def@(Defn{..}) = withCurrentModule (qnameModule defName) $ do
+  s <- liftIO readState
+  (mdef, s') <- runC s (convert def)
+  liftIO $ writeState s'
+  return $ case mdef of
+    IgnoreDef       -> Nothing
+    CompileDef cdef -> Just $ Ranged (defRange def) $ show (R.pretty' cdef)
 
 getForeignRust :: TCM [CompiledDef]
 getForeignRust

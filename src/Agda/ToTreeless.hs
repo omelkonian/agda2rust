@@ -155,7 +155,7 @@ compilerPipeline v q =
       , compilerPass "uncase" (30 + v) "uncase"             $ const caseToSeq
       -- , compilerPass "aspat"  (30 + v) "@-pattern recovery" $ const recoverAsPatterns
       ]
-    , compilerPass "id" (30 + v) "identity function detection" $ const (detectIdentityFunctions q)
+    -- , compilerPass "id" (30 + v) "identity function detection" $ const (detectIdentityFunctions q)
     ]
 
 runPipeline :: EvaluationStrategy -> QName -> Pipeline -> TTerm -> TCM TTerm
