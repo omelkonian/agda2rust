@@ -6,25 +6,31 @@
 <a id="ℕ"></a><a id="74" href="TypeAliases.html#74" class="Function">ℕ</a> <a id="76" class="Symbol">:</a> <a id="78" href="Agda.Primitive.html#388" class="Primitive">Set</a>
 <a id="82" href="TypeAliases.html#74" class="Function">ℕ</a> <a id="84" class="Symbol">=</a> <a id="86" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a>
 
-<a id="91" class="Comment">-- below, ℕ gets reduced to Nat</a>
-<a id="testAlias"></a><a id="123" href="TypeAliases.html#123" class="Function">testAlias</a> <a id="133" class="Symbol">:</a> <a id="135" href="TypeAliases.html#74" class="Function">ℕ</a>
-<a id="137" href="TypeAliases.html#123" class="Function">testAlias</a> <a id="147" class="Symbol">=</a> <a id="149" class="Number">42</a>
+<a id="testAlias"></a><a id="91" href="TypeAliases.html#91" class="Function">testAlias</a> <a id="101" class="Symbol">:</a> <a id="103" href="TypeAliases.html#74" class="Function">ℕ</a>
+<a id="105" href="TypeAliases.html#91" class="Function">testAlias</a> <a id="115" class="Symbol">=</a> <a id="117" class="Number">42</a>
 
-<a id="ℕ→ℕ"></a><a id="153" href="TypeAliases.html#153" class="Function">ℕ→ℕ</a> <a id="157" class="Symbol">:</a> <a id="159" href="Agda.Primitive.html#388" class="Primitive">Set</a>
-<a id="163" href="TypeAliases.html#153" class="Function">ℕ→ℕ</a> <a id="167" class="Symbol">=</a> <a id="169" href="TypeAliases.html#74" class="Function">ℕ</a> <a id="171" class="Symbol">→</a> <a id="173" href="TypeAliases.html#74" class="Function">ℕ</a>
+<a id="ℕ→ℕ"></a><a id="121" href="TypeAliases.html#121" class="Function">ℕ→ℕ</a> <a id="125" class="Symbol">:</a> <a id="127" href="Agda.Primitive.html#388" class="Primitive">Set</a>
+<a id="131" href="TypeAliases.html#121" class="Function">ℕ→ℕ</a> <a id="135" class="Symbol">=</a> <a id="137" href="TypeAliases.html#74" class="Function">ℕ</a> <a id="139" class="Symbol">→</a> <a id="141" href="TypeAliases.html#74" class="Function">ℕ</a>
 
-<a id="incr"></a><a id="176" href="TypeAliases.html#176" class="Function">incr</a> <a id="181" class="Symbol">:</a> <a id="183" href="TypeAliases.html#153" class="Function">ℕ→ℕ</a>
-<a id="187" href="TypeAliases.html#176" class="Function">incr</a> <a id="192" class="Symbol">=</a> <a id="194" href="Agda.Builtin.Nat.html#336" class="Primitive Operator">_+</a> <a id="197" class="Number">1</a>
+<a id="incr"></a><a id="144" href="TypeAliases.html#144" class="Function">incr</a> <a id="149" class="Symbol">:</a> <a id="151" href="TypeAliases.html#121" class="Function">ℕ→ℕ</a>
+<a id="155" href="TypeAliases.html#144" class="Function">incr</a> <a id="160" class="Symbol">=</a> <a id="162" href="Agda.Builtin.Nat.html#336" class="Primitive Operator">_+</a> <a id="165" class="Number">1</a>
 
-<a id="testAliasF"></a><a id="200" href="TypeAliases.html#200" class="Function">testAliasF</a> <a id="211" class="Symbol">:</a> <a id="213" href="TypeAliases.html#74" class="Function">ℕ</a>
-<a id="215" href="TypeAliases.html#200" class="Function">testAliasF</a> <a id="226" class="Symbol">=</a> <a id="228" href="TypeAliases.html#176" class="Function">incr</a> <a id="233" class="Number">41</a>
+<a id="testAliasF"></a><a id="168" href="TypeAliases.html#168" class="Function">testAliasF</a> <a id="179" class="Symbol">:</a> <a id="181" href="TypeAliases.html#74" class="Function">ℕ</a>
+<a id="183" href="TypeAliases.html#168" class="Function">testAliasF</a> <a id="194" class="Symbol">=</a> <a id="196" href="TypeAliases.html#144" class="Function">incr</a> <a id="201" class="Number">41</a>
 
-<a id="237" class="Symbol">{-#</a> <a id="241" class="Keyword">FOREIGN</a> <a id="249" class="Pragma">AGDA2RUST</a>
-<a id="259" class="Pragma">pub</a> <a id="263" class="Pragma">fn</a> <a id="266" class="Pragma">main</a> <a id="271" class="Pragma">()</a> <a id="274" class="Pragma">{</a>
-  <a id="278" class="Pragma">println!(&quot;{}:\t\t</a> <a id="296" class="Pragma">{}</a> <a id="299" class="Pragma">|</a> <a id="301" class="Pragma">{}&quot;,</a> <a id="306" class="Pragma">module_path!(),</a>
-    <a id="326" class="Pragma">testAlias(),</a>
-    <a id="343" class="Pragma">testAliasF(),</a>
-  <a id="359" class="Pragma">);</a>
-<a id="362" class="Pragma">}</a>
-<a id="364" class="Symbol">#-}</a>
+<a id="Id"></a><a id="205" href="TypeAliases.html#205" class="Function">Id</a> <a id="208" class="Symbol">:</a> <a id="210" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="214" class="Symbol">→</a> <a id="216" href="Agda.Primitive.html#388" class="Primitive">Set</a>
+<a id="220" href="TypeAliases.html#205" class="Function">Id</a> <a id="223" href="TypeAliases.html#223" class="Bound">A</a> <a id="225" class="Symbol">=</a> <a id="227" href="TypeAliases.html#223" class="Bound">A</a>
+
+<a id="id"></a><a id="230" href="TypeAliases.html#230" class="Function">id</a> <a id="233" class="Symbol">:</a> <a id="235" class="Symbol">∀</a> <a id="237" class="Symbol">{</a><a id="238" href="TypeAliases.html#238" class="Bound">A</a> <a id="240" class="Symbol">:</a> <a id="242" href="Agda.Primitive.html#388" class="Primitive">Set</a><a id="245" class="Symbol">}</a> <a id="247" class="Symbol">→</a> <a id="249" href="TypeAliases.html#205" class="Function">Id</a> <a id="252" href="TypeAliases.html#238" class="Bound">A</a> <a id="254" class="Symbol">→</a> <a id="256" href="TypeAliases.html#205" class="Function">Id</a> <a id="259" href="TypeAliases.html#238" class="Bound">A</a>
+<a id="261" href="TypeAliases.html#230" class="Function">id</a> <a id="264" href="TypeAliases.html#264" class="Bound">x</a> <a id="266" class="Symbol">=</a> <a id="268" href="TypeAliases.html#264" class="Bound">x</a>
+
+<a id="271" class="Symbol">{-#</a> <a id="275" class="Keyword">FOREIGN</a> <a id="283" class="Pragma">AGDA2RUST</a>
+<a id="293" class="Pragma">pub</a> <a id="297" class="Pragma">fn</a> <a id="300" class="Pragma">main</a> <a id="305" class="Pragma">()</a> <a id="308" class="Pragma">{</a>
+  <a id="312" class="Pragma">println!(&quot;{}:\t\t</a> <a id="330" class="Pragma">{}</a> <a id="333" class="Pragma">|</a> <a id="335" class="Pragma">{}</a> <a id="338" class="Pragma">|</a> <a id="340" class="Pragma">{}&quot;,</a> <a id="345" class="Pragma">module_path!(),</a>
+    <a id="365" class="Pragma">testAlias(),</a>
+    <a id="382" class="Pragma">testAliasF(),</a>
+    <a id="400" class="Pragma">id(42),</a>
+  <a id="410" class="Pragma">);</a>
+<a id="413" class="Pragma">}</a>
+<a id="415" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/TypeAliases.unicode.html"/></div></body></html>
