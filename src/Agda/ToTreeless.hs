@@ -604,8 +604,9 @@ maybeInlineDef q vs = do
         | otherwise -> do
         -- If ArgUsage hasn't been computed yet, we assume all arguments are used.
         used <- lift $ fromMaybe [] <$> getCompiledArgUse q
-        let substUsed _   ArgUnused = pure C.TErased
-            substUsed arg ArgUsed   = substArg arg
+        -- let substUsed _   ArgUnused = pure C.TErased
+        --     substUsed arg ArgUsed   = substArg arg
+        let substUsed arg _ = substArg arg
         C.mkTApp (C.TDef q) <$> zipWithM substUsed vs (used ++ repeat ArgUsed)
       _ -> C.mkTApp (C.TDef q) <$> substArgs vs
   where

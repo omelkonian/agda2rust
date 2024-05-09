@@ -129,7 +129,7 @@ instance A.TTerm ~> R.Expr where
       A.TCon cn -> do
         report $ " * compiling head of application (constructor: " <> pp cn <> ")"
         isRec <- A.isRecordConstructor cn
-        report $ "  isRec: " <> pp (isJust isRec)
+        -- report $ "  isRec: " <> pp (isJust isRec)
         isBlt <- isBuiltinTerm cn
         if isJust isRec then do
           Right A.ConHead{..} <- A.getConHead cn
@@ -187,25 +187,25 @@ instance A.TAlt ~> R.Arm where
     (A.TACon con n body) -> do
       report $ " * compiling arm (constructor): " <> pp con
       recCons <- recordConstructors <$> get
-      report $ "  recordConstructors: " <> pp recCons
+      -- report $ "  recordConstructors: " <> pp recCons
       isRec <- isRecordConstructor con
-      report $ "  isRec: " <> pp isRec
+      -- report $ "  isRec: " <> pp isRec
       isBlt <- isBuiltinTerm con
       if isRec then do
         -- compiling match on a record/struct value
         path <- parentQualR con
-        report $ "  path: " <> ppR path
+        -- report $ "  path: " <> ppR path
         (_, vas, _) <- viewTy =<< A.typeOfConst con
         vas' <- populateArgNames vas
-        report $ "  vas': " <> pp vas'
+        -- report $ "  vas': " <> pp vas'
         let xs = transcribe . fst . A.unDom <$> filter hasQuantityNon0 (take n vas')
         Just (qn, _) <- A.isRecordConstructor con
         hasPhantomField <- hasUnusedTyParams qn
         let pats = RId . R.mkIdent <$> xs <> ["_phantom" | hasPhantomField]
-        report $ "  pat: " <> pp con <> "(" <> show n <> ")"
-              <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
+        -- report $ "  pat: " <> pp con <> "(" <> show n <> ")"
+        --       <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
         body'  <- A.addContext vas' (go body)
-        report $ "  body: " <> pp body <> " ~> " <> ppR body'
+        -- report $ "  body: " <> pp body <> " ~> " <> ppR body'
         return $ RArm (RStructP path (RNoFieldP <$> pats)) body'
       else case isBlt of
         -- compiling match on builtin value
@@ -219,10 +219,10 @@ instance A.TAlt ~> R.Arm where
           vas' <- populateArgNames vas
           let xs = take n (fst . A.unDom <$> filter hasQuantityNon0 vas')
           let pats = RId . R.mkIdent <$> xs
-          report $ "  pat: " <> pp con <> "(" <> show n <> ")"
-                <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
+          -- report $ "  pat: " <> pp con <> "(" <> show n <> ")"
+          --       <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
           body'  <- unboxPats con n xs =<< A.addContext vas' (go body)
-          report $ "  body: " <> pp body <> " ~> " <> ppR body'
+          -- report $ "  body: " <> pp body <> " ~> " <> ppR body'
           return $ RArm (RTupleP path pats) body'
       where
       populateArgNames :: A.ListTel -> C (A.ListTel)

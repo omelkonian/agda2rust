@@ -14,7 +14,7 @@ repl :
 rustp :
 	cabal repl rustp # e.g. `:rustp Input`
 
-test/agda2rust : src/*.hs
+test/agda2rust : $(shell find src/ -name '*.hs')
 	cabal install agda2rust:agda2rust agda2rust:reUnicode \
 		--overwrite-policy=always --installdir=test --install-method=copy
 

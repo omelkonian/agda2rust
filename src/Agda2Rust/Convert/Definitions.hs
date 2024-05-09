@@ -79,8 +79,8 @@ instance A.Definition ~> RDef where
       -- ** postulates (FFI)
       A.Axiom{..} | Just (FFI mq s) <- pragma -> do
         report " compiling postulate to user-provided FFI"
-        report $ " -pragma: " <> s
-        report $ " -pragma qualifier: " <> show mq
+        -- report $ " -pragma: " <> s
+        -- report $ " -pragma qualifier: " <> show mq
         setFFI defName (mq, s)
         return IgnoreDef
 
@@ -113,11 +113,11 @@ instance A.Definition ~> RDef where
       -- A.Function{..} | d ^. funInline
       A.Function{..} -> do
         report $ " type: " <> pp defType
-        report $ " pragma: " <> show pragma
+        -- report $ " pragma: " <> show pragma
         when (any isNoFFI pragma) $
           setConst defName
         tdef <- liftTCM $ A.toTreeless defName
-        -- report $ " tdef: " <> pp tdef
+        report $ " tdef: " <> pp tdef
         let (tterm, introVars) = stripTopTLams tdef
         -- report $ " tterm: " <> pp tterm
         -- report $ " intros: " <> pp introVars

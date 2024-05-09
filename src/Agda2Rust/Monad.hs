@@ -90,7 +90,7 @@ setBox :: C ()
 setBox = do
   Just cn <- asks curConstructor
   i <- asks curArgument
-  report $ "* setting box " <> pp (cn, i)
+  -- report $ "* setting box " <> pp (cn, i)
   setBoxedConstructor (pp cn, i)
 
 getBox :: (QName, Int) -> C Bool
@@ -101,9 +101,9 @@ shouldBox = asks curConstructor >>= \case
   Nothing -> return False
   Just cn -> do
     i <- asks curArgument
-    report $ "* should box? " <> pp (cn, i)
+    -- report $ "* should box? " <> pp (cn, i)
     ret <- getBox (cn, i)
-    report $ if ret then " yes!" else " no!"
+    -- report $ if ret then " yes!" else " no!"
     return ret
 
 setRecordConstructor :: ConHead -> C ()

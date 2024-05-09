@@ -29,6 +29,7 @@ mod TypeAliases;
 mod OverloadedConstructors;
 mod OverloadedFields;
 mod ErasedFields;
+mod UnusedArgs;
 
 fn main() {
   Identity::main();
@@ -60,4 +61,5 @@ fn main() {
   OverloadedConstructors::main();
   OverloadedFields::main();
   ErasedFields::main();
+  UnusedArgs::main();
 }

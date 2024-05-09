@@ -17,7 +17,7 @@ pub fn justify<  A,>(x0: Maybe<A>, x1: A) -> A {
 }
 
 pub fn testNaught() -> i32 {
-  justify(naught(), 42)
+  justify::<i32>(naught::<i32>(), 42)
 }
 
 pub const the42: i32 = 42;
