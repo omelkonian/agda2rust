@@ -37,7 +37,7 @@ pub fn idY(x0: Y) -> i32 {
 }
 
 pub fn main() {
-  println!("{}: {} | {} | {} | {} ", module_path!(),
+  println!("{}:\t\t {} | {} | {} | {} ", module_path!(),
     X·id(X{id: 42}),
     Y·id(Y{id: 42}),
     idX(exX()),

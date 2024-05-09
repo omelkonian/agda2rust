@@ -10,7 +10,7 @@ pub fn idUnit(x0: Unit) -> Unit {
 }
 
 pub fn main () {
-  println!("{}:\t {:?}", module_path!(),
+  println!("{}:\t\t\t {:?}", module_path!(),
     idUnit(Unit::tt())
   );
 }

@@ -40,7 +40,7 @@ pub fn fst<A, B>(x0: _Ֆ215Ֆ_<A, B>) -> A {
 }
 
 pub fn main() {
-  println!("{}:\t {} | {} | {}", module_path!(),
+  println!("{}:\t\t\t {} | {} | {}", module_path!(),
     mapSnd(
       |x| x + 1
       , _Ֆ215Ֆ_ {projՖ8321Ֆ: 0, projՖ8322Ֆ: 41}

@@ -9,7 +9,7 @@ pub fn neg42() -> i32 {
 }
 
 pub fn main () {
-  println!("{}:\t {} | {}", module_path!(),
+  println!("{}:\t\t\t {} | {}", module_path!(),
     pos42(),
     neg42(),
   );

@@ -36,7 +36,7 @@ pub fn bool2Nat(x0: bool) -> i32 {
 }
 
 pub fn main () {
-  println!("{}:\t {}", module_path!(),
+  println!("{}:\t\t\t {}", module_path!(),
     bool2Nat(testBool())
   );
 }

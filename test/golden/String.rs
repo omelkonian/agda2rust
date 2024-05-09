@@ -5,7 +5,7 @@ pub fn s42() -> String {
 }
 
 pub fn main () {
-  println!("{}:\t {}", module_path!(),
+  println!("{}:\t\t\t {}", module_path!(),
     s42()
   );
 }

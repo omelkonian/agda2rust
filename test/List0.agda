@@ -19,7 +19,7 @@ fn ᐁ<T>(x : T) -> Box<T> { return Box::new(x); }
 use self::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};
 
 pub fn main() {
-  println!("{}:\t {:?}", module_path!(),
+  println!("{}:\t\t\t {:?}", module_path!(),
     map(|x| x + 1, _Ֆ43ՖՖ43Ֆ_(
       _Ֆ8759Ֆ_(3, ᐁ(Ֆ91ՖՖ93Ֆ())),
       _Ֆ8759Ֆ_(1, ᐁ(Ֆ91ՖՖ93Ֆ()))

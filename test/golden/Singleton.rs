@@ -8,7 +8,7 @@ pub enum The<  A,> {
 use self::The::{the};
 
 pub fn main() {
-  println!("{}: {:?}", module_path!(),
+  println!("{}:\t\t {:?}", module_path!(),
     the(42),
   );
 }

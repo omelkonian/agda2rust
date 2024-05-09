@@ -30,7 +30,7 @@ exAddress = mk "Bay Loan" 42 "Morpeth" "UK"
 
 {-# FOREIGN AGDA2RUST
 pub fn main() {
-  println!("{}: {} | {}", module_path!(),
+  println!("{}:\t {} | {}", module_path!(),
     accountNo(exUser()),
     roadNo(exAddress()),
   );

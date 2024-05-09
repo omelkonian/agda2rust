@@ -13,7 +13,7 @@ pub fn idH<  A,>(x0: A) -> A {
 }
 
 pub fn main() {
-  println!("{}:\t {} | {} | {}", module_path!(),
+  println!("{}:\t\t\t {} | {} | {}", module_path!(),
     id(42),
     idՖ10216Ֆ_Ֆ10217Ֆ_(42),
     idH(42)

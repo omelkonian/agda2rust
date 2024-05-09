@@ -8,7 +8,7 @@ the42 = constNat 42 0
 
 {-# FOREIGN AGDA2RUST
 pub fn main() {
-  println!("{}: {} | {}", module_path!(),
+  println!("{}:\t\t {} | {}", module_path!(),
     constNat(42, 41),
     the42(),
   );

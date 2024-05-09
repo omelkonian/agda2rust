@@ -39,7 +39,7 @@ pub fn testHash() -> u64 {
 }
 
 pub fn main() {
-  println!("{}: {} | {} | {} | {} | {} | hash(42)={}", module_path!(),
+  println!("{}:\t\t {} | {} | {} | {} | {} | hash(42)={}", module_path!(),
     testMax,
     getTestMax(),
     idKey(42),

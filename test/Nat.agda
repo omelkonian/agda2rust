@@ -9,7 +9,7 @@ testNat = 40 + 2
 
 {-# FOREIGN AGDA2RUST
 pub fn main () {
-  println!("{}:\t {}", module_path!(),
+  println!("{}:\t\t\t {}", module_path!(),
     testNat()
   );
 }

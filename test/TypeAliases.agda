@@ -20,7 +20,7 @@ testAliasF = incr 41
 
 {-# FOREIGN AGDA2RUST
 pub fn main () {
-  println!("{}: {} | {}", module_path!(),
+  println!("{}:\t\t {} | {}", module_path!(),
     testAlias(),
     testAliasF(),
   );

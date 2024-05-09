@@ -6,7 +6,7 @@ neg42 = negsuc 41
 
 {-# FOREIGN AGDA2RUST
 pub fn main () {
-  println!("{}:\t {} | {}", module_path!(),
+  println!("{}:\t\t\t {} | {}", module_path!(),
     pos42(),
     neg42(),
   );

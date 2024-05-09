@@ -9,7 +9,7 @@ pub fn the42() -> i32 {
 }
 
 pub fn main() {
-  println!("{}: {} | {}", module_path!(),
+  println!("{}:\t\t {} | {}", module_path!(),
     constNat(42, 41),
     the42(),
   );

@@ -7,7 +7,7 @@ increment = _+ 1
 
 {-# FOREIGN AGDA2RUST
 pub fn main() {
-  println!("{}: {}", module_path!(),
+  println!("{}:\t\t {}", module_path!(),
     increment(41)
   );
 }

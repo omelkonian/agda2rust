@@ -29,7 +29,7 @@ fromMaybe _   (Just x) = x
 use self::Maybe::{Nothing,Just};
 
 pub fn main () {
-  println!("{}:\t {:?} | {:?} | {} | {} | {} | {} | {}", module_path!(),
+  println!("{}:\t\t\t {:?} | {:?} | {} | {} | {} | {} | {}", module_path!(),
     idMaybe(Just(42)), idMaybe(m1()),
     fromMaybeNat(Nothing()), fromMaybeNat(m0()), fromMaybeNat(m1()),
     fromMaybe(42, m0()), fromMaybe(0, m1()),

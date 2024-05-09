@@ -23,7 +23,7 @@ pub fn testNaught() -> i32 {
 pub const the42: i32 = 42;
 
 pub fn main() {
-  println!("{}: {} | {}", module_path!(),
+  println!("{}:\t\t {} | {}", module_path!(),
     testNaught(),
     the42
   );

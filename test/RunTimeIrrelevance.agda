@@ -75,7 +75,7 @@ fn ᐁ<T>(x : T) -> Box<T> { return Box::new(x); }
 use self::BST::{Leaf,Node};
 
 pub fn main() {
-  println!("{}: {} | {} | {} | {} | {} | {} | {:?} | {:?} | {:?}", module_path!(),
+  println!("{}:\t {} | {} | {} | {} | {} | {} | {:?} | {:?} | {:?}", module_path!(),
     erasedFunArg(41),
     erasedHigherOrderFunArg(41),
     erasedRec(),

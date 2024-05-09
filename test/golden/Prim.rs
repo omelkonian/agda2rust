@@ -5,7 +5,7 @@ pub fn testLevel() -> i32 {
 }
 
 pub fn main () {
-  println!("{}:\t {}", module_path!(),
+  println!("{}:\t\t\t {}", module_path!(),
     testLevel()
   );
 }

@@ -47,7 +47,7 @@ pub fn testBar() -> i32 {
 }
 
 pub fn main() {
-  println!("{}:\t {} | {} | {} | {}", module_path!(),
+  println!("{}:\t\t {} | {} | {} | {}", module_path!(),
     testFoo(),
     testBar(),
     getFoo(Foo{foo: 42}),

@@ -5,7 +5,7 @@ pub fn increment(x0: i32) -> i32 {
 }
 
 pub fn main() {
-  println!("{}: {}", module_path!(),
+  println!("{}:\t\t {}", module_path!(),
     increment(41)
   );
 }

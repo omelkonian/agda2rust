@@ -9,7 +9,7 @@ pub fn c2() -> char {
 }
 
 pub fn main () {
-  println!("{}:\t {}{}", module_path!(),
+  println!("{}:\t\t\t {}{}", module_path!(),
     c4(), c2()
   );
 }

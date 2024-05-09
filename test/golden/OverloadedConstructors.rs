@@ -48,7 +48,7 @@ pub fn exAddress() -> Address {
 }
 
 pub fn main() {
-  println!("{}: {} | {}", module_path!(),
+  println!("{}:\t {} | {}", module_path!(),
     accountNo(exUser()),
     roadNo(exAddress()),
   );

@@ -23,7 +23,7 @@ bool2Nat = λ where
 
 {-# FOREIGN AGDA2RUST
 pub fn main () {
-  println!("{}:\t {}", module_path!(),
+  println!("{}:\t\t\t {}", module_path!(),
     bool2Nat(testBool())
   );
 }
