@@ -28,68 +28,71 @@
 <a id="390" class="Keyword">import</a> <a id="397" href="OverloadedConstructors.html" class="Module">OverloadedConstructors</a>
 <a id="420" class="Keyword">import</a> <a id="427" href="OverloadedFields.html" class="Module">OverloadedFields</a>
 <a id="444" class="Keyword">import</a> <a id="451" href="ErasedFields.html" class="Module">ErasedFields</a>
+<a id="464" class="Keyword">import</a> <a id="471" href="UnusedArgs.html" class="Module">UnusedArgs</a>
 
-<a id="465" class="Symbol">{-#</a> <a id="469" class="Keyword">FOREIGN</a> <a id="477" class="Pragma">AGDA2RUST</a>
-<a id="487" class="Pragma">mod</a> <a id="491" class="Pragma">Identity;</a>
-<a id="501" class="Pragma">mod</a> <a id="505" class="Pragma">Numbers;</a>
-<a id="514" class="Pragma">mod</a> <a id="518" class="Pragma">Simplification;</a>
-<a id="534" class="Pragma">mod</a> <a id="538" class="Pragma">Top;</a>
-<a id="543" class="Pragma">mod</a> <a id="547" class="Pragma">Product;</a>
-<a id="556" class="Pragma">mod</a> <a id="560" class="Pragma">Either;</a>
-<a id="568" class="Pragma">mod</a> <a id="572" class="Pragma">Maybe;</a>
-<a id="579" class="Pragma">mod</a> <a id="583" class="Pragma">Exp;</a>
-<a id="588" class="Pragma">mod</a> <a id="592" class="Pragma">Nat0;</a>
-<a id="598" class="Pragma">mod</a> <a id="602" class="Pragma">Nat;</a>
-<a id="607" class="Pragma">mod</a> <a id="611" class="Pragma">List0;</a>
-<a id="618" class="Pragma">mod</a> <a id="622" class="Pragma">Singleton;</a>
-<a id="633" class="Pragma">mod</a> <a id="637" class="Pragma">RunTimeIrrelevance;</a>
-<a id="657" class="Pragma">mod</a> <a id="661" class="Pragma">Postulates;</a>
-<a id="673" class="Pragma">mod</a> <a id="677" class="Pragma">Constants;</a>
-<a id="688" class="Pragma">//</a> <a id="691" class="Pragma">mod</a> <a id="695" class="Pragma">Float0;</a>
-<a id="703" class="Pragma">mod</a> <a id="707" class="Pragma">Float;</a>
-<a id="714" class="Pragma">mod</a> <a id="718" class="Pragma">Char;</a>
-<a id="724" class="Pragma">//</a> <a id="727" class="Pragma">mod</a> <a id="731" class="Pragma">String0;</a>
-<a id="740" class="Pragma">mod</a> <a id="744" class="Pragma">String;</a>
-<a id="752" class="Pragma">mod</a> <a id="756" class="Pragma">Prim;</a>
-<a id="762" class="Pragma">mod</a> <a id="766" class="Pragma">Bool00;</a>
-<a id="774" class="Pragma">//</a> <a id="777" class="Pragma">mod</a> <a id="781" class="Pragma">Bool0;</a>
-<a id="788" class="Pragma">mod</a> <a id="792" class="Pragma">Bool;</a>
-<a id="798" class="Pragma">mod</a> <a id="802" class="Pragma">Int;</a>
-<a id="807" class="Pragma">mod</a> <a id="811" class="Pragma">TypeAliases;</a>
-<a id="824" class="Pragma">mod</a> <a id="828" class="Pragma">OverloadedConstructors;</a>
-<a id="852" class="Pragma">mod</a> <a id="856" class="Pragma">OverloadedFields;</a>
-<a id="874" class="Pragma">mod</a> <a id="878" class="Pragma">ErasedFields;</a>
+<a id="483" class="Symbol">{-#</a> <a id="487" class="Keyword">FOREIGN</a> <a id="495" class="Pragma">AGDA2RUST</a>
+<a id="505" class="Pragma">mod</a> <a id="509" class="Pragma">Identity;</a>
+<a id="519" class="Pragma">mod</a> <a id="523" class="Pragma">Numbers;</a>
+<a id="532" class="Pragma">mod</a> <a id="536" class="Pragma">Simplification;</a>
+<a id="552" class="Pragma">mod</a> <a id="556" class="Pragma">Top;</a>
+<a id="561" class="Pragma">mod</a> <a id="565" class="Pragma">Product;</a>
+<a id="574" class="Pragma">mod</a> <a id="578" class="Pragma">Either;</a>
+<a id="586" class="Pragma">mod</a> <a id="590" class="Pragma">Maybe;</a>
+<a id="597" class="Pragma">mod</a> <a id="601" class="Pragma">Exp;</a>
+<a id="606" class="Pragma">mod</a> <a id="610" class="Pragma">Nat0;</a>
+<a id="616" class="Pragma">mod</a> <a id="620" class="Pragma">Nat;</a>
+<a id="625" class="Pragma">mod</a> <a id="629" class="Pragma">List0;</a>
+<a id="636" class="Pragma">mod</a> <a id="640" class="Pragma">Singleton;</a>
+<a id="651" class="Pragma">mod</a> <a id="655" class="Pragma">RunTimeIrrelevance;</a>
+<a id="675" class="Pragma">mod</a> <a id="679" class="Pragma">Postulates;</a>
+<a id="691" class="Pragma">mod</a> <a id="695" class="Pragma">Constants;</a>
+<a id="706" class="Pragma">//</a> <a id="709" class="Pragma">mod</a> <a id="713" class="Pragma">Float0;</a>
+<a id="721" class="Pragma">mod</a> <a id="725" class="Pragma">Float;</a>
+<a id="732" class="Pragma">mod</a> <a id="736" class="Pragma">Char;</a>
+<a id="742" class="Pragma">//</a> <a id="745" class="Pragma">mod</a> <a id="749" class="Pragma">String0;</a>
+<a id="758" class="Pragma">mod</a> <a id="762" class="Pragma">String;</a>
+<a id="770" class="Pragma">mod</a> <a id="774" class="Pragma">Prim;</a>
+<a id="780" class="Pragma">mod</a> <a id="784" class="Pragma">Bool00;</a>
+<a id="792" class="Pragma">//</a> <a id="795" class="Pragma">mod</a> <a id="799" class="Pragma">Bool0;</a>
+<a id="806" class="Pragma">mod</a> <a id="810" class="Pragma">Bool;</a>
+<a id="816" class="Pragma">mod</a> <a id="820" class="Pragma">Int;</a>
+<a id="825" class="Pragma">mod</a> <a id="829" class="Pragma">TypeAliases;</a>
+<a id="842" class="Pragma">mod</a> <a id="846" class="Pragma">OverloadedConstructors;</a>
+<a id="870" class="Pragma">mod</a> <a id="874" class="Pragma">OverloadedFields;</a>
+<a id="892" class="Pragma">mod</a> <a id="896" class="Pragma">ErasedFields;</a>
+<a id="910" class="Pragma">mod</a> <a id="914" class="Pragma">UnusedArgs;</a>
 
-<a id="893" class="Pragma">fn</a> <a id="896" class="Pragma">main()</a> <a id="903" class="Pragma">{</a>
-  <a id="907" class="Pragma">Identity::main();</a>
-  <a id="927" class="Pragma">Numbers::main();</a>
-  <a id="946" class="Pragma">Simplification::main();</a>
-  <a id="972" class="Pragma">Top::main();</a>
-  <a id="987" class="Pragma">Product::main();</a>
-  <a id="1006" class="Pragma">Either::main();</a>
-  <a id="1024" class="Pragma">Maybe::main();</a>
-  <a id="1041" class="Pragma">Exp::main();</a>
-  <a id="1056" class="Pragma">Nat0::main();</a>
-  <a id="1072" class="Pragma">Nat::main();</a>
-  <a id="1087" class="Pragma">List0::main();</a>
-  <a id="1104" class="Pragma">Singleton::main();</a>
-  <a id="1125" class="Pragma">RunTimeIrrelevance::main();</a>
-  <a id="1155" class="Pragma">Postulates::main();</a>
-  <a id="1177" class="Pragma">Constants::main();</a>
-  <a id="1198" class="Pragma">//</a> <a id="1201" class="Pragma">Float0::main();</a>
-  <a id="1219" class="Pragma">Float::main();</a>
-  <a id="1236" class="Pragma">Char::main();</a>
-  <a id="1252" class="Pragma">//</a> <a id="1255" class="Pragma">String0::main();</a>
-  <a id="1274" class="Pragma">String::main();</a>
-  <a id="1292" class="Pragma">Prim::main();</a>
-  <a id="1308" class="Pragma">Bool00::main();</a>
-  <a id="1326" class="Pragma">//</a> <a id="1329" class="Pragma">Bool0::main();</a>
-  <a id="1346" class="Pragma">Bool::main();</a>
-  <a id="1362" class="Pragma">Int::main();</a>
-  <a id="1377" class="Pragma">TypeAliases::main();</a>
-  <a id="1400" class="Pragma">OverloadedConstructors::main();</a>
-  <a id="1434" class="Pragma">OverloadedFields::main();</a>
-  <a id="1462" class="Pragma">ErasedFields::main();</a>
-<a id="1484" class="Pragma">}</a>
-<a id="1486" class="Symbol">#-}</a>
+<a id="927" class="Pragma">fn</a> <a id="930" class="Pragma">main()</a> <a id="937" class="Pragma">{</a>
+  <a id="941" class="Pragma">Identity::main();</a>
+  <a id="961" class="Pragma">Numbers::main();</a>
+  <a id="980" class="Pragma">Simplification::main();</a>
+  <a id="1006" class="Pragma">Top::main();</a>
+  <a id="1021" class="Pragma">Product::main();</a>
+  <a id="1040" class="Pragma">Either::main();</a>
+  <a id="1058" class="Pragma">Maybe::main();</a>
+  <a id="1075" class="Pragma">Exp::main();</a>
+  <a id="1090" class="Pragma">Nat0::main();</a>
+  <a id="1106" class="Pragma">Nat::main();</a>
+  <a id="1121" class="Pragma">List0::main();</a>
+  <a id="1138" class="Pragma">Singleton::main();</a>
+  <a id="1159" class="Pragma">RunTimeIrrelevance::main();</a>
+  <a id="1189" class="Pragma">Postulates::main();</a>
+  <a id="1211" class="Pragma">Constants::main();</a>
+  <a id="1232" class="Pragma">//</a> <a id="1235" class="Pragma">Float0::main();</a>
+  <a id="1253" class="Pragma">Float::main();</a>
+  <a id="1270" class="Pragma">Char::main();</a>
+  <a id="1286" class="Pragma">//</a> <a id="1289" class="Pragma">String0::main();</a>
+  <a id="1308" class="Pragma">String::main();</a>
+  <a id="1326" class="Pragma">Prim::main();</a>
+  <a id="1342" class="Pragma">Bool00::main();</a>
+  <a id="1360" class="Pragma">//</a> <a id="1363" class="Pragma">Bool0::main();</a>
+  <a id="1380" class="Pragma">Bool::main();</a>
+  <a id="1396" class="Pragma">Int::main();</a>
+  <a id="1411" class="Pragma">TypeAliases::main();</a>
+  <a id="1434" class="Pragma">OverloadedConstructors::main();</a>
+  <a id="1468" class="Pragma">OverloadedFields::main();</a>
+  <a id="1496" class="Pragma">ErasedFields::main();</a>
+  <a id="1520" class="Pragma">UnusedArgs::main();</a>
+<a id="1540" class="Pragma">}</a>
+<a id="1542" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/main.unicode.html"/></div></body></html>
