@@ -56,7 +56,7 @@ import Agda.Syntax.Internal
   , Abs(..), unAbs, absName
   , Dom(..), unDom, domName, pDom, defaultDom
   , Elim, argsFromElims
-  , Tele(..), ListTel, telToList, telFromList
+  , Telescope, Tele(..), ListTel, telToList, telFromList
   , ConHead(..)
   , Clause(..)
   , nameId, dbPatVarIndex )

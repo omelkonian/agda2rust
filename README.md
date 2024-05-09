@@ -20,7 +20,7 @@ alongside the corresponding generated Rust code
 - [ ] identifiers
   + [x] transcribe to valid Rust identifiers (e.g. remove Unicode somehow)
   + [ ] ensure qualification/scopes are OK
-- [ ] primitives types
+- [ ] primitive/builtin types
   + [x] Nat
     * [ ] avoid overflow
   + [x] Char
@@ -35,6 +35,8 @@ alongside the corresponding generated Rust code
   + [x] Case expresssions
   + [x] higher-order functions
 - [ ] type aliases
+  + [x] simple aliases without arguments
+  + [x] parameterized aliases
 - [ ] datatypes
   + [x] polymorphic types / type variables
   + [x] constructors/variants
@@ -49,7 +51,7 @@ alongside the corresponding generated Rust code
   + [ ] private definitions (i.e. not `pub` for everything)
 - [x] Postulates
 - [x] FOREIGN pragmas
-  + [ ] FFI with postulates
+  + [x] FFI with postulates
 - [x] Erasure (a.k.a. run-time irrelevance)
 - [ ] Compile-time irrelevance
   + [ ] Prop universe
@@ -57,12 +59,14 @@ alongside the corresponding generated Rust code
   + [x] golden files
   + [x] CI
 - [ ] Compiler instructions
-  + [ ] Inlining
+  + [x] COMPILE ignore
+  + [x] COMPILE const/static
   + [ ] COMPILE rename
   + [ ] COMPILE derive
-  + [ ] COMPILE ignore
+  + [ ] Inlining
 - [ ] interface
   + [ ] emacs mode?
   + [ ] TUI?
 - [ ] Optional features
   + [ ] IO
+  + [ ] Procedural code

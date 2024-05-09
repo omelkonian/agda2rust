@@ -64,6 +64,7 @@ instance A.Definition ~> RDef where
       return IgnoreDef
     else do
       report $ "\n*** compiling definition: " <> pp defName
+      report $ " type: " <> pp defType
       goD pragma theDef
     where
     dx :: R.Ident
@@ -89,20 +90,21 @@ instance A.Definition ~> RDef where
 
       -- ** postulates
       A.Axiom{..} -> do
-        report $ " type: " <> pp defType
         report " compiling postulate with `panic!`"
         (tel, resTy) <- telListView defType
         CompileDef <$> goFn pragma (return $ rPanic "POSTULATE") (tel, resTy)
 
       -- ** type aliases
       A.Function{..}
-        | isSortTy defType
+        | isSortTerm (returnTy defType)
         , [A.Clause{..}] <- funClauses
-        , A.EmptyTel <- clauseTel
-        , [] <- namedClausePats
         , Just t <- clauseBody
-        -- , Nothing <- pragma
-        -> CompileDef . RTyAlias dx <$> go (typeFromTerm t)
+        , Nothing <- pragma
+        -> do
+        report " compiling type alias"
+        params <- fmap rTyParam <$> mapMaybeM shouldKeepTyParam (A.telToList clauseTel)
+        body   <- A.addContext clauseTel $ go (typeFromTerm t)
+        return $ CompileDef $ RTyAlias' dx params body
 
       -- -- ** record projections
       -- A.Function{..} | Right proj <- funProjection -> do
@@ -112,7 +114,7 @@ instance A.Definition ~> RDef where
       -- ** functions
       -- A.Function{..} | d ^. funInline
       A.Function{..} -> do
-        report $ " type: " <> pp defType
+        report " compiling function"
         -- report $ " pragma: " <> show pragma
         when (any isNoFFI pragma) $
           setConst defName
@@ -161,6 +163,7 @@ instance A.Definition ~> RDef where
 
       -- ** datatypes
       A.Datatype{..} -> inDatatype defName $ do
+        report " compiling datatype"
         -- cs <- zip dataCons <$> traverse typeOfConst dataCons)
         cs <- concat <$> forM dataCons (\dc -> do
           cDef <- A.instantiateDef =<< A.getConstInfo dc
@@ -180,6 +183,7 @@ instance A.Definition ~> RDef where
 
       -- ** records
       A.Record{..} -> do
+        report " compiling record"
         -- NB: incorporate conHead/namedCon in the future for accuracy
         --     + to solve the issue with private (non-public) fields
         report $ " recPars: " <> pp recPars
@@ -225,7 +229,7 @@ instance A.Definition ~> RDef where
         | StaticNoFFI <- pragma, null ps, null as
         -> RStatic dx resTy body
         | otherwise
-        -> mkFn dx (RTyParam . R.mkIdent <$> ps) (RFnTy as resTy) (RBlock body)
+        -> mkFn dx (rTyParam <$> ps) (RFnTy as resTy) (RBlock body)
       where
       goFn' :: (A.ListTel, A.Type) -> C ([String], [R.Arg ()], R.Ty (), R.Expr ())
       goFn' (d:tel, resTy) = do

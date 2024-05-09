@@ -56,6 +56,9 @@ pattern RForall tys = Generics [] tys REmptyWhere ()
 pattern REmptyGenerics = RForall []
 pattern RTyParam x = TyParam [] x [] Nothing ()
 
+rTyParam :: String -> TyParam ()
+rTyParam = RTyParam . mkIdent
+
 rTyFromExp :: Expr () -> Ty ()
 rTyFromExp = \case
   RCall f [] -> rTyFromExp (RExprRef f)
@@ -65,6 +68,7 @@ rTyFromExp = \case
 
 -- ** type aliases
 pattern RTyAlias x ty = TyAlias [] PublicV x ty REmptyGenerics ()
+pattern RTyAlias' x ts ty = TyAlias [] PublicV x ty (RForall ts) ()
 
 -- ** function types
 pattern RFnTy as b = FnDecl as (Just b) False ()

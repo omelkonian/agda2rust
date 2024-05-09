@@ -7,7 +7,7 @@ import Control.Monad.Reader ( asks )
 import Utils
 
 import qualified Agda as A
-import Agda.Lib ( ifJustM )
+import Agda.Lib ( ifJustM, mapMaybeM )
 import Agda.Utils
 
 import qualified Rust as R

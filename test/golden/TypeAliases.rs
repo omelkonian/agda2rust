@@ -16,9 +16,16 @@ pub fn testAliasF() -> ℕ {
   incr(41)
 }
 
+pub type Id<  A,> = A;
+
+pub fn id<  A,>(x0: Id<A>) -> Id<A> {
+  x0
+}
+
 pub fn main () {
-  println!("{}:\t\t {} | {}", module_path!(),
+  println!("{}:\t\t {} | {} | {}", module_path!(),
     testAlias(),
     testAliasF(),
+    id(42),
   );
 }

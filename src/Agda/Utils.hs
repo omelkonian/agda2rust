@@ -124,6 +124,11 @@ isLevelTy, isSortTy :: Type -> Bool
 isLevelTy = isLevelTerm . unEl
 isSortTy  = isSortTerm  . unEl
 
+returnTy :: Type -> Term
+returnTy = flip (.) unEl $ \case
+  Pi _ ty -> returnTy (unAbs ty)
+  ty -> ty
+
 isSortResTy :: PureTCM m => Type -> m Bool
 isSortResTy ty = isSortTy <$> resTy ty
 
