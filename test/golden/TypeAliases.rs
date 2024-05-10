@@ -27,5 +27,6 @@ pub fn main () {
     testAlias(),
     testAliasF(),
     id(42),
+    // idK(42),
   );
 }

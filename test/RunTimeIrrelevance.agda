@@ -1,5 +1,3 @@
-module RunTimeIrrelevance where
-
 open import Agda.Builtin.Nat using (Nat; suc)
 
 -- ** functions

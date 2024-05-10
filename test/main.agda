@@ -9,6 +9,7 @@ import Exp
 import Nat0
 import Nat
 import List0
+import List
 import Singleton
 import RunTimeIrrelevance
 import Postulates
@@ -41,6 +42,7 @@ mod Exp;
 mod Nat0;
 mod Nat;
 mod List0;
+mod List;
 mod Singleton;
 mod RunTimeIrrelevance;
 mod Postulates;
@@ -73,6 +75,7 @@ fn main() {
   Nat0::main();
   Nat::main();
   List0::main();
+  List::main();
   Singleton::main();
   RunTimeIrrelevance::main();
   Postulates::main();

@@ -40,8 +40,9 @@ currentCtx :: MonadTCEnv m => m [(String, Type)]
 currentCtx = fmap (first pp . unDom) <$> getContext
 
 reportCurrentCtx :: (MonadIO m, MonadTCEnv m) => m ()
-reportCurrentCtx = currentCtx >>= \ctx ->
-  report $ "currentCtx: " <> pp ctx
+reportCurrentCtx = do
+  ctx <- currentCtx
+  report $ " currentCtx: " <> pp ctx
 
 lookupCtx :: MonadTCEnv m => Int -> m (String, Type)
 lookupCtx i = first transcribe . (!! i) {-. reverse-} <$> currentCtx
@@ -143,6 +144,10 @@ isSortM = \case
 --   Var n _ -> typeOfBV n
 --   Def n _ -> typeOfBV n
 
+-- | Perform multiple η-expansions on a treeless term.
+etaExpandT :: Int -> TTerm -> TTerm
+etaExpandT n t = mkTLam n $ raise n t `mkTApp` map TVar (downFrom n)
+
 -- ** erasure
 isErasedTTerm :: TTerm -> Bool
 isErasedTTerm = \case
@@ -232,6 +237,19 @@ isNullary ty = null . filter hasQuantityNon0 . fst <$> telListView ty
 --     | otherwise -> traverseF (filterTel p) tel
 
 -- ** definitions
+
+isDataDef, isRecDef, isFunDef :: Defn -> Bool
+isDataDef = \case
+  Datatype{} -> True
+  _ -> False
+
+isRecDef = \case
+  Record{} -> True
+  _ -> False
+
+isFunDef = \case
+  Function{} -> True
+  _ -> False
 
 isRecordProjection :: Defn -> Maybe (QName, QName)
 isRecordProjection d

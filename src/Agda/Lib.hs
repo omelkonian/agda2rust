@@ -71,7 +71,9 @@ import Agda.Compiler.ToTreeless
 import Agda.ToTreeless
   ( toTreeless )
 import Agda.Syntax.Treeless
-  ( TTerm(..), TPrim(..), TAlt(..), EvaluationStrategy(..), isPrimEq
+  ( TTerm(..), TPrim(..), TAlt(..)
+  , CaseInfo(..), CaseType(..)
+  , EvaluationStrategy(..), isPrimEq
   , mkTLam, mkTApp, tLamView )
 import Agda.Compiler.Treeless.Pretty ()
 import Agda.Compiler.Treeless.EliminateLiteralPatterns

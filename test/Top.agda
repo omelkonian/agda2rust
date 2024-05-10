@@ -1,5 +1,3 @@
-module Top where
-
 {-# FOREIGN AGDA2RUST
 #[derive(Debug)]
 #-}

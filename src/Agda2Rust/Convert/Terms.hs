@@ -5,7 +5,7 @@ import Control.Monad ( (<=<), filterM )
 import Control.Monad.Error.Class ( MonadError(catchError) )
 import Control.Monad.State ( get )
 
-import Data.Maybe ( isJust )
+import Data.Maybe ( isJust, isNothing )
 import Data.List ( intercalate )
 
 import Utils
@@ -28,22 +28,20 @@ import Agda2Rust.Convert.Types
 
 -- | Compiling (treeless) Agda terms into Rust expressions.
 instance A.TTerm ~> R.Expr where
-  go = boxTerm <=< (\case
+  go = \case
     A.TVar i -> do
       -- iTy <- lookupCtxTy i
       -- report $ "* compiling variable: " <> pp i -- <> " : " <> pp iTy
-      ctx <- currentCtx
-      -- report $ " ctx: " <> pp ctx
+      -- reportCurrentCtx
       RExprRef . R.mkIdent <$> lookupCtxVar i
     A.TLit l -> rLit <$> go l
     t@(A.TDef _)  -> go (A.TApp t [])
     t@(A.TCon _)  -> go (A.TApp t [])
-    t@(A.TPrim _) -> go (etaExpand 2 t)
-      where
-      etaExpand n t = A.mkTLam n $ A.raise n t `A.mkTApp` map A.TVar (downFrom n)
+    t@(A.TPrim _) -> go (etaExpandT 2 t)
     A.TApp t (onlyNonErased -> ts) -> do
       report $ " * compiling application: " <> pp t <> " $ " <> pp ts
       (cn, h) <- goHead t
+      report $ "   cn: " <> pp cn
       (ts', ps) <- separateTyParams ts `catchError` \_ -> pure (ts, [])
       -- report $ "  ps: " <> pp ps
       -- report $ "  ts': " <> pp ts'
@@ -51,7 +49,8 @@ instance A.TTerm ~> R.Expr where
       -- report $ "  ps': " <> show ps'
       ts'' <- maybe inNonConstructor inConstructor cn $ gos ts'
       -- report $ "  ts'': " <> ppR ts''
-      return $ h ps' ts''
+      toBox <- shouldBox
+      return $ (if toBox then RBox else id) (h ps' ts'')
     t0@(A.TLam t) -> do
       report $ " * compiling lambda term: " <> pp t0
       let (n, b) = A.tLamView t0
@@ -66,22 +65,23 @@ instance A.TTerm ~> R.Expr where
       e  <- go t
       e' <- A.addContext [(x, defaultTy)] $ go t'
       return $ rLet [(x, e)] e'
-    t@(A.TCase scrutinee _ defCase alts) -> do
+    t@(A.TCase scrutinee A.CaseInfo{..} defCase alts) -> do
       report $ " * compiling case expression:\n" <> pp t
       ctx <- currentCtx
-      -- report $ "  ctx: " <> pp ctx
-      -- report $ "  scrutineeVar: " <> pp scrutinee
+      report $ "  ctx: " <> pp ctx
+      report $ "  scrutineeVar: " <> pp scrutinee
       (x, ty) <- lookupCtx scrutinee -- (pred (length ctx) - scrutinee)
-      -- report $ "  scrutinee: " <> x <> " : " <> pp ty
+      report $ "  scrutinee: " <> x <> " : " <> pp ty
       arms <- traverse go =<< filterM shouldKeepAlt alts
       defArm <- case defCase of
         A.TError _ -> do
           -- report $ "  scrutineeTy: " <> pp ty
-          shouldCatchAll <- A.reduce (A.unEl ty) >>= \case
-            A.Def qn _ -> (A.theDef <$> A.getConstInfo qn) >>= \case
-              A.Datatype{} -> hasUnusedTyParams qn
-              _ -> return False
-          return [RArm RWildP (rPanic "IMPOSSIBLE") | shouldCatchAll]
+          shouldCatchAll <- case caseType of
+            A.CTData qn -> do
+              (&&) <$> (isDataDef . A.theDef <$> A.getConstInfo qn)
+                   <*> hasUnusedTyParams qn
+            _ -> return False
+          return [RArm RWildP rUnreachable | shouldCatchAll]
         t -> do
           catchAll <- go t
           return [RArm RWildP catchAll]
@@ -95,7 +95,7 @@ instance A.TTerm ~> R.Expr where
     A.TError err -> do
       let msg = A.ppShow err
       return $ RMacroCall (RRef "panic") (RStrTok msg)
-    t -> panic "treeless term" t)
+    t -> panic "treeless term" t
     where
     shouldKeepAlt :: A.TAlt -> C Bool
     shouldKeepAlt = \case
@@ -105,16 +105,12 @@ instance A.TTerm ~> R.Expr where
       A.TAGuard{} -> pure True
       A.TALit{}   -> pure True
 
-    boxTerm :: R.Expr () :~> R.Expr
-    boxTerm e = do
-      toBox <- shouldBox
-      return $ (if toBox then RBox else id) e
-
     goHead :: A.TTerm -> C (Maybe A.QName, ([R.Ty ()] -> [R.Expr ()] -> R.Expr ()))
     goHead = \case
       A.TDef qn ->
         ifJustM (getFFI qn) (return . compileFFIHead) $ do
         ifM (isConst qn) (return $ compileFFIHead (Just Const, pp $ A.unqual qn)) $ do
+          report $ " * compiling head of application (definition: " <> pp qn <> ")"
           rn <- getRid <$> A.getConstInfo qn
           -- toConst <- isNullary =<< A.typeOfConst qn
           -- return (Nothing, (if toConst then rCall else RCall) (unqualR qn))

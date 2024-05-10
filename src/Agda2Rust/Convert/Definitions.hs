@@ -124,17 +124,14 @@ instance A.Definition ~> RDef where
         -- report $ " tterm: " <> pp tterm
         -- report $ " intros: " <> pp introVars
         (tel0, _) <- telListView defType
+        -- report $ " tel0: " <> pp tel0
         intros <- calculateIntros introVars tel0
         (tel, resTy) <- telListViewUpTo intros defType
-        -- report $ " >>tel: " <> pp tel
-        -- report $ " >>resTy: " <> pp resTy
-        -- let ctx | Right A.Projection{..} <- funProjection
-        --         , Just recName <- projProper
-        --         = RMod (unqualR recName)
-        --         | otherwise
-        --         = id
-        -- ctx <$> goFn (go tterm) (tel, resTy)
-        CompileDef <$> goFn pragma (go tterm) (tel, resTy)
+        -- report $ " tel: " <> pp tel
+        -- report $ " resTy: " <> pp resTy
+        let tterm' = tterm
+        -- let (tterm', _) = stripTopTLams $ etaExpandT (length tel - intros) tterm
+        CompileDef <$> goFn pragma (go tterm') (tel, resTy)
         where
         stripTopTLams :: A.TTerm -> (A.TTerm, Int)
         stripTopTLams = \case
@@ -143,8 +140,10 @@ instance A.Definition ~> RDef where
 
         calculateIntros :: Int -> A.ListTel -> C Int
         calculateIntros _ tel = return (length tel)
+        -- calculateIntros n _ = return n
         -- calculateIntros = go 0
         --   where
+        --   go :: Int -> Int -> A.ListTel -> C Int
         --   go n vIntros (d@(A.unDom -> (x, ty)) : tel) = do
         --     isSrt <- isSortResTy ty
         --     isLvl <- A.isLevelType ty

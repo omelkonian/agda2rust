@@ -20,7 +20,17 @@ pub enum OnlyLeft<A, B> {
 pub fn fromOnlyLeft<A, B>(x0: OnlyLeft<A, B>) -> A {
   match x0 {
     OnlyLeft::Left(x1) => x1,
-    _ => panic!("IMPOSSIBLE"),
+    _ => unreachable!(),
+  }
+}
+
+pub fn fromOnlyLeft2<A, B, C>(x0: OnlyLeft<OnlyLeft<A, B>, C>) -> A {
+  match x0 {
+    OnlyLeft::Left(x1) => match x1 {
+      OnlyLeft::Left(x2) => x2,
+      _ => unreachable!(),
+    },
+    _ => unreachable!(),
   }
 }
 
@@ -39,13 +49,22 @@ pub fn fromOnlyLeftR<A, B>(x0: OnlyLeftR<A, B>) -> A {
   OnlyLeftR·left(x0)
 }
 
+pub fn fromOnlyLeftR2<A, B, C>(x0: OnlyLeftR<OnlyLeftR<A, B>, C>) -> A {
+  OnlyLeftR·left(OnlyLeftR·left(x0))
+}
+
 use std::marker::{PhantomData};
 fn __<T>() -> PhantomData<T> { return PhantomData; }
 
 pub fn main() {
-  println!("{}:\t\t\t {} | {} | {}", module_path!(),
+  println!("{}:\t\t\t {} | {} | {} | {} | {}", module_path!(),
     fromEither::<i32, i32>(41, Either::Left(42)),
     fromOnlyLeft::<i32, i32>(OnlyLeft::Left(42)),
     fromOnlyLeftR::<i32, i32>(OnlyLeftR {left: 42, _phantom: __()}),
+    fromOnlyLeft2::<i32, i32, i32>(OnlyLeft::Left(OnlyLeft::Left(42))),
+    fromOnlyLeftR2::<i32, i32, i32>(OnlyLeftR
+      {left: OnlyLeftR {left: 42, _phantom: __()},
+      _phantom: __()}
+    ),
   );
 }

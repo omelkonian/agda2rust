@@ -1,3 +1,4 @@
+-- ** no unused type parameters
 record _×_ (A B : Set) : Set where
   constructor _,_
   field proj₁ : A

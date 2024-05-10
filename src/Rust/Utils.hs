@@ -94,6 +94,8 @@ pattern RMkStruct path fs = Struct [] path fs Nothing ()
 
 pattern RMacroCall f xs = MacExpr [] (Mac f xs ()) ()
 rPanic s = RMacroCall (RRef "panic") (RStrTok s)
+rImpossible = rPanic "IMPOSSIBLE"
+rUnreachable = RMacroCall (RRef "unreachable") RNoTok
 
 -- ** closures
 pattern RInferArg x = RArg x (Infer ())
@@ -109,6 +111,7 @@ pattern RStatic x ty b = Static [] PublicV x ty Immutable b ()
 pattern RNoSpan   = Span NoPosition NoPosition
 pattern RTok    t = Tree (Token RNoSpan (LiteralTok t Nothing))
 pattern RStrTok s = RTok (StrTok s)
+pattern RNoTok    = Stream []
 
 -- ** enums
 pattern REnum x ps cs = Enum [] PublicV x cs (RForall ps) ()

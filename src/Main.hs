@@ -172,8 +172,9 @@ writeModule opts _ _ m (catMaybes -> cdefs) = do
       outFile = fromMaybe outDir (optOutDir opts) <> "/" <> rustFn
       outS =  "#![allow(" <> intercalate "," ignoredRustWarnings <> ")]\n\n"
            <> code
-  runC0 $ report $ "\n******* MODULE: " <> rustFn <> "********\n"
+  runC0 $ report $ "\n************** MODULE: " <> rustFn <> " ***************\n"
         <> outS
+        <> "************************************************************"
   unless (null code) $
     writeRsFile outFile outS
   where
