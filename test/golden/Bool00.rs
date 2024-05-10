@@ -37,8 +37,27 @@ pub fn bool2Nat(x0: Bool) -> i32 {
   }
 }
 
+pub fn isZero(x0: i32) -> Bool {
+  match x0 {
+    0 => Bool::r#true(),
+    _ => Bool::r#false(),
+  }
+}
+
+pub fn toNonZero(x0: i32) -> i32 {
+  {
+    let x1 = isZero(x0);
+    match x1 {
+      Bool::r#false() => x0,
+      Bool::r#true() => 1,
+    }
+  }
+}
+
 pub fn main () {
-  println!("{}:\t\t\t {:?}", module_path!(),
-    bool2Nat(testBool())
+  println!("{}:\t\t\t {} | {} | {}", module_path!(),
+    bool2Nat(testBool()),
+    bool2Nat(isZero(5)),
+    toNonZero(42),
   );
 }
