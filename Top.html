@@ -1,20 +1,18 @@
 <!DOCTYPE HTML>
-<html><head><meta charset="utf-8"><title>Top</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Keyword">module</a> <a id="8" href="Top.html" class="Module">Top</a> <a id="12" class="Keyword">where</a>
+<html><head><meta charset="utf-8"><title>Top</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Symbol">{-#</a> <a id="5" class="Keyword">FOREIGN</a> <a id="13" class="Pragma">AGDA2RUST</a>
+<a id="23" class="Pragma">#[derive(Debug)]</a>
+<a id="40" class="Symbol">#-}</a>
+<a id="44" class="Keyword">data</a> <a id="Unit"></a><a id="49" href="Top.html#49" class="Datatype">Unit</a> <a id="54" class="Symbol">:</a> <a id="56" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="60" class="Keyword">where</a>
+  <a id="Unit.tt"></a><a id="68" href="Top.html#68" class="InductiveConstructor">tt</a> <a id="71" class="Symbol">:</a> <a id="73" href="Top.html#49" class="Datatype">Unit</a>
 
-<a id="19" class="Symbol">{-#</a> <a id="23" class="Keyword">FOREIGN</a> <a id="31" class="Pragma">AGDA2RUST</a>
-<a id="41" class="Pragma">#[derive(Debug)]</a>
-<a id="58" class="Symbol">#-}</a>
-<a id="62" class="Keyword">data</a> <a id="Unit"></a><a id="67" href="Top.html#67" class="Datatype">Unit</a> <a id="72" class="Symbol">:</a> <a id="74" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="78" class="Keyword">where</a>
-  <a id="Unit.tt"></a><a id="86" href="Top.html#86" class="InductiveConstructor">tt</a> <a id="89" class="Symbol">:</a> <a id="91" href="Top.html#67" class="Datatype">Unit</a>
+<a id="idUnit"></a><a id="79" href="Top.html#79" class="Function">idUnit</a> <a id="86" class="Symbol">:</a> <a id="88" href="Top.html#49" class="Datatype">Unit</a> <a id="93" class="Symbol">→</a> <a id="95" href="Top.html#49" class="Datatype">Unit</a>
+<a id="100" href="Top.html#79" class="Function">idUnit</a> <a id="107" href="Top.html#68" class="InductiveConstructor">tt</a> <a id="110" class="Symbol">=</a> <a id="112" href="Top.html#68" class="InductiveConstructor">tt</a>
 
-<a id="idUnit"></a><a id="97" href="Top.html#97" class="Function">idUnit</a> <a id="104" class="Symbol">:</a> <a id="106" href="Top.html#67" class="Datatype">Unit</a> <a id="111" class="Symbol">→</a> <a id="113" href="Top.html#67" class="Datatype">Unit</a>
-<a id="118" href="Top.html#97" class="Function">idUnit</a> <a id="125" href="Top.html#86" class="InductiveConstructor">tt</a> <a id="128" class="Symbol">=</a> <a id="130" href="Top.html#86" class="InductiveConstructor">tt</a>
-
-<a id="134" class="Symbol">{-#</a> <a id="138" class="Keyword">FOREIGN</a> <a id="146" class="Pragma">AGDA2RUST</a>
-<a id="156" class="Pragma">pub</a> <a id="160" class="Pragma">fn</a> <a id="163" class="Pragma">main</a> <a id="168" class="Pragma">()</a> <a id="171" class="Pragma">{</a>
-  <a id="175" class="Pragma">println!(&quot;{}:\t\t\t</a> <a id="195" class="Pragma">{:?}&quot;,</a> <a id="202" class="Pragma">module_path!(),</a>
-    <a id="222" class="Pragma">idUnit(Unit::tt())</a>
-  <a id="243" class="Pragma">);</a>
-<a id="246" class="Pragma">}</a>
-<a id="248" class="Symbol">#-}</a>
+<a id="116" class="Symbol">{-#</a> <a id="120" class="Keyword">FOREIGN</a> <a id="128" class="Pragma">AGDA2RUST</a>
+<a id="138" class="Pragma">pub</a> <a id="142" class="Pragma">fn</a> <a id="145" class="Pragma">main</a> <a id="150" class="Pragma">()</a> <a id="153" class="Pragma">{</a>
+  <a id="157" class="Pragma">println!(&quot;{}:\t\t\t</a> <a id="177" class="Pragma">{:?}&quot;,</a> <a id="184" class="Pragma">module_path!(),</a>
+    <a id="204" class="Pragma">idUnit(Unit::tt())</a>
+  <a id="225" class="Pragma">);</a>
+<a id="228" class="Pragma">}</a>
+<a id="230" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/Top.unicode.html"/></div></body></html>
