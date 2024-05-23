@@ -159,6 +159,7 @@ ignoredRustWarnings =
   , "unused_variables"
   , "non_camel_case_types"
   , "non_upper_case_globals"
+  , "unreachable_patterns"
   -- , "uncommon_codepoints" -- only crate-level attribute
   ]
 

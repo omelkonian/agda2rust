@@ -49,6 +49,8 @@ pattern RTyRef' x ts = RPathTy (RRef' x ts)
 rTyRef' x ts = RPathTy (rRef' x ts)
 
 -- ** type parameters
+pattern RParens ts = Parenthesized ts Nothing ()
+pattern RParens' ts retTy = Parenthesized ts (Just retTy) ()
 pattern RAngles ts = AngleBracketed [] ts [] ()
 pattern RArg x ty = Arg (Just (RId x)) ty ()
 pattern REmptyWhere = WhereClause [] ()
@@ -96,6 +98,15 @@ pattern RMacroCall f xs = MacExpr [] (Mac f xs ()) ()
 rPanic s = RMacroCall (RRef "panic") (RStrTok s)
 rImpossible = rPanic "IMPOSSIBLE"
 rUnreachable = RMacroCall (RRef "unreachable") RNoTok
+
+-- ** traits
+pattern RImpl tb = ImplTrait (tb :| []) ()
+pattern RTyBound r = TraitTyParamBound (PolyTraitRef [] (TraitRef r) ()) None ()
+pattern RImplFn a b = RImpl (RTyBound (RPath [RPathSeg' "Fn" (RParens' [a] b)]))
+rImplFn a b | RImpl (RTyBound (RPath [RPathSeg' "Fn" (RParens' as b')])) <- b
+            = RImpl (RTyBound (RPath [RPathSeg' "Fn" (RParens' (a : as) b')]))
+            | otherwise
+            = RImplFn a b
 
 -- ** closures
 pattern RInferArg x = RArg x (Infer ())

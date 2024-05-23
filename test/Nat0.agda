@@ -1,4 +1,6 @@
-{-# FOREIGN AGDA2RUST #[derive(Debug)] #-}
+{-# FOREIGN AGDA2RUST
+#[derive(Debug)]
+#-}
 data Nat : Set where
   zero : Nat
   suc  : Nat → Nat

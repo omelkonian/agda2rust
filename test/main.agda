@@ -29,6 +29,7 @@ import OverloadedConstructors
 import OverloadedFields
 import ErasedFields
 import UnusedArgs
+import ExactSplit
 
 {-# FOREIGN AGDA2RUST
 mod Identity;
@@ -62,6 +63,7 @@ mod OverloadedConstructors;
 mod OverloadedFields;
 mod ErasedFields;
 mod UnusedArgs;
+mod ExactSplit;
 
 fn main() {
   Identity::main();
@@ -95,5 +97,6 @@ fn main() {
   OverloadedFields::main();
   ErasedFields::main();
   UnusedArgs::main();
+  ExactSplit::main();
 }
 #-}

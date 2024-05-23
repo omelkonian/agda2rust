@@ -48,7 +48,7 @@ executable agda2rust
     ViewPatterns PatternGuards
     ScopedTypeVariables
     TypeFamilies TypeOperators TypeApplications
-    FunctionalDependencies TypeSynonymInstances
+    FunctionalDependencies TypeSynonymInstances ConstraintKinds
     DoAndIfThenElse BlockArguments MultiWayIf
   ghc-options:         -rtsopts
   build-depends:       base >= 4.10 && < 4.18,
