@@ -39,7 +39,6 @@ pattern RRef     x = RPath [RPathSeg x]
 pattern RExprRef x = RPathExpr (RRef x)
 pattern RExprRef' x ts = RPathExpr (RRef' x ts)
 pattern RTyRef   x = RPathTy   (RRef x)
-pattern RBorrow ty = Rptr Nothing Immutable ty ()
 
 pattern RRef'   x ts = RPath [RPathSeg' x (RAngles ts)]
 rRef' x ts | null ts   = RRef x
@@ -47,6 +46,11 @@ rRef' x ts | null ts   = RRef x
 
 pattern RTyRef' x ts = RPathTy (RRef' x ts)
 rTyRef' x ts = RPathTy (rRef' x ts)
+
+-- ** type bounds
+pattern RTyBound r = TraitTyParamBound (PolyTraitRef [] (TraitRef r) ()) None ()
+pattern RTyBoundRef s = RTyBound (RRef s)
+pattern RTyBoundPath ps = RTyBound (RPath ps)
 
 -- ** type parameters
 pattern RParens ts = Parenthesized ts Nothing ()
@@ -56,10 +60,14 @@ pattern RArg x ty = Arg (Just (RId x)) ty ()
 pattern REmptyWhere = WhereClause [] ()
 pattern RForall tys = Generics [] tys REmptyWhere ()
 pattern REmptyGenerics = RForall []
-pattern RTyParam x = TyParam [] x [] Nothing ()
 
-rTyParam :: String -> TyParam ()
-rTyParam = RTyParam . mkIdent
+pattern RTyParam' x bs = TyParam [] x bs Nothing ()
+pattern RTyParam      x = RTyParam' x []
+pattern RTyParamCopy  x = RTyParam' x [RTyBoundRef "Copy"]
+pattern RTyParamClone x = RTyParam' x [RTyBoundRef "Clone"]
+rTyParam      = RTyParam      . mkIdent
+rTyParamCopy  = RTyParamCopy  . mkIdent
+rTyParamClone = RTyParamClone . mkIdent
 
 rTyFromExp :: Expr () -> Ty ()
 rTyFromExp = \case
@@ -68,27 +76,57 @@ rTyFromExp = \case
   RBox e -> rTyFromExp e
   e -> error $ "[rTyFromExp] cannot type-convert " <> show e
 
+rClone :: Expr () -> Expr ()
+rClone e = RMethodCall e "clone"
+
 -- ** type aliases
 pattern RTyAlias x ty = TyAlias [] PublicV x ty REmptyGenerics ()
 pattern RTyAlias' x ts ty = TyAlias [] PublicV x ty (RForall ts) ()
 
+-- ** traits
+pattern RTrait tb = TraitObject (tb :| []) ()
+pattern RImpl tb = ImplTrait (tb :| []) ()
+
 -- ** function types
+pattern RFn' isConst x ps ty b =
+  Fn [] PublicV x ty Normal isConst Rust (RForall ps) b ()
+pattern RFn x ps ty b = RFn' NotConst x ps ty b
+
 pattern RFnTy as b = FnDecl as (Just b) False ()
+
+rUnArg :: Arg a -> Ty a
+rUnArg (Arg _ ty _) = ty
+
+rMkArg :: Ty () -> Arg ()
+rMkArg ty = Arg Nothing ty ()
+
+mkFnTy :: [Arg ()] -> Ty () -> Ty ()
+mkFnTy [] b = b
+mkFnTy (a:as) b = RImplFn (rUnArg a) (mkFnTy as b)
+
+mkFnDeclTy :: [Arg ()] -> Ty () -> FnDecl ()
+-- mkFnDeclTy as b = RFnTy [] (mkFnTy as b) -- curried
+mkFnDeclTy = RFnTy
+
+pattern RTraitFn a b = RTrait (RTyBoundPath [RPathSeg' "Fn" (RParens' [a] b)])
+pattern RImplFn a b = RImpl (RTyBoundPath [RPathSeg' "Fn" (RParens' [a] b)])
+rImplFn a b | RImpl (RTyBoundPath [RPathSeg' "Fn" (RParens' as b')]) <- b
+            = RImpl (RTyBoundPath [RPathSeg' "Fn" (RParens' (a : as) b')])
+            | otherwise
+            = RImplFn a b
+
 pattern RBareFn x a b = BareFn Normal Rust [] (RFnTy [RArg x a] b) ()
 rBareFn x a b | BareFn Normal Rust [] (RFnTy as b') () <- b
               = BareFn Normal Rust [] (RFnTy (RArg x a : as) b') ()
               | otherwise
               = RBareFn x a b
-pattern RFn' isConst x ps ty b =
-  Fn [] PublicV x ty Normal isConst Rust (RForall ps) b ()
-pattern RFn x ps ty b = RFn' NotConst x ps ty b
 
 -- ** function calls
 pattern RCall f xs = Call [] (RExprRef f) xs ()
 rCall f xs | null xs   = RExprRef f
            | otherwise = RCall f xs
 pattern RCall' f ts xs = Call [] (RExprRef' f ts) xs ()
-rCall' f ts xs | null ts   = RCall f xs -- rCall f xs
+rCall' f ts xs | null ts   = RCall f xs
                | otherwise = RCall' f ts xs
 
 pattern RCallCon con xs = Call [] con xs ()
@@ -99,19 +137,19 @@ rPanic s = RMacroCall (RRef "panic") (RStrTok s)
 rImpossible = rPanic "IMPOSSIBLE"
 rUnreachable = RMacroCall (RRef "unreachable") RNoTok
 
--- ** traits
-pattern RImpl tb = ImplTrait (tb :| []) ()
-pattern RTyBound r = TraitTyParamBound (PolyTraitRef [] (TraitRef r) ()) None ()
-pattern RImplFn a b = RImpl (RTyBound (RPath [RPathSeg' "Fn" (RParens' [a] b)]))
-rImplFn a b | RImpl (RTyBound (RPath [RPathSeg' "Fn" (RParens' as b')])) <- b
-            = RImpl (RTyBound (RPath [RPathSeg' "Fn" (RParens' (a : as) b')]))
-            | otherwise
-            = RImplFn a b
-
 -- ** closures
 pattern RInferArg x = RArg x (Infer ())
-pattern RLam xs e = Closure [] Movable Ref (FnDecl xs Nothing False ()) e ()
-rLam xs e = RLam (RInferArg <$> xs) e
+pattern RLam' mov xs e = Closure [] Movable mov (FnDecl xs Nothing False ()) e ()
+pattern RLam xs e = RLam' Ref xs e
+pattern RMoveLam xs e = RLam' Value xs e
+rLam' mov xs e = RLam' mov (RInferArg <$> xs) e
+rLam = rLam' Ref
+rMoveLam = rLam' Value
+
+rMoveLams :: [Arg ()] -> Expr () -> Expr ()
+rMoveLams = \case
+  []     -> id
+  (Arg (Just (IdentP _ x _ _)) _ _ : xs) -> rMoveLam [x] . rMoveLams xs
 
 -- ** constants
 pattern RConstFn x ps ty b = RFn' Const x ps ty b
@@ -138,15 +176,24 @@ pattern RWildP = WildP ()
 pattern RLitP lit = LitP lit ()
 pattern RFieldP x p = FieldPat (Just x) p ()
 pattern RNoFieldP p = FieldPat Nothing p ()
+rFieldP x p | ppR x == ppR p = RNoFieldP p
+            | otherwise      = RFieldP x p
 pattern RTupleP path pats = TupleStructP path pats Nothing ()
 pattern RStructP path fpats = StructP path fpats False ()
 pattern RArm pat body = Arm [] (pat :| []) Nothing body ()
 pattern RGuardedArm pat guard body = Arm [] (pat :| []) (Just guard) body ()
 pattern RMatch scr arms = Match [] scr arms ()
+rMatchClone scr arms = RMatch (rClone scr) arms
+rMatchBorrow scr arms = RMatch (RBorrow scr) arms
+rMatch = RMatch
+
+-- ** methods
+pattern RMethodCall' e f xs = MethodCall [] e f Nothing xs ()
+pattern RMethodCall e f = RMethodCall' e f []
 
 -- ** primitives
 pattern RLit l = Lit [] l ()
-rLit l | Str _ _ _ () <- l = MethodCall [] (RLit l) "to_string" Nothing [] ()
+rLit l | Str _ _ _ () <- l = RMethodCall (RLit l) "to_string"
        | otherwise         = RLit l
 pattern RLitBool b = RLit (Bool b Unsuffixed ())
 pattern RLitTrue  = RLitBool True
@@ -158,8 +205,14 @@ pattern RDeref x = Unary [] Deref (RExprRef x) ()
 
 -- ** pointers
 pattern RPointer ty = Rptr Nothing Immutable ty ()
+
+pattern RBorrowTy ty = Rptr Nothing Immutable ty ()
+pattern RBorrow   e  = AddrOf [] Immutable e ()
+
 pattern RBoxTy   ty = RTyRef' "Box" [ ty ]
 pattern RBox     e  = RCallCon (RExprConRef "Box" "new") [ e ]
+
+rBox = RBox
 
 -- ** phantom data
 phantomField :: [Ident] -> Ty ()

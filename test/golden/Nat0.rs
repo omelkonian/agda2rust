@@ -1,4 +1,4 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
 
 #[derive(Debug)]
 pub enum Nat {
@@ -6,10 +6,10 @@ pub enum Nat {
   suc(Box<Nat>),
 }
 
-pub fn _Ֆ43Ֆ_(x0: Nat, x1: Nat) -> Nat {
-  match x0 {
-    Nat::zero() => x1,
-    Nat::suc(x2) => { let x2 = *x2; Nat::suc(Box::new(_Ֆ43Ֆ_(x2, x1))) },
+pub fn _Ֆ43Ֆ_(x: Nat, x0: Nat) -> Nat {
+  match x {
+    Nat::zero() => x0,
+    Nat::suc(x1) => { let x1 = *x1; Nat::suc(Box::new(_Ֆ43Ֆ_(x1, x0))) },
   }
 }
 

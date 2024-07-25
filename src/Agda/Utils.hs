@@ -4,16 +4,23 @@
 module Agda.Utils where
 
 import Control.Monad.IO.Class ( MonadIO )
+import Control.Monad ( filterM )
 import Control.Arrow ( first )
 
 import Data.List ( partition )
 import qualified Data.List.NonEmpty as NE ( fromList )
-import Data.Maybe ( isJust )
+import Data.Maybe ( isJust, isNothing )
 
 import Utils
 import Agda.Lib
 
+-- ** useful monad constraint kinds
+
+type MonadIOEnv m = (MonadIO m, MonadTCEnv m)
+type PureEnvTCM m = (PureTCM m, ReadTCState m, HasConstInfo m, MonadIOEnv m)
+
 -- ** pretty-printing
+
 pp :: Pretty a => a -> String
 pp = prettyShow
 
@@ -36,6 +43,7 @@ panic s t = error $
   where limit = take 500
 
 -- ** typechecking context
+
 currentCtx :: MonadTCEnv m => m [(String, Type)]
 currentCtx = fmap (first pp . unDom) <$> getContext
 
@@ -60,6 +68,7 @@ lookupCtxTy :: MonadTCEnv m => Int -> m Type
 lookupCtxTy i = (!! i) {-. reverse-} <$> currentCtxTys
 
 -- ** variables
+
 unqual :: QName -> String
 unqual = transcribe . pp . qnameName
 
@@ -67,29 +76,29 @@ qParent :: QName -> QName
 qParent =
   qnameFromList . NE.fromList . reverse . drop 1 . reverse . qnameToList0
 
-varPool :: [String]
-varPool = zipWith (<>) (repeat "x") (show <$> [0..])
+varPool :: String -> [String]
+varPool varName = zipWith (<>) (repeat varName) $ "" : (show <$> [0..])
 
-getVarPool :: MonadTCEnv m => m [String]
-getVarPool = do
-  xs <- currentCtxVars
-  return $ filter (`elem` xs) varPool
+freshVarInCtx :: MonadIOEnv m => String -> m String
+freshVarInCtx varName = freshVar varName' <$> currentCtxVars
+  where
+  varName' = if varName == "_" then "x" else varName
 
-freshVar :: [String] -> String
-freshVar xs = head $ dropWhile (`elem` xs) varPool
+  freshVar :: String -> [String] -> String
+  freshVar varName xs = head $ dropWhile (`elem` xs) (varPool varName)
 
-freshVarInCtx :: MonadTCEnv m => m String
-freshVarInCtx = freshVar <$> currentCtxVars
-
-freshVarsInCtx :: (MonadTCEnv m, MonadAddContext m) => Int -> m [String]
+freshVarsInCtx :: (MonadIOEnv m, MonadAddContext m) => Int -> m [String]
 freshVarsInCtx n | n < 0 = error $ "[freshVarsInCtx] negative number of variables"
 freshVarsInCtx 0 = return []
 freshVarsInCtx n = do
-  x <- freshVar <$> currentCtxVars
+  x <- freshVarInCtx "_"
   addContext [(x, defaultTy)] $
     (x :) <$> freshVarsInCtx (n - 1)
 
 -- ** arguments & visibility
+
+unElims :: [Elim] -> [Term]
+unElims = fmap unArg . argsFromElims
 
 hasQuantityNon0 :: LensQuantity a => a -> Bool
 hasQuantityNon0 = not . hasQuantity0
@@ -97,25 +106,21 @@ hasQuantityNon0 = not . hasQuantity0
 shouldKeep :: (LensQuantity a, LensHiding a) => a -> Bool
 shouldKeep = visible /\ hasQuantityNon0
 
-shouldKeepTyParam :: PureTCM m => Dom (ArgName, Type) -> m (Maybe ArgName)
+shouldKeepTyParam :: PureTCM m => TelItem -> m (Maybe ArgName)
 shouldKeepTyParam d@(unDom -> (x, ty)) = do
   isSrt <- isSortResTy ty
   return $ boolToMaybe (hasQuantityNon0 d && isSrt) x
 
-vArgs :: [Arg a] -> [a]
-vArgs = fmap unArg . filter shouldKeep
+shouldKeepTel :: PureTCM m => ListTel -> m ListTel
+shouldKeepTel = filterM (fmap isNothing . shouldKeepTyParam)
 
-vElims :: [Elim] -> [Term]
-vElims = vArgs . argsFromElims
+-- shouldKeepArgs :: [Arg a] -> [a]
+-- shouldKeepArgs = fmap unArg . filter shouldKeep
+
+-- shouldKeepElims :: [Elim] -> [Term]
+-- shouldKeepElims = shouldKeepArgs . argsFromElims
 
 isLevelTerm, isSortTerm :: Term -> Bool
--- isTyParam = \case
---   Var _ _   -> True
---   Def _ _   -> True
---   Con _ _ _ -> True
---   Pi _ _    -> True
---   Sort _    -> False
---   _         -> False
 isLevelTerm = \case
   Level _ -> True
   _       -> False
@@ -144,11 +149,49 @@ isSortM = \case
 --   Var n _ -> typeOfBV n
 --   Def n _ -> typeOfBV n
 
+erasedArity :: Type -> Int
+erasedArity t = case unEl t of
+  Pi a b -> (if hasQuantity0 a then 0 else 1) + erasedArity (unAbs b)
+  _      -> 0
+
+-- ** treeless terms
+
+defNameOfT :: TTerm -> Maybe QName
+defNameOfT = \case
+  TDef n -> Just n
+  TCon n -> Just n
+  -- TPrim n -> ??
+  -- TVar n -> ??
+  _ -> Nothing
+
 -- | Perform multiple η-expansions on a treeless term.
-etaExpandT :: Int -> TTerm -> TTerm
-etaExpandT n t = mkTLam n $ raise n t `mkTApp` map TVar (downFrom n)
+etaExpandT :: Int -> Int -> TTerm -> TTerm
+etaExpandT n k t = mkTLam nk $ raise nk t `mkTApp` map TVar (downFrom n)
+  where nk = max (n - k) 0 -- safeguard
 
 -- ** erasure
+
+data ClassifiedArg = TyParam ArgName | DroppedArg | KeptArg ArgName Type
+
+onlyKept, notTyParams :: [ClassifiedArg] -> [ClassifiedArg]
+onlyKept = filter \case {KeptArg{} -> True; _ -> False}
+notTyParams = filter (not . \case {TyParam{} -> False; _ -> True})
+
+type TelItem = Dom (ArgName, Type)
+type Tel     = [TelItem]
+
+classifyArg :: PureTCM m => TelItem -> m ClassifiedArg
+classifyArg d@(unDom -> (x, ty)) = do
+  isSrt <- isSortResTy ty
+  isLvl <- isLevelType ty
+  return $ if
+    | isSrt -> TyParam x
+    | isLvl || hasQuantity0 d -> DroppedArg
+    | otherwise -> KeptArg x ty
+
+classifyArgs :: PureTCM m => [TelItem] -> m [ClassifiedArg]
+classifyArgs = mapM classifyArg
+
 isErasedTTerm :: TTerm -> Bool
 isErasedTTerm = \case
   TErased -> True
@@ -159,13 +202,25 @@ isErasedTTerm = \case
 onlyNonErased :: [TTerm] -> [TTerm]
 onlyNonErased = filter (not . isErasedTTerm)
 
-isTyParam :: (ReadTCState m, HasConstInfo m, MonadTCEnv m) => TTerm -> m Bool
+isTyParam :: PureEnvTCM m => TTerm -> m Bool
 isTyParam = \case
   TDef n -> isSortTy <$> typeOfConst n
   TVar i -> isSortTy <$> lookupCtxTy i
-  _      -> pure False
+  TApp h _ -> do
+    -- report $ "  t (head): " <> pp t
+    isResTyParam h
+    -- return False
+    -- let ty = termFromTTerm tt
+    -- resTy t
+    where
+      isResTyParam = \case
+        TDef n -> isSortTy <$> (resTy =<< typeOfConst n)
+        TVar i -> isSortTy <$> (resTy =<< lookupCtxTy i)
+        _ -> pure False
+        -- t -> panic "result type parameter" t
+  _ -> return False
 
-separateTyParams :: (ReadTCState m, HasConstInfo m, MonadTCEnv m) => [TTerm] -> m ([TTerm], [TTerm])
+separateTyParams :: PureEnvTCM m  => [TTerm] -> m ([TTerm], [TTerm])
 separateTyParams = partitionM isTyParam
 
 -- ** types & telescopes
@@ -175,13 +230,23 @@ isDependentArrow ty = pp (domName ty) `notElem` ["_", "(nothing)"]
 typeFromTerm :: a -> Type'' Term a
 typeFromTerm = El (DummyS "???" :: Sort)
 
+elimFromTTerm :: TTerm -> Elim
+elimFromTTerm = elimFromTerm . termFromTTerm
+
+elimFromTerm :: Term -> Elim
+elimFromTerm = Apply . defaultArg
+
 termFromTTerm :: TTerm -> Term
 termFromTTerm = \case
   TVar n -> Var n []
   TDef qn -> Def qn []
   TLit lit -> Lit lit
   -- TCon qn ->
-  -- TApp tterm as -> Def qn
+  TApp t as -> let as' = elimFromTTerm <$> as in
+    case termFromTTerm t of
+      Var n [] -> Var n as'
+      Def qn [] -> Def qn as'
+      _ -> panic "treeless head" t
   t -> panic "tterm (to convert to term)" t
 
 typeFromTTerm :: TTerm -> Type
@@ -260,4 +325,12 @@ isRecordProjection d
   | otherwise
   = Nothing
 
-
+funCC :: (MonadTCM m, HasConstInfo m) => QName -> m CompiledClauses
+funCC q = do
+  def <- theDef <$> getConstInfo q
+  case def of
+    Function{..} -> do
+      case funCompiled of
+        Just cc -> return cc
+        Nothing -> panic "function clauses (not compiled yet)" def
+    _ -> panic "definition (not a function)" def

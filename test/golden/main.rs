@@ -1,13 +1,14 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
 
 mod Identity;
 mod Numbers;
 mod Simplification;
 mod Top;
+mod Newtype;
 mod Product;
 mod Either;
 mod Maybe;
-mod Exp;
+// mod Exp;
 mod Nat0;
 mod Nat;
 mod List0;
@@ -30,17 +31,23 @@ mod TypeAliases;
 mod OverloadedConstructors;
 mod OverloadedFields;
 mod ErasedFields;
+mod RecordFields;
 mod UnusedArgs;
+mod ExactSplit;
+mod OpenModule;
+// mod MultiArgFun;
+// mod PartialApp;
 
 fn main() {
   Identity::main();
   Numbers::main();
   Simplification::main();
   Top::main();
+  Newtype::main();
   Product::main();
   Either::main();
   Maybe::main();
-  Exp::main();
+//  Exp::main();
   Nat0::main();
   Nat::main();
   List0::main();
@@ -63,5 +70,10 @@ fn main() {
   OverloadedConstructors::main();
   OverloadedFields::main();
   ErasedFields::main();
+  RecordFields::main();
   UnusedArgs::main();
+  ExactSplit::main();
+  OpenModule::main();
+//  MultiArgFun::main();
+//  PartialApp::main();
 }

@@ -1,4 +1,4 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
 
 pub fn c4() -> char {
   '\u{01d7dc}'

@@ -23,7 +23,7 @@ instance (A.QName, A.Type) ~> R.Variant where
     report $ " as: " <> pp as
     RVariant (unqualR c) <$> goFs 1 ({-unDom <$> filter shouldKeep-} as)
     where
-      goFs :: Int -> [A.Dom (String, A.Type)] :~>* R.StructField
+      goFs :: Int -> Tel :~>* R.StructField
       goFs _ [] = return []
       -- goFs i ((x, ty):fs) =
       --   (:) <$> inArgument i (goF (x, ty))

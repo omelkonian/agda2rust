@@ -16,8 +16,20 @@ tested-with:
     GHC == 9.4.8
     GHC == 9.4.3
 
+common common-settings
+  hs-source-dirs: src
+  default-extensions:
+    LambdaCase RecordWildCards PatternSynonyms TupleSections
+    ViewPatterns PatternGuards
+    ScopedTypeVariables
+    TypeFamilies TypeOperators TypeApplications
+    FunctionalDependencies TypeSynonymInstances ConstraintKinds
+    DoAndIfThenElse BlockArguments MultiWayIf
+  build-depends:
+    base >= 4.10 && < 4.18
+
 executable agda2rust
-  hs-source-dirs:      src
+  import:              common-settings
   main-is:             Main.hs
   autogen-modules:     Paths_agda2rust
   other-modules:       Paths_agda2rust
@@ -43,16 +55,8 @@ executable agda2rust
                        Agda2Rust.Convert.FFI
                        Agda2Rust.Convert
                        Agda2Rust
-  default-extensions:
-    LambdaCase RecordWildCards PatternSynonyms TupleSections
-    ViewPatterns PatternGuards
-    ScopedTypeVariables
-    TypeFamilies TypeOperators TypeApplications
-    FunctionalDependencies TypeSynonymInstances ConstraintKinds
-    DoAndIfThenElse BlockArguments MultiWayIf
   ghc-options:         -rtsopts
-  build-depends:       base >= 4.10 && < 4.18,
-                       Agda >= 2.6.4 && < 2.6.5,
+  build-depends:       Agda >= 2.6.4 && < 2.6.5,
                        deepseq >= 1.4.4 && < 1.6,
                        text,
                        language-rust,
@@ -65,16 +69,23 @@ executable agda2rust
                        unicode-data,
                        syb
 
-executable rustp
-  hs-source-dirs:      src
-  main-is:             RustPrinter.hs
+executable rustPrint
+  import:              common-settings
+  main-is:             PrintRust.hs
   other-modules:       Rust.Lib
-  build-depends:       base >= 4.10 && < 4.18,
-                       language-rust,
+                       Rust.Utils
+                       Rust
+  build-depends:       language-rust,
+                       pretty-show,
+                       syb
+
+executable rustParse
+  import:              common-settings
+  main-is:             ParseRust.hs
+  other-modules:       Rust.Lib
+  build-depends:       language-rust,
                        pretty-show
 
 executable reUnicode
-  hs-source-dirs:      src
+  import:              common-settings
   main-is:             RustUnicode.hs
-  build-depends:       base >= 4.10 && < 4.18,
-

@@ -1,9 +1,11 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import Data.Maybe ( fromMaybe, catMaybes )
 import qualified Data.Map as M ( lookup )
 import Data.Function ( on )
 import Data.List ( sortBy, intercalate )
+import qualified Data.Text as T
 
 import Text.Read ( readMaybe )
 
@@ -152,7 +154,7 @@ getForeignRust
   . M.lookup "AGDA2RUST"
   . iForeignCode <$> curIF
 
-ignoredRustWarnings :: [String]
+ignoredRustWarnings, experimentRustFeatures :: [String]
 ignoredRustWarnings =
   [ "dead_code"
   , "non_snake_case"
@@ -162,6 +164,11 @@ ignoredRustWarnings =
   , "unreachable_patterns"
   -- , "uncommon_codepoints" -- only crate-level attribute
   ]
+experimentRustFeatures =
+  []
+  -- [ "type_alias_impl_trait"
+  -- , "impl_trait_in_fn_trait_return"
+  -- ]
 
 writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName
             -> [Maybe CompiledDef] -> TCM ModuleRes
@@ -171,8 +178,10 @@ writeModule opts _ _ m (catMaybes -> cdefs) = do
   let code    = renderCode (pragmas <> addNewLines cdefs)
       rustFn  = moduleNameToFileName m "rs"
       outFile = fromMaybe outDir (optOutDir opts) <> "/" <> rustFn
-      outS =  "#![allow(" <> intercalate "," ignoredRustWarnings <> ")]\n\n"
-           <> code
+      outS =  mkDirective "feature" experimentRustFeatures
+           <> mkDirective "allow" ignoredRustWarnings
+           <> "\n"
+           <> fixCode code
   runC0 $ report $ "\n************** MODULE: " <> rustFn <> " ***************\n"
         <> outS
         <> "************************************************************"
@@ -188,3 +197,11 @@ writeModule opts _ _ m (catMaybes -> cdefs) = do
     addNewLines :: [CompiledDef] -> [CompiledDef]
     addNewLines [] = []
     addNewLines (d:ds) = d : Ranged (rangeOf d) "" : addNewLines ds
+
+    mkDirective group items
+      | null items = ""
+      | otherwise  = "#![" <> group <> "(" <> intercalate "," items <> ")]\n"
+
+    -- c.f. test/RustPrintBug
+    fixCode :: String -> String
+    fixCode = T.unpack . T.replace " + {\n" " {\n" . T.pack

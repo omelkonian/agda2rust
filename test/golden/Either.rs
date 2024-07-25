@@ -1,14 +1,14 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
 
 pub enum Either<A, B> {
   Left(A),
   Right(B),
 }
 
-pub fn fromEither<A, B>(x0: A, x1: Either<A, B>) -> A {
-  match x1 {
-    Either::Left(x2) => x2,
-    Either::Right(x2) => x0,
+pub fn fromEither<A, B>(x: A, x0: Either<A, B>) -> A {
+  match x0 {
+    Either::Left(x1) => x1,
+    Either::Right(x1) => x,
   }
 }
 
@@ -17,17 +17,17 @@ pub enum OnlyLeft<A, B> {
   _Impossible(std::marker::PhantomData<(B,)>),
 }
 
-pub fn fromOnlyLeft<A, B>(x0: OnlyLeft<A, B>) -> A {
-  match x0 {
-    OnlyLeft::Left(x1) => x1,
+pub fn fromOnlyLeft<A, B>(x: OnlyLeft<A, B>) -> A {
+  match x {
+    OnlyLeft::Left(x0) => x0,
     _ => unreachable!(),
   }
 }
 
-pub fn fromOnlyLeft2<A, B, C>(x0: OnlyLeft<OnlyLeft<A, B>, C>) -> A {
-  match x0 {
-    OnlyLeft::Left(x1) => match x1 {
-      OnlyLeft::Left(x2) => x2,
+pub fn fromOnlyLeft2<A, B, C>(x: OnlyLeft<OnlyLeft<A, B>, C>) -> A {
+  match x {
+    OnlyLeft::Left(x0) => match x0 {
+      OnlyLeft::Left(x1) => x1,
       _ => unreachable!(),
     },
     _ => unreachable!(),
@@ -45,12 +45,12 @@ pub fn OnlyLeftR·left<A, B>(r: OnlyLeftR<A, B>) -> A {
   }
 }
 
-pub fn fromOnlyLeftR<A, B>(x0: OnlyLeftR<A, B>) -> A {
-  OnlyLeftR·left(x0)
+pub fn fromOnlyLeftR<A, B>(x: OnlyLeftR<A, B>) -> A {
+  OnlyLeftR·left(x)
 }
 
-pub fn fromOnlyLeftR2<A, B, C>(x0: OnlyLeftR<OnlyLeftR<A, B>, C>) -> A {
-  OnlyLeftR·left(OnlyLeftR·left(x0))
+pub fn fromOnlyLeftR2<A, B, C>(x: OnlyLeftR<OnlyLeftR<A, B>, C>) -> A {
+  OnlyLeftR·left(OnlyLeftR·left(x))
 }
 
 use std::marker::{PhantomData};

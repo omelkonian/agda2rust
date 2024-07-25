@@ -1,4 +1,4 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
 
 pub type Email = String;
 
@@ -10,9 +10,9 @@ pub enum User {
   mk(Email, Password, AccountNo),
 }
 
-pub fn accountNo(x0: User) -> i32 {
-  match x0 {
-    User::mk(x1, x2, x3) => x3,
+pub fn accountNo(x: User) -> i32 {
+  match x {
+    User::mk(x0, x1, x2) => x2,
   }
 }
 
@@ -32,9 +32,9 @@ pub enum Address {
   mk(Road, RoadNo, Town, Country),
 }
 
-pub fn roadNo(x0: Address) -> i32 {
-  match x0 {
-    Address::mk(x1, x2, x3, x4) => x2,
+pub fn roadNo(x: Address) -> i32 {
+  match x {
+    Address::mk(x0, x1, x2, x3) => x1,
   }
 }
 

@@ -17,6 +17,7 @@ testAliasF = incr 41
 
 Id : Set → Set
 Id A = A
+-- Id = λ A → A
 
 id : ∀ {A : Set} → Id A → Id A
 id x = x

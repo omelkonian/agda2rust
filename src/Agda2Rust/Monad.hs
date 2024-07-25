@@ -9,7 +9,7 @@ import qualified Data.Map as M ( Map, empty, insert, lookup )
 import Utils
 import Agda
   ( TCM, liftTCM, QName, ConHead(..), ifM
-  , unqual, vArgs, pp )
+  , unqual, pp )
 import Agda.Builtins ( isBuiltinDef )
 import Agda2Rust.Pragma ( PragmaQualifier )
 
@@ -25,8 +25,15 @@ runC0 = runC initState
 -- | Environment tracking which part of a definition we are currently compiling.
 data Env = Env
   { curDatatype    :: Maybe QName
+    -- ^ the datatype are we currently compiling
   , curConstructor :: Maybe QName
+    -- ^ the constructor (of the current datatype) are we currently compiling
   , curArgument    :: Int
+    -- ^ the argument (of the current constructor) are we currently compiling
+  , funIntroVars   :: Int
+    -- ^ the arity of the function we're currently compliling
+  , tyAlias        :: Bool
+    -- ^ whether we are currently compiling a type alias
   }
 
 initEnv :: Env
@@ -34,6 +41,8 @@ initEnv = Env
   { curDatatype    = Nothing
   , curConstructor = Nothing
   , curArgument    = 0
+  , funIntroVars   = 0
+  , tyAlias        = False
   }
 
 type QNameS   = String
@@ -53,6 +62,8 @@ data State = State
   , consts             :: S.Set QNameS
     -- ^ registers functions that should be treated as constants (via `const` or `static`)
     -- e.g. referring to them with `x` instead of `x()`
+  , arities            :: M.Map QNameS Int
+    -- ^ registers the arity of compiled functions (to later perform η-expansion)
   } deriving (Show, Read)
 
 initState :: State
@@ -62,6 +73,7 @@ initState = State
   , unusedTyParams     = M.empty
   , ffi                = M.empty
   , consts             = S.empty
+  , arities            = M.empty
   }
 
 inDatatype, inConstructor :: QName -> C a -> C a
@@ -77,6 +89,18 @@ inNonConstructor = local $ \e -> e
 inArgument :: Int -> C a -> C a
 inArgument n = local $ \e -> e
   { curArgument = n }
+
+inFunIntros :: Int -> C a -> C a
+inFunIntros n = local $ \e -> e
+  { funIntroVars = n }
+
+inNoFunIntros :: C a -> C a
+inNoFunIntros = local $ \e -> e
+  { funIntroVars = 0 }
+
+inTyAlias :: C a -> C a
+inTyAlias = local $ \e -> e
+  { tyAlias = True }
 
 nextArgument :: Int -> C a -> C a
 nextArgument n = local $ \e -> e
@@ -101,9 +125,9 @@ shouldBox = asks curConstructor >>= \case
   Nothing -> return False
   Just cn -> do
     i <- asks curArgument
-    report $ "* should box? " <> pp (cn, i)
+    -- report $ "* should box? " <> pp (cn, i)
     ret <- getBox (cn, i)
-    report $ if ret then " yes!" else " no!"
+    -- report $ if ret then " yes!" else " no!"
     return ret
 
 setRecordConstructor :: ConHead -> C ()
@@ -135,3 +159,10 @@ setConst qn = modify \s -> s
 
 isConst :: QName -> C Bool
 isConst qn = S.member (pp qn) . consts <$> get
+
+setArity :: QName -> Int -> C ()
+setArity qn n = modify \s -> s
+  { arities = M.insert (pp qn) n (arities s) }
+
+getArity :: QName -> C (Maybe Int)
+getArity qn = M.lookup (pp qn) . arities <$> get

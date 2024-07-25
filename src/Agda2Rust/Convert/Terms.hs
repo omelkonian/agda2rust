@@ -1,12 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Agda2Rust.Convert.Terms () where
 
-import Control.Monad ( (<=<), filterM )
+import Control.Monad ( (<=<), filterM, when )
 import Control.Monad.Error.Class ( MonadError(catchError) )
 import Control.Monad.State ( get )
+import Control.Monad.Reader ( asks )
 
-import Data.Maybe ( isJust, isNothing )
-import Data.List ( intercalate )
+import Data.Maybe ( isJust, isNothing, fromJust )
+import Data.List ( intercalate, splitAt )
 
 import Utils
 
@@ -28,44 +29,83 @@ import Agda2Rust.Convert.Types
 
 -- | Compiling (treeless) Agda terms into Rust expressions.
 instance A.TTerm ~> R.Expr where
-  go = \case
-    A.TVar i -> do
+  go t = do
+   -- report $ "* compiling tterm: " <> pp t
+   case t of
+    t0@(A.TVar i) -> do
       -- iTy <- lookupCtxTy i
-      -- report $ "* compiling variable: " <> pp i -- <> " : " <> pp iTy
+      -- report $ "* compiling variable: " <> pp i <> " : " <> pp iTy
       -- reportCurrentCtx
+      -- shouldEtaExpand <- do
+      --   ar <- arityOf t
+      --   return $ case ar of
+      --     Nothing  -> Nothing
+      --     Just arN -> if arN > 0 then Just arN else Nothing
+      -- case shouldEtaExpand of
+      --   Just etaN -> do
+      --     intros <- asks funIntroVars
+      --     inNoFunIntros $ go (etaExpandT etaN intros t0)
+      --   Nothing -> RExprRef . R.mkIdent <$> lookupCtxVar i
       RExprRef . R.mkIdent <$> lookupCtxVar i
     A.TLit l -> rLit <$> go l
     t@(A.TDef _)  -> go (A.TApp t [])
     t@(A.TCon _)  -> go (A.TApp t [])
-    t@(A.TPrim _) -> go (etaExpandT 2 t)
-    A.TApp t (onlyNonErased -> ts) -> do
+    t@(A.TPrim _) -> go (A.TApp t [])
+    t0@(A.TApp t (onlyNonErased -> ts)) -> do
       report $ " * compiling application: " <> pp t <> " $ " <> pp ts
       (cn, h) <- goHead t
       report $ "   cn: " <> pp cn
-      (ts', ps) <- separateTyParams ts `catchError` \_ -> pure (ts, [])
-      -- report $ "  ps: " <> pp ps
-      -- report $ "  ts': " <> pp ts'
-      ps' <- gos (typeFromTTerm <$> ps)
-      -- report $ "  ps': " <> show ps'
-      ts'' <- maybe inNonConstructor inConstructor cn $ gos ts'
-      -- report $ "  ts'': " <> ppR ts''
-      toBox <- shouldBox
-      return $ (if toBox then RBox else id) (h ps' ts'')
-    t0@(A.TLam t) -> do
+      (ts', ps) <- separateTyParams ts -- `catchError` \_ -> pure (ts, [])
+      report $ "  ps: " <> pp ps
+      report $ "  ts': " <> pp ts'
+      ar <- arityOf t
+      report $ "  arity: " <> pp ar
+      shouldEtaExpand <- do
+        return $ case ar of
+          Nothing  -> Nothing
+          Just arN -> if d > 0 then Just d else Nothing
+            where d = arN - length ts'
+      case shouldEtaExpand of
+        Just etaN -> do
+          report $ "  etaN: " <> pp etaN
+          intros <- asks funIntroVars
+          report $ "  intros: " <> pp intros
+
+          -- ctxLen <- length <$> currentCtx
+          -- let instVars = take 1 $ drop 1 $ A.downFrom ctxLen
+          -- inNoFunIntros $ go (etaExpandT etaN intros t0 `A.mkTApp` map A.TVar instVars)
+
+          inNoFunIntros $ go (etaExpandT etaN intros t0)
+        Nothing -> inNoFunIntros $ do
+          -- report $ "  ps: " <> pp ps
+          -- report $ "  ts': " <> pp ts'
+          ps' <- gos (typeFromTTerm <$> ps)
+          -- report $ "  ps': " <> show ps'
+          ts'' <- maybe inNonConstructor inConstructor cn $ gos ts'
+          -- report $ "  ts'': " <> ppR ts''
+          toBox <- shouldBox
+          return $ (if toBox then rBox else id) (h ps' ts'')
+{-
+    t0@(A.TLam t) {-| 0 `A.freeIn` t-} -> do
+      report $ " * compiling lambda term: " <> pp t0
+      x <- freshVarInCtx "x"
+      rMoveLam [R.mkIdent x] <$> A.addContext [(x, defaultTy)] (go t)
+-}
+    t0@(A.TLam t) -> inNoFunIntros $ do
       report $ " * compiling lambda term: " <> pp t0
       let (n, b) = A.tLamView t0
-      report $ "  n: " <> pp n
-      report $ "  b: " <> pp b
+      -- report $ "  n: " <> pp n
+      -- report $ "  b: " <> pp b
       xs <- freshVarsInCtx n
-      report $ "  xs: " <> pp xs
+      -- report $ "  xs: " <> pp xs
       rLam (R.mkIdent <$> xs) <$> A.addContext (zip xs $ repeat defaultTy) (go b)
     t0@(A.TLet t t') -> do
       report $ " * compiling let: " <> pp t0
-      x <- freshVarInCtx
+      x <- freshVarInCtx "_"
       e  <- go t
       e' <- A.addContext [(x, defaultTy)] $ go t'
       return $ rLet [(x, e)] e'
-    t@(A.TCase scrutinee A.CaseInfo{..} defCase alts) -> do
+    t@(A.TCase scrutinee A.CaseInfo{..} defCase alts) -> inNoFunIntros $ do
       report $ " * compiling case expression:\n" <> pp t
       ctx <- currentCtx
       report $ "  ctx: " <> pp ctx
@@ -77,7 +117,7 @@ instance A.TTerm ~> R.Expr where
         A.TError _ -> do
           -- report $ "  scrutineeTy: " <> pp ty
           shouldCatchAll <- case caseType of
-            A.CTData qn -> do
+            A.CTData qn ->
               (&&) <$> (isDataDef . A.theDef <$> A.getConstInfo qn)
                    <*> hasUnusedTyParams qn
             _ -> return False
@@ -85,13 +125,13 @@ instance A.TTerm ~> R.Expr where
         t -> do
           catchAll <- go t
           return [RArm RWildP catchAll]
-      return $ RMatch (RExprRef $ R.mkIdent x) (arms <> defArm)
+      return $ rMatch (RExprRef $ R.mkIdent x) (arms <> defArm)
 
     -- A.TUnit ->
     -- A.TSort ->
     -- A.TErased ->
+    -- A.TCoerce t -> go t
 
-    A.TCoerce t -> go t
     A.TError err -> do
       let msg = A.ppShow err
       return $ RMacroCall (RRef "panic") (RStrTok msg)
@@ -114,7 +154,7 @@ instance A.TTerm ~> R.Expr where
           rn <- getRid <$> A.getConstInfo qn
           -- toConst <- isNullary =<< A.typeOfConst qn
           -- return (Nothing, (if toConst then rCall else RCall) (unqualR qn))
-          return (Nothing, rCall' rn)
+          return (Nothing, \ts -> rCall' rn ts)
           where
           getRid :: A.Definition -> R.Ident
           getRid A.Defn{..}
@@ -177,6 +217,20 @@ instance A.TTerm ~> R.Expr where
       -- A.PSeq ->
       -- A.PITo64 ->
 
+    arityOf :: A.TTerm -> C (Maybe Int)
+    arityOf t = report ("  arityOf: " <> pp t) >> case t of
+      A.TDef n  -> getArity n
+      A.TCon n  -> getArity n
+      A.TPrim _ -> return $ Just 2 -- TODO: generalize this to 1/2/3
+      A.TVar i  -> Just . erasedArity <$> lookupCtxTy i
+      -- A.TApp t ts -> do
+      --   (ts, _) <- separateTyParams ts
+      --   headAr <- arityOf t
+      --   let ar = headAr - length ts
+      --   when (ar < 0) $ error "[arityOf] negative arity!"
+      --   return ar
+      _ -> panic "tterm [arityOf]" t
+
 -- | Compiling match clauses into case expressions.
 instance A.TAlt ~> R.Arm where
   go = \case
@@ -188,27 +242,30 @@ instance A.TAlt ~> R.Arm where
       -- report $ "  isRec: " <> pp isRec
       isBlt <- isBuiltinTerm con
       if isRec then do
-        -- compiling match on a record/struct value
+        -- * compiling match on a record/struct value
         path <- parentQualR con
         -- report $ "  path: " <> ppR path
         (_, vas, _) <- viewTy =<< A.typeOfConst con
         vas' <- populateArgNames vas
         -- report $ "  vas': " <> pp vas'
+        let fs = transcribe . fst . A.unDom <$> filter hasQuantityNon0 (take n vas)
         let xs = transcribe . fst . A.unDom <$> filter hasQuantityNon0 (take n vas')
         Just (qn, _) <- A.isRecordConstructor con
         hasPhantomField <- hasUnusedTyParams qn
+        -- TODO: hygienic handling of hardcoded string "_phantom"
+        let pfs  = R.mkIdent <$> fs <> ["_phantom" | hasPhantomField]
         let pats = RId . R.mkIdent <$> xs <> ["_phantom" | hasPhantomField]
         -- report $ "  pat: " <> pp con <> "(" <> show n <> ")"
         --       <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
         body'  <- A.addContext vas' (go body)
         -- report $ "  body: " <> pp body <> " ~> " <> ppR body'
-        return $ RArm (RStructP path (RNoFieldP <$> pats)) body'
+        return $ RArm (RStructP path (uncurry rFieldP <$> zip pfs pats)) body'
       else case isBlt of
-        -- compiling match on builtin value
+        -- * compiling match on builtin value
         Just bltE -> do
           body' <- go body
           return $ RArm (RLitP $ compileBuiltinTerm bltE) body'
-        -- compiling match on a data/enum value
+        -- * compiling match on a data/enum value
         Nothing -> do
           path <- qualR con
           (_, vas, _) <- viewTy =<< A.typeOfConst con
@@ -223,13 +280,10 @@ instance A.TAlt ~> R.Arm where
       where
       populateArgNames :: A.ListTel -> C (A.ListTel)
       populateArgNames [] = return []
-      populateArgNames (d@(A.unDom -> (x, ty)):tel)
-        | "_" <- x
-        = do x' <- freshVarInCtx
-             let d' = d {A.unDom = (x', ty)}
-             (d' :) <$> A.addContext d' (populateArgNames tel)
-        | otherwise
-        = (d :) <$> populateArgNames tel
+      populateArgNames (d@(A.unDom -> (x, ty)):tel) = do
+        x' <- freshVarInCtx x
+        let d' = d {A.unDom = (x', ty)}
+        (d' :) <$> A.addContext d' (populateArgNames tel)
 
       unboxPats :: A.QName -> Int -> [String] -> R.Expr () :~> R.Expr
       unboxPats con n xs e = inConstructor con $ do

@@ -1,4 +1,4 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
 
 pub type ℕ = i32;
 
@@ -8,18 +8,18 @@ pub fn testAlias() -> ℕ {
 
 pub type ℕՖ8594Ֆℕ = fn(_: ℕ) -> ℕ;
 
-pub fn incr(x0: ℕ) -> ℕ {
-  1 + x0
+pub fn incr(x: ℕ) -> ℕ {
+  1 + x
 }
 
 pub fn testAliasF() -> ℕ {
   incr(41)
 }
 
-pub type Id<  A,> = A;
+pub type Id<A> = A;
 
-pub fn id<  A,>(x0: Id<A>) -> Id<A> {
-  x0
+pub fn id<A>(x: Id<A>) -> Id<A> {
+  x
 }
 
 pub fn main () {

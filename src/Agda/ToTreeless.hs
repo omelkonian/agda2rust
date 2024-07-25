@@ -37,6 +37,7 @@ import Agda.TypeChecking.Pretty
 import Agda.TypeChecking.Records (getRecordConstructor)
 import Agda.TypeChecking.Reduce
 import Agda.TypeChecking.Substitute
+import Agda.TypeChecking.Functions (etaExpandClause)
 
 import Agda.Compiler.Treeless.AsPatterns
 import Agda.Compiler.Treeless.Builtin
@@ -66,7 +67,8 @@ getCompiledClauses :: QName -> TCM CC.CompiledClauses
 getCompiledClauses q = do
   def <- getConstInfo q
   let cs = defClauses def
-      isProj | Function{ funProjection = Right x } <- theDef def = isJust (projProper x)
+  -- cs <- mapM etaExpandClause cs
+  let isProj | Function{ funProjection = Right x } <- theDef def = isJust (projProper x)
              | otherwise = False
       translate | isProj    = CC.DontRunRecordPatternTranslation
                 | otherwise = CC.RunRecordPatternTranslation

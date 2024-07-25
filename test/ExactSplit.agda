@@ -10,6 +10,7 @@ data Nat : Set where
 min : Nat → Nat → Nat
 min zero    _       = zero
 min _       zero    = zero
+-- min (suc _) zero    = zero
 min (suc n) (suc m) = min n m
 
 {-# FOREIGN AGDA2RUST

@@ -1,4 +1,4 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
 
 pub struct _Ֆ215Ֆ_<A, B> {
   pub projՖ8321Ֆ: A,
@@ -17,26 +17,26 @@ pub fn _Ֆ215Ֆ_·projՖ8322Ֆ<A, B>(r: _Ֆ215Ֆ_<A, B>) -> B {
   }
 }
 
-pub fn mapFst<A, C, B>(x0: fn(_: A) -> C, x1: _Ֆ215Ֆ_<A, B>) -> _Ֆ215Ֆ_<C, B> {
-  match x1 {
+pub fn mapFst<A, C, B>(x: impl Fn(A) -> C, x0: _Ֆ215Ֆ_<A, B>) -> _Ֆ215Ֆ_<C, B> {
+  match x0 {
     _Ֆ215Ֆ_ { projՖ8321Ֆ, projՖ8322Ֆ } => _Ֆ215Ֆ_ {
-      projՖ8321Ֆ: x0(projՖ8321Ֆ),
+      projՖ8321Ֆ: x(projՖ8321Ֆ),
       projՖ8322Ֆ: projՖ8322Ֆ,
     },
   }
 }
 
-pub fn mapSnd<B, C, A>(x0: fn(_: B) -> C, x1: _Ֆ215Ֆ_<A, B>) -> _Ֆ215Ֆ_<A, C> {
-  match x1 {
+pub fn mapSnd<B, C, A>(x: impl Fn(B) -> C, x0: _Ֆ215Ֆ_<A, B>) -> _Ֆ215Ֆ_<A, C> {
+  match x0 {
     _Ֆ215Ֆ_ { projՖ8321Ֆ, projՖ8322Ֆ } => _Ֆ215Ֆ_ {
       projՖ8321Ֆ: projՖ8321Ֆ,
-      projՖ8322Ֆ: x0(projՖ8322Ֆ),
+      projՖ8322Ֆ: x(projՖ8322Ֆ),
     },
   }
 }
 
-pub fn fst<A, B>(x0: _Ֆ215Ֆ_<A, B>) -> A {
-  _Ֆ215Ֆ_·projՖ8321Ֆ(x0)
+pub fn fst<A, B>(x: _Ֆ215Ֆ_<A, B>) -> A {
+  _Ֆ215Ֆ_·projՖ8321Ֆ(x)
 }
 
 pub fn main() {

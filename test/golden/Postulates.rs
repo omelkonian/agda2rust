@@ -1,21 +1,21 @@
-#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals)]
+#![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
 
-pub const fn TODO<  A,>() -> A {
+pub const fn TODO<A>() -> A {
   panic!("POSTULATE")
 }
 
-pub const fn max(x0: i32) -> i32 {
+pub const fn max(x: i32) -> i32 {
   TODO()
 }
 
-pub const testMax: i32 = { let x0 = 0; match x0 { 0 => 42, _ => max(42) } };
+pub const testMax: i32 = { let x = 0; match x { 0 => 42, _ => max(42) } };
 
 pub fn getTestMax() -> i32 {
   testMax
 }
 
-pub fn idKey(x0: u64) -> u64 {
-  x0
+pub fn idKey(x: u64) -> u64 {
+  x
 }
 
 fn getDefaultKey() -> u64 {

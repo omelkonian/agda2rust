@@ -26,7 +26,7 @@ pub fn main() {
     add_answer(0),
     add(40, 2),
     add3(40, 1, 1),
-    add3b(40, 1, 1)
+    add3b(40, 1, 1),
   );
 }
 #-}

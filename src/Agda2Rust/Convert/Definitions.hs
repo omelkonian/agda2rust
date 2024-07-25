@@ -1,14 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Agda2Rust.Convert.Definitions (RDef(..)) where
 
-import Control.Monad ( forM, when )
+import Control.Monad ( forM, when, filterM, (>=>) )
 import Control.Arrow ( second )
 import Data.Maybe ( isJust )
 
 import Utils
 
 import qualified Agda as A
-import Agda.Lib ( TCM, liftTCM, mapMaybeM )
+import Agda.Lib ( TCM, liftTCM, mapMaybeM, (^.), funInline )
 import Agda.Utils
 import Agda.Builtins ( isBuiltinDef )
 
@@ -37,6 +37,8 @@ ignoreDef d@A.Defn{..} = do
     _ | A.hasQuantity0 d -> True
     -- ** ignore functions that are @0/pattern-lambdas/with-generated
     A.Function{..} | {-funErasure ||-} isJust funExtLam || isJust funWith -> True
+    -- ** ignore inlined functions (arising from instantiated modules)
+    A.Function{..} | theDef ^. funInline -> True
     -- ** ignored these kind of definitions
     A.Constructor{..} {-| conErasure-} -> True
     A.Primitive{..} -> True
@@ -87,12 +89,13 @@ instance A.Definition ~> RDef where
 
       d | Just (FFI _ _) <- pragma ->
         panic "pragma (can only register FFI for postulates)" (pp defName)
+        -- TODO: allow FFI for defined things
 
       -- ** postulates
       A.Axiom{..} -> do
         report " compiling postulate with `panic!`"
         (tel, resTy) <- telListView defType
-        CompileDef <$> goFn pragma (return $ rPanic "POSTULATE") (tel, resTy)
+        CompileDef <$> goFn pragma 0 (\_ -> return $ rPanic "POSTULATE") (tel, resTy)
 
       -- ** type aliases
       A.Function{..}
@@ -100,7 +103,7 @@ instance A.Definition ~> RDef where
         , [A.Clause{..}] <- funClauses
         , Just t <- clauseBody
         , Nothing <- pragma
-        -> do
+        -> inTyAlias $ do
         report " compiling type alias"
         params <- fmap rTyParam <$> mapMaybeM shouldKeepTyParam (A.telToList clauseTel)
         body   <- A.addContext clauseTel $ go (typeFromTerm t)
@@ -112,34 +115,65 @@ instance A.Definition ~> RDef where
       --   return undefined
 
       -- ** functions
-      -- A.Function{..} | d ^. funInline
       A.Function{..} -> do
         report " compiling function"
         -- report $ " pragma: " <> show pragma
         when (any isNoFFI pragma) $
           setConst defName
+        -- cc <- funCC defName
+        -- report $ " cc: " <> pp cc
         tdef <- liftTCM $ A.toTreeless defName
         report $ " tdef: " <> pp tdef
-        let (tterm, introVars) = stripTopTLams tdef
+        telV0 <- telListView defType
+        report $ " telV0: " <> pp telV0
+        let (intros, tterm) = A.tLamView tdef
+        report $ " intros: " <> pp intros
+        -- telV <- telListViewUpTo (length (fst telV0) - intros) defType
+        telV <- telListViewUpTo (length (fst telV0)) defType
+        report $ " telV: " <> pp telV
+        CompileDef <$> goFn pragma undefined (\_ -> go tterm) telV
+{-
+        let (intros, tterm) = A.tLamView tdef
+        -- report $ " intros: " <> pp intros
         -- report $ " tterm: " <> pp tterm
-        -- report $ " intros: " <> pp introVars
-        (tel0, _) <- telListView defType
-        -- report $ " tel0: " <> pp tel0
-        intros <- calculateIntros introVars tel0
-        (tel, resTy) <- telListViewUpTo intros defType
+        telV@(tel, _) <- telListView defType
         -- report $ " tel: " <> pp tel
+        ctel <- classifyArgs tel
+        let telIntros = length (notTyParams ctel)
+        -- report $ " telIntros: " <> pp telIntros
+        let newIntros = telIntros - intros
+        -- report $ " newIntros: " <> pp newIntros
+        CompileDef <$> goFn pragma intros (\_ -> go $ A.raise 0 tterm) telV
+-}
+{-
+        report $ " intros: " <> pp intros
+        telV@(tel, resTy) <- telListView defType
+        report $ " tel: " <> pp tel
         -- report $ " resTy: " <> pp resTy
-        let tterm' = tterm
-        -- let (tterm', _) = stripTopTLams $ etaExpandT (length tel - intros) tterm
-        CompileDef <$> goFn pragma (go tterm') (tel, resTy)
-        where
-        stripTopTLams :: A.TTerm -> (A.TTerm, Int)
-        stripTopTLams = \case
-          A.TLam t -> second (+ 1) (stripTopTLams t)
-          t        -> (t, 0)
 
-        calculateIntros :: Int -> A.ListTel -> C Int
-        calculateIntros _ tel = return (length tel)
+        -- intros <- calculateIntros introVars tel0
+        -- (tel, resTy) <- telListViewUpTo intros defType
+
+        -- telIntros <- length <$> filterM (fmap not . isTyParam) tel
+        -- let telIntros = length $ filter hasQuantityNon0 tel
+        -- let telIntros = length tel
+        tel1 <- shouldKeepTel tel
+        report $ " tel1: " <> pp tel1
+        let telIntros = length tel1
+        let newIntros = telIntros - intros
+        report $ " newIntros: " <> pp newIntros
+        when (newIntros < 0) $ error "newIntros is negative!"
+
+        let tterm' = A.raise newIntros tterm
+        -- let tterm' = tterm
+        report $ " tterm': " <> pp tterm'
+        -- let (tterm', _) = stripTopTLams $ etaExpandT newIntros tterm
+
+        CompileDef <$> goFn pragma (inFunIntros newIntros $ go tterm') telV
+-}
+        where
+        -- calculateIntros :: Int -> A.ListTel -> C Int
+        -- calculateIntros _ tel = return (length tel)
         -- calculateIntros n _ = return n
         -- calculateIntros = go 0
         --   where
@@ -199,11 +233,10 @@ instance A.Definition ~> RDef where
         let unusedParams = filter (unusedIn fields) params
         setUnusedTyParams defName (ppR <$> unusedParams)
         return $ CompileDef $ RStruct dx (RTyParam <$> params) (fields <>
+          -- TODO: hygienic handling of hardcoded string "_phantom"
           [ RNamedField "_phantom" (phantomField unusedParams)
           | not (null unusedParams)
           ])
-
-
         where
         goFs :: [(String, A.Type)] :~>* R.StructField
         goFs [] = return []
@@ -217,48 +250,46 @@ instance A.Definition ~> RDef where
       d -> panic "definition" d
 
     -- ** helper for functions and axioms
-    goFn :: Maybe Pragma -> C (R.Expr ()) -> (A.ListTel, A.Type) -> C (R.Item ())
-    goFn pragma goBody acc = do
-      (ps, as, resTy, body) <- goFn' acc
+    goFn :: Maybe Pragma -> Int -> (Int -> C (R.Expr ())) -> (A.ListTel, A.Type) -> C (R.Item ())
+    goFn pragma intros goBody acc = do
+      (ps, as, resTy, body) <- goFn' 0 acc
+      report $ "ps: " <> pp ps
       let mkFn | ConstNoFFI <- pragma{-, null as-} = RConstFn
                | otherwise = RFn
-      return $ if
-        | ConstNoFFI <- pragma, null ps, null as
-        -> RConst dx resTy body
-        | StaticNoFFI <- pragma, null ps, null as
-        -> RStatic dx resTy body
-        | otherwise
-        -> mkFn dx (rTyParam <$> ps) (RFnTy as resTy) (RBlock body)
+      if | ConstNoFFI <- pragma, null ps, null as
+         -> return $ RConst dx resTy body
+         | StaticNoFFI <- pragma, null ps, null as
+         -> return $ RStatic dx resTy body
+         | otherwise
+         -> do setArity defName (length as)
+               return $ mkFn dx (rTyParam <$> ps) (mkFnDeclTy as resTy) (RBlock body)
       where
-      goFn' :: (A.ListTel, A.Type) -> C ([String], [R.Arg ()], R.Ty (), R.Expr ())
-      goFn' (d:tel, resTy) = do
+      goFn' :: Int -> (A.ListTel, A.Type) -> C ([String], [R.Arg ()], R.Ty (), R.Expr ())
+      goFn' allIntros (d:tel, resTy) = do
         -- report $ "_telArg: " <> pp d
         d' <- renameTelArg d
         -- report $ "_telArg': " <> pp d'
         (ps0, as0) <- goTelArg d'
-        (ps, as, resTy, body) <- A.addContext d' (goFn' (tel, resTy))
+        -- report $ "ps0: " <> pp ps0
+        -- report $ "as0: " <> A.ppShow as0
+        (ps, as, resTy, body) <- A.addContext d' (goFn' (allIntros + length as0) (tel, resTy))
         return $ (ps0 <> ps, as0 <> as, resTy, body)
-      goFn' ([], resTy) = do
+      goFn' allIntros ([], resTy) = do
         resTy' <- go resTy
-        body <- goBody
+        {-
+        let newIntros = max (allIntros - intros) 0
+        body <- inFunIntros newIntros $ goBody newIntros
+        -}
+        body <- goBody undefined
         return ([], [], resTy', body)
 
-      goTelArg :: A.Dom (String, A.Type) -> C ([String], [R.Arg ()])
-      goTelArg d@(A.unDom -> (x, ty)) = do
-        -- let isSrt = isSortTy ty
-        isSrt <- isSortResTy ty
-        isLvl <- A.isLevelType ty
-        let shouldDrop = isLvl || A.hasQuantity0 d
-        if isSrt then
-          return ([x], [])
-        else do
-          ty' <- go ty
-          return ([], [RArg (R.mkIdent x) ty' | not shouldDrop])
+      goTelArg :: TelItem -> C ([String], [R.Arg ()])
+      goTelArg = classifyArg >=> \case
+        TyParam x -> return ([x], [])
+        DroppedArg -> return ([], [])
+        KeptArg x ty -> go ty >>= \ty' -> return ([], [RArg (R.mkIdent x) ty'])
 
-      renameTelArg :: A.Dom (String, A.Type) -> C (A.Dom (String, A.Type))
-      renameTelArg d@(A.unDom -> (x, ty))
-        | "_" <- x
-        = do x' <- freshVarInCtx
-             return $ d {A.unDom = (x', ty)}
-        | otherwise
-        = return d
+      renameTelArg :: TelItem -> C TelItem
+      renameTelArg d@(A.unDom -> (x, ty)) = do
+        x' <- freshVarInCtx x
+        return $ d {A.unDom = (x', ty)}

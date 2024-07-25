@@ -2,10 +2,11 @@ import Identity
 import Numbers
 import Simplification
 import Top
+import Newtype
 import Product
 import Either
 import Maybe
-import Exp
+-- import Exp
 import Nat0
 import Nat
 import List0
@@ -28,18 +29,25 @@ import TypeAliases
 import OverloadedConstructors
 import OverloadedFields
 import ErasedFields
+import RecordFields
 import UnusedArgs
 import ExactSplit
+import OpenModule
+-- import MultiArgFun
+-- import PartialApp
+-- import PartialApp2
+-- import PartialApp3
 
 {-# FOREIGN AGDA2RUST
 mod Identity;
 mod Numbers;
 mod Simplification;
 mod Top;
+mod Newtype;
 mod Product;
 mod Either;
 mod Maybe;
-mod Exp;
+// mod Exp;
 mod Nat0;
 mod Nat;
 mod List0;
@@ -62,18 +70,23 @@ mod TypeAliases;
 mod OverloadedConstructors;
 mod OverloadedFields;
 mod ErasedFields;
+mod RecordFields;
 mod UnusedArgs;
 mod ExactSplit;
+mod OpenModule;
+// mod MultiArgFun;
+// mod PartialApp;
 
 fn main() {
   Identity::main();
   Numbers::main();
   Simplification::main();
   Top::main();
+  Newtype::main();
   Product::main();
   Either::main();
   Maybe::main();
-  Exp::main();
+//  Exp::main();
   Nat0::main();
   Nat::main();
   List0::main();
@@ -96,7 +109,11 @@ fn main() {
   OverloadedConstructors::main();
   OverloadedFields::main();
   ErasedFields::main();
+  RecordFields::main();
   UnusedArgs::main();
   ExactSplit::main();
+  OpenModule::main();
+//  MultiArgFun::main();
+//  PartialApp::main();
 }
 #-}

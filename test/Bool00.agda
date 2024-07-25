@@ -30,12 +30,20 @@ toNonZero x with isZero x
 ... | true  = 1
 ... | false = x
 
+if_then_else_ : ∀ {A : Set} → Bool → A → A → A
+if true  then t else _ = t
+if false then _ else f = f
+
+testIte : Nat
+testIte = if true then 42 else 0
+
 {-# FOREIGN AGDA2RUST
 pub fn main () {
-  println!("{}:\t\t\t {} | {} | {}", module_path!(),
+  println!("{}:\t\t\t {} | {} | {} | {}", module_path!(),
     bool2Nat(testBool()),
     bool2Nat(isZero(5)),
     toNonZero(42),
+    testIte(),
   );
 }
 #-}

@@ -22,7 +22,7 @@ import Agda2Rust.Convert.FFI ( compileFFITy )
 -- | Compiling types.
 instance A.Type ~> R.Ty where
   go ty = asks curDatatype >>= \curD -> do
-    report $ " ** compiling type: " <> pp ty
+    -- report $ " ** compiling type: " <> pp ty
     -- typeT <- liftTCM $ A.closedTermToTreeless A.LazyEvaluation (unEl ty)
     -- report $ " type (treeless): " <> pp typeT
     case A.unEl ty of
@@ -47,22 +47,24 @@ instance A.Type ~> R.Ty where
             <$> gos (typeFromTerm . A.unArg . snd <$> as)
 
       -- ** function types
-      A.Pi a b ->
+      A.Pi a@(A.unDom -> ty) b@(A.unAbs -> b') -> do
+        insideTyAlias <- asks tyAlias
+        let mkFn = if insideTyAlias then rBareFn (R.mkIdent x) else rImplFn
+            -- ^ use bare functions due to limitations in type aliases
+            --   c.f. https://github.com/rust-lang/rust/issues/63063
+            x    = A.bareNameWithDefault (A.absName b) (A.domName a)
+            ctx  = if isDependentArrow a then A.addContext [(x, a)] else id
         if A.hasQuantity0 a then
-          ctx (go $ A.unAbs b)
+          ctx (go b')
         else
-          rBareFn (R.mkIdent x) <$> go (A.unDom a) <*> ctx (go $ A.unAbs b)
-        where
-          x   = A.bareNameWithDefault (A.absName b) (A.domName a)
-          ctx = if isDependentArrow a then A.addContext [(x, a)] else id
+          mkFn <$> go ty <*> ctx (go b')
 
       -- ** variables
-      A.Var i es -> do
-        ctx <- currentCtx
+      A.Var i _ -> do
+        -- ctx <- currentCtx
         -- report $ "  ctx: " <> pp ctx
         x <- lookupCtxVar i
         -- report $ "  ctx[" <> pp i <> "]: " <> pp x
-        -- es' <- traverse go (vArgs es)
         return $ RTyRef (R.mkIdent x)
 
       -- ** type lambdas
