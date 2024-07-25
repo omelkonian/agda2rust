@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>RecordFields</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Keyword">open</a> <a id="6" class="Keyword">import</a> <a id="13" href="Agda.Primitive.html" class="Module">Agda.Primitive</a> <a id="28" class="Keyword">using</a> <a id="34" class="Symbol">(</a><a id="35" href="Agda.Primitive.html#742" class="Postulate">Level</a><a id="40" class="Symbol">)</a>
+<a id="42" class="Keyword">open</a> <a id="47" class="Keyword">import</a> <a id="54" href="Agda.Builtin.Nat.html" class="Module">Agda.Builtin.Nat</a> <a id="71" class="Keyword">using</a> <a id="77" class="Symbol">(</a><a id="78" href="Agda.Builtin.Nat.html#234" class="InductiveConstructor">suc</a><a id="81" class="Symbol">;</a> <a id="83" href="Agda.Builtin.Nat.html#336" class="Primitive Operator">_+_</a><a id="86" class="Symbol">)</a> <a id="88" class="Keyword">renaming</a> <a id="97" class="Symbol">(</a><a id="98" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a> <a id="102" class="Symbol">to</a> <a id="105" class="Datatype">ℕ</a><a id="106" class="Symbol">)</a>
+<a id="108" class="Comment">-- open import Agda.Builtin.Int using () renaming (Int to ℤ)</a>
+<a id="169" class="Comment">-- open import Agda.Builtin.String using (String)</a>
+
+<a id="220" class="Keyword">private</a> <a id="228" class="Keyword">variable</a>
+  <a id="239" href="RecordFields.html#239" class="Generalizable">ℓ</a> <a id="241" class="Symbol">:</a> <a id="243" href="Agda.Primitive.html#742" class="Postulate">Level</a>
+  <a id="251" href="RecordFields.html#251" class="Generalizable">A</a> <a id="253" class="Symbol">:</a> <a id="255" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="259" href="RecordFields.html#239" class="Generalizable">ℓ</a>
+
+<a id="262" class="Keyword">data</a> <a id="Wrap"></a><a id="267" href="RecordFields.html#267" class="Datatype">Wrap</a> <a id="272" class="Symbol">{</a><a id="273" href="RecordFields.html#273" class="Bound">ℓ</a><a id="274" class="Symbol">}</a> <a id="276" class="Symbol">(</a><a id="277" href="RecordFields.html#277" class="Bound">A</a> <a id="279" class="Symbol">:</a> <a id="281" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="285" href="RecordFields.html#273" class="Bound">ℓ</a><a id="286" class="Symbol">)</a> <a id="288" class="Symbol">:</a> <a id="290" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="294" href="RecordFields.html#273" class="Bound">ℓ</a> <a id="296" class="Keyword">where</a>
+  <a id="Wrap.mk"></a><a id="304" href="RecordFields.html#304" class="InductiveConstructor">mk</a> <a id="307" class="Symbol">:</a> <a id="309" href="RecordFields.html#277" class="Bound">A</a> <a id="311" class="Symbol">→</a> <a id="313" href="RecordFields.html#267" class="Datatype">Wrap</a> <a id="318" href="RecordFields.html#277" class="Bound">A</a>
+
+<a id="unmk"></a><a id="321" href="RecordFields.html#321" class="Function">unmk</a> <a id="326" class="Symbol">:</a> <a id="328" href="RecordFields.html#267" class="Datatype">Wrap</a> <a id="333" href="RecordFields.html#251" class="Generalizable">A</a> <a id="335" class="Symbol">→</a> <a id="337" href="RecordFields.html#251" class="Generalizable">A</a>
+<a id="339" href="RecordFields.html#321" class="Function">unmk</a> <a id="344" class="Symbol">(</a><a id="345" href="RecordFields.html#304" class="InductiveConstructor">mk</a> <a id="348" href="RecordFields.html#348" class="Bound">a</a><a id="349" class="Symbol">)</a> <a id="351" class="Symbol">=</a> <a id="353" href="RecordFields.html#348" class="Bound">a</a>
+
+<a id="356" class="Keyword">record</a> <a id="Point"></a><a id="363" href="RecordFields.html#363" class="Record">Point</a> <a id="369" class="Symbol">:</a> <a id="371" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="375" class="Keyword">where</a>
+  <a id="383" class="Keyword">field</a> <a id="Point.slot"></a><a id="389" href="RecordFields.html#389" class="Field">slot</a>      <a id="399" class="Symbol">:</a> <a id="401" href="RecordFields.html#267" class="Datatype">Wrap</a> <a id="406" href="RecordFields.html#105" class="Datatype">ℕ</a>
+        <a id="Point.blockHash"></a><a id="416" href="RecordFields.html#416" class="Field">blockHash</a> <a id="426" class="Symbol">:</a> <a id="428" href="RecordFields.html#105" class="Datatype">ℕ</a>
+<a id="430" class="Keyword">open</a> <a id="435" href="RecordFields.html#363" class="Module">Point</a> <a id="441" class="Keyword">public</a>
+
+<a id="matchPoint"></a><a id="449" href="RecordFields.html#449" class="Function">matchPoint</a> <a id="460" class="Symbol">:</a> <a id="462" href="RecordFields.html#363" class="Record">Point</a> <a id="468" class="Symbol">→</a> <a id="470" href="RecordFields.html#105" class="Datatype">ℕ</a>
+<a id="472" href="RecordFields.html#449" class="Function">matchPoint</a> <a id="483" class="Keyword">record</a> <a id="490" class="Symbol">{</a><a id="491" href="RecordFields.html#389" class="Field">slot</a> <a id="496" class="Symbol">=</a> <a id="498" href="RecordFields.html#304" class="InductiveConstructor">mk</a> <a id="501" href="RecordFields.html#501" class="Bound">n</a><a id="502" class="Symbol">}</a> <a id="504" class="Symbol">=</a> <a id="506" href="RecordFields.html#501" class="Bound">n</a>
+
+<a id="exPoint"></a><a id="509" href="RecordFields.html#509" class="Function">exPoint</a> <a id="517" class="Symbol">:</a> <a id="519" href="RecordFields.html#363" class="Record">Point</a>
+<a id="525" href="RecordFields.html#509" class="Function">exPoint</a> <a id="533" class="Symbol">.</a><a id="534" href="RecordFields.html#389" class="Field">slot</a>      <a id="544" class="Symbol">=</a> <a id="546" href="RecordFields.html#304" class="InductiveConstructor">mk</a> <a id="549" class="Number">42</a>
+<a id="552" href="RecordFields.html#509" class="Function">exPoint</a> <a id="560" class="Symbol">.</a><a id="561" href="RecordFields.html#416" class="Field">blockHash</a> <a id="571" class="Symbol">=</a> <a id="573" class="Number">0</a>
+
+<a id="Hash"></a><a id="576" href="RecordFields.html#576" class="Function">Hash</a> <a id="581" class="Symbol">=</a> <a id="583" href="RecordFields.html#105" class="Datatype">ℕ</a>
+
+<a id="586" class="Symbol">{-#</a> <a id="590" class="Keyword">FOREIGN</a> <a id="598" class="Pragma">AGDA2RUST</a>
+<a id="608" class="Pragma">#[derive(Default)]</a>
+<a id="627" class="Symbol">#-}</a>
+<a id="631" class="Keyword">record</a> <a id="Header"></a><a id="638" href="RecordFields.html#638" class="Record">Header</a> <a id="645" class="Symbol">:</a> <a id="647" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="651" class="Keyword">where</a>
+  <a id="659" class="Keyword">field</a>  <a id="Header.slotNo"></a><a id="666" href="RecordFields.html#666" class="Field">slotNo</a> <a id="Header.blockNo"></a><a id="673" href="RecordFields.html#673" class="Field">blockNo</a> <a id="681" class="Symbol">:</a> <a id="683" href="RecordFields.html#105" class="Datatype">ℕ</a>
+         <a id="Header.blockHash"></a><a id="694" href="RecordFields.html#694" class="Field">blockHash</a>      <a id="709" class="Symbol">:</a> <a id="711" href="RecordFields.html#576" class="Function">Hash</a>
+         <a id="Header.prev"></a><a id="725" href="RecordFields.html#725" class="Field">prev</a> <a id="Header.nodeId"></a><a id="730" href="RecordFields.html#730" class="Field">nodeId</a>    <a id="740" class="Symbol">:</a> <a id="742" href="RecordFields.html#105" class="Datatype">ℕ</a>
+<a id="744" class="Keyword">open</a> <a id="749" href="RecordFields.html#638" class="Module">Header</a> <a id="756" class="Keyword">public</a>
+
+<a id="matchHeader"></a><a id="764" href="RecordFields.html#764" class="Function">matchHeader</a> <a id="776" class="Symbol">:</a> <a id="778" href="RecordFields.html#638" class="Record">Header</a> <a id="785" class="Symbol">→</a> <a id="787" href="RecordFields.html#105" class="Datatype">ℕ</a>
+<a id="789" href="RecordFields.html#764" class="Function">matchHeader</a> <a id="801" class="Keyword">record</a> <a id="808" class="Symbol">{</a><a id="809" href="RecordFields.html#666" class="Field">slotNo</a> <a id="816" class="Symbol">=</a> <a id="818" href="RecordFields.html#818" class="Bound">n</a><a id="819" class="Symbol">}</a> <a id="821" class="Symbol">=</a> <a id="823" href="RecordFields.html#818" class="Bound">n</a>
+
+<a id="exHeader"></a><a id="826" href="RecordFields.html#826" class="Function">exHeader</a> <a id="835" class="Symbol">:</a> <a id="837" href="RecordFields.html#638" class="Record">Header</a>
+<a id="844" href="RecordFields.html#826" class="Function">exHeader</a> <a id="853" class="Symbol">=</a> <a id="855" class="Symbol">λ</a> <a id="857" class="Keyword">where</a>
+  <a id="865" class="Symbol">.</a><a id="866" href="RecordFields.html#666" class="Field">slotNo</a> <a id="873" class="Symbol">→</a> <a id="875" class="Number">42</a>
+  <a id="880" class="Symbol">.</a><a id="881" href="RecordFields.html#673" class="Field">blockNo</a> <a id="889" class="Symbol">→</a> <a id="891" class="Number">0</a>
+  <a id="895" class="Symbol">.</a><a id="896" href="RecordFields.html#694" class="Field">blockHash</a> <a id="906" class="Symbol">→</a> <a id="908" class="Number">0</a>
+  <a id="912" class="Symbol">.</a><a id="913" href="RecordFields.html#725" class="Field">prev</a> <a id="918" class="Symbol">→</a> <a id="920" class="Number">0</a>
+  <a id="924" class="Symbol">.</a><a id="925" href="RecordFields.html#730" class="Field">nodeId</a> <a id="932" class="Symbol">→</a> <a id="934" class="Number">0</a>
+
+<a id="937" class="Keyword">data</a> <a id="Tx"></a><a id="942" href="RecordFields.html#942" class="Datatype">Tx</a> <a id="945" class="Symbol">:</a> <a id="947" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="951" class="Keyword">where</a>
+  <a id="Tx.inc"></a><a id="959" href="RecordFields.html#959" class="InductiveConstructor">inc</a> <a id="Tx.dec"></a><a id="963" href="RecordFields.html#963" class="InductiveConstructor">dec</a> <a id="967" class="Symbol">:</a> <a id="969" href="RecordFields.html#942" class="Datatype">Tx</a>
+
+<a id="pred"></a><a id="973" href="RecordFields.html#973" class="Function">pred</a> <a id="978" class="Symbol">:</a> <a id="980" href="RecordFields.html#105" class="Datatype">ℕ</a> <a id="982" class="Symbol">→</a> <a id="984" href="RecordFields.html#105" class="Datatype">ℕ</a>
+<a id="986" href="RecordFields.html#973" class="Function">pred</a> <a id="991" class="Number">0</a> <a id="993" class="Symbol">=</a> <a id="995" class="Number">0</a>
+<a id="997" href="RecordFields.html#973" class="Function">pred</a> <a id="1002" class="Symbol">(</a><a id="1003" href="Agda.Builtin.Nat.html#234" class="InductiveConstructor">suc</a> <a id="1007" href="RecordFields.html#1007" class="Bound">n</a><a id="1008" class="Symbol">)</a> <a id="1010" class="Symbol">=</a> <a id="1012" href="RecordFields.html#1007" class="Bound">n</a>
+
+<a id="1015" class="Comment">-- applyTx : Tx → ℕ → ℕ</a>
+<a id="1039" class="Comment">-- applyTx = λ where</a>
+<a id="1060" class="Comment">--   inc → suc</a>
+<a id="1075" class="Comment">--   dec → pred</a>
+
+<a id="1092" class="Comment">-- applyTx : Tx → ℕ → ℕ</a>
+<a id="1116" class="Comment">-- applyTx inc = suc</a>
+<a id="1137" class="Comment">-- applyTx dec = pred</a>
+
+<a id="1160" class="Comment">-- ℕ→ℕ = ℕ → ℕ</a>
+
+<a id="1176" class="Comment">-- applyTx : Tx → ℕ→ℕ</a>
+<a id="1198" class="Comment">-- applyTx = λ where</a>
+<a id="1219" class="Comment">--   inc → _+ 1</a>
+<a id="1235" class="Comment">--   dec → _- 1</a>
+<a id="1251" class="Comment">--  where</a>
+<a id="1261" class="Comment">--   _-_ : ℕ → ℕ → ℕ</a>
+<a id="1282" class="Comment">--   0 - _ = 0</a>
+<a id="1297" class="Comment">--   n - 0 = n</a>
+<a id="1312" class="Comment">--   (suc x) - (suc y) = x - y</a>
+
+<a id="1344" class="Comment">-- postulate @0 List : Set → Set</a>
+
+<a id="1378" class="Comment">-- record Block : Set where</a>
+<a id="1406" class="Comment">--   field header  : Header</a>
+<a id="1434" class="Comment">--         @0 body : List Tx</a>
+
+<a id="1464" class="Comment">-- record LedgerState : Set where</a>
+<a id="1498" class="Comment">--   field  tip                  : Point</a>
+<a id="1539" class="Comment">--          count                : ℤ</a>
+<a id="1576" class="Comment">--          snapshot1 snapshot2  : ℤ</a>
+
+<a id="1614" class="Comment">-- postulate hash : String → Hash</a>
+
+<a id="1649" class="Symbol">{-#</a> <a id="1653" class="Keyword">FOREIGN</a> <a id="1661" class="Pragma">AGDA2RUST</a>
+<a id="1671" class="Pragma">pub</a> <a id="1675" class="Pragma">fn</a> <a id="1678" class="Pragma">main()</a> <a id="1685" class="Pragma">{</a>
+  <a id="1689" class="Pragma">println!(&quot;{}:\t\t</a> <a id="1707" class="Pragma">{}</a> <a id="1710" class="Pragma">|</a> <a id="1712" class="Pragma">{}</a> <a id="1715" class="Pragma">|</a> <a id="1717" class="Pragma">{}</a> <a id="1720" class="Pragma">|</a> <a id="1722" class="Pragma">{}&quot;,</a> <a id="1727" class="Pragma">module_path!(),</a>
+    <a id="1747" class="Pragma">unmk(Point·slot(exPoint())),</a>
+    <a id="1780" class="Pragma">matchPoint(exPoint()),</a>
+    <a id="1807" class="Pragma">Header·slotNo(Header</a> <a id="1828" class="Pragma">{slotNo:</a> <a id="1837" class="Pragma">42,</a> <a id="1841" class="Pragma">..</a> <a id="1844" class="Pragma">Default::default()}),</a>
+    <a id="1870" class="Pragma">matchHeader(exHeader()),</a>
+  <a id="1897" class="Pragma">);</a>
+<a id="1900" class="Pragma">}</a>
+<a id="1902" class="Symbol">#-}</a>
+</pre><div class="split right"><embed src="build/RecordFields.unicode.html"/></div></body></html>

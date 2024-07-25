@@ -76,7 +76,7 @@
   </style>
 </head>
 <body>
-<div class="sourceCode" id="cb1"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="at">#![</span>allow<span class="at">(</span>dead_code<span class="op">,</span>non_snake_case<span class="op">,</span>unused_variables<span class="op">,</span>non_camel_case_types<span class="op">,</span>non_upper_case_globals<span class="at">)]</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="at">#![</span>allow<span class="at">(</span>dead_code<span class="op">,</span>non_snake_case<span class="op">,</span>unused_variables<span class="op">,</span>non_camel_case_types<span class="op">,</span>non_upper_case_globals<span class="op">,</span>unreachable_patterns<span class="at">)]</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">type</span> ℕ <span class="op">=</span> <span class="dt">i32</span><span class="op">;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
@@ -86,18 +86,18 @@
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">type</span> ℕՖ8594Ֆℕ <span class="op">=</span> <span class="kw">fn</span>(_<span class="op">:</span> ℕ) <span class="op">-&gt;</span> ℕ<span class="op">;</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> incr(x0<span class="op">:</span> ℕ) <span class="op">-&gt;</span> ℕ <span class="op">{</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  <span class="dv">1</span> <span class="op">+</span> x0</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> incr(x<span class="op">:</span> ℕ) <span class="op">-&gt;</span> ℕ <span class="op">{</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  <span class="dv">1</span> <span class="op">+</span> x</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="op">}</span></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> testAliasF() <span class="op">-&gt;</span> ℕ <span class="op">{</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  incr(<span class="dv">41</span>)</span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="op">}</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">type</span> Id<span class="op">&lt;</span>  A<span class="op">,&gt;</span> <span class="op">=</span> A<span class="op">;</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">type</span> Id<span class="op">&lt;</span>A<span class="op">&gt;</span> <span class="op">=</span> A<span class="op">;</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> id<span class="op">&lt;</span>  A<span class="op">,&gt;</span>(x0<span class="op">:</span> Id<span class="op">&lt;</span>A<span class="op">&gt;</span>) <span class="op">-&gt;</span> Id<span class="op">&lt;</span>A<span class="op">&gt;</span> <span class="op">{</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>  x0</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> id<span class="op">&lt;</span>A<span class="op">&gt;</span>(x<span class="op">:</span> Id<span class="op">&lt;</span>A<span class="op">&gt;</span>) <span class="op">-&gt;</span> Id<span class="op">&lt;</span>A<span class="op">&gt;</span> <span class="op">{</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>  x</span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="op">}</span></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a></span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> main () <span class="op">{</span></span>
