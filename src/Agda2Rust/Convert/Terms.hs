@@ -171,7 +171,11 @@ instance A.TTerm ~> R.Expr where
           Right A.ConHead{..} <- A.getConHead cn
           h <- parentQualR cn
           let xs = unqualR . A.unArg <$> filter hasQuantityNon0 conFields
-          return (Just cn , \[] es -> RMkStruct h (zipWith (\x e -> R.Field x (Just e) ()) xs es))
+          let Just (qn, _) = isRec
+          hasPhantomField <- hasUnusedTyParams qn
+          return (Just cn , \[] es ->
+            RMkStruct h (zipWith (\x e -> R.Field x (Just e) ()) xs es
+                          <> [R.Field "_phantom" (Just mkPhantomField) () | hasPhantomField]))
         else if isJust isBlt then do
           let Just bltE = isBlt
           return (Nothing, \[] [] -> compileBuiltinTerm bltE)
@@ -245,19 +249,23 @@ instance A.TAlt ~> R.Arm where
         -- * compiling match on a record/struct value
         path <- parentQualR con
         -- report $ "  path: " <> ppR path
-        (_, vas, _) <- viewTy =<< A.typeOfConst con
-        vas' <- populateArgNames vas
-        -- report $ "  vas': " <> pp vas'
-        let fs = transcribe . fst . A.unDom <$> filter hasQuantityNon0 (take n vas)
-        let xs = transcribe . fst . A.unDom <$> filter hasQuantityNon0 (take n vas')
+        (tel, _) <- telListView =<< A.typeOfConst con
+        -- report $ " tel: " <> pp tel
+        tel' <- populateArgNames tel
+        -- report $ " tel': " <> pp tel'
+        ctx <- filterM (fmap not . isSrtOrLvlTy . snd . A.unDom) tel
+        bodyCtx <- filterM (fmap not . isSrtOrLvlTy . snd . A.unDom) tel'
+        let fs = transcribe . fst . A.unDom <$> filter hasQuantityNon0 (take n $ ctx)
+        let xs = transcribe . fst . A.unDom <$> filter hasQuantityNon0 (take n $ bodyCtx)
         Just (qn, _) <- A.isRecordConstructor con
         hasPhantomField <- hasUnusedTyParams qn
+        let phantomField = ["_phantom" | hasPhantomField]
         -- TODO: hygienic handling of hardcoded string "_phantom"
-        let pfs  = R.mkIdent <$> fs <> ["_phantom" | hasPhantomField]
-        let pats = RId . R.mkIdent <$> xs <> ["_phantom" | hasPhantomField]
+        let pfs  = R.mkIdent       <$> fs <> phantomField
+        let pats = RId . R.mkIdent <$> xs <> phantomField
         -- report $ "  pat: " <> pp con <> "(" <> show n <> ")"
         --       <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
-        body'  <- A.addContext vas' (go body)
+        body' <- A.addContext bodyCtx (go body)
         -- report $ "  body: " <> pp body <> " ~> " <> ppR body'
         return $ RArm (RStructP path (uncurry rFieldP <$> zip pfs pats)) body'
       else case isBlt of
@@ -268,13 +276,21 @@ instance A.TAlt ~> R.Arm where
         -- * compiling match on a data/enum value
         Nothing -> do
           path <- qualR con
-          (_, vas, _) <- viewTy =<< A.typeOfConst con
-          vas' <- populateArgNames vas
-          let xs = take n (fst . A.unDom <$> filter hasQuantityNon0 vas')
+          -- report $ "  path: " <> ppR path
+          (tel, _) <- telListView =<< A.typeOfConst con
+          -- report $ " tel: " <> pp tel
+          tel' <- populateArgNames tel
+          -- report $ " tel': " <> pp tel'
+          bodyCtx <- filterM (fmap not . isSrtOrLvlTy . snd . A.unDom) tel'
+          -- report $ " bodyCtx: " <> pp bodyCtx
+          let vTel = filter hasQuantityNon0 bodyCtx
+          -- report $ " vTel: " <> pp vTel
+          let xs = take n (fst . A.unDom <$> vTel)
+          -- report $ " xs: " <> pp xs
           let pats = RId . R.mkIdent <$> xs
           -- report $ "  pat: " <> pp con <> "(" <> show n <> ")"
           --       <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
-          body'  <- unboxPats con n xs =<< A.addContext vas' (go body)
+          body' <- unboxPats con n xs =<< A.addContext bodyCtx (go body)
           -- report $ "  body: " <> pp body <> " ~> " <> ppR body'
           return $ RArm (RTupleP path pats) body'
       where
@@ -303,3 +319,4 @@ instance A.TAlt ~> R.Arm where
       lit'  <- RLit <$> go lit
       body' <- go body
       return $ RArm (RLitP lit') body'
+

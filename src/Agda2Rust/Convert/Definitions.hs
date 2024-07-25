@@ -131,7 +131,7 @@ instance A.Definition ~> RDef where
         -- telV <- telListViewUpTo (length (fst telV0) - intros) defType
         telV <- telListViewUpTo (length (fst telV0)) defType
         report $ " telV: " <> pp telV
-        CompileDef <$> goFn pragma undefined (\_ -> go tterm) telV
+        CompileDef <$> goFn pragma 0 (\intros -> {-inFunIntros intros $-} go tterm) telV
 {-
         let (intros, tterm) = A.tLamView tdef
         -- report $ " intros: " <> pp intros
@@ -154,7 +154,7 @@ instance A.Definition ~> RDef where
         -- intros <- calculateIntros introVars tel0
         -- (tel, resTy) <- telListViewUpTo intros defType
 
-        -- telIntros <- length <$> filterM (fmap not . isTyParam) tel
+        -- telIntros <- length <$> filterM (fmap not . isTyParamM) tel
         -- let telIntros = length $ filter hasQuantityNon0 tel
         -- let telIntros = length tel
         tel1 <- shouldKeepTel tel
@@ -280,7 +280,7 @@ instance A.Definition ~> RDef where
         let newIntros = max (allIntros - intros) 0
         body <- inFunIntros newIntros $ goBody newIntros
         -}
-        body <- goBody undefined
+        body <- goBody allIntros
         return ([], [], resTy', body)
 
       goTelArg :: TelItem -> C ([String], [R.Arg ()])

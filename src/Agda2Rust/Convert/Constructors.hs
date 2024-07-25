@@ -19,18 +19,15 @@ instance (A.QName, A.Type) ~> R.Variant where
   go (c, ty) = inConstructor c $ do
     report $ "** compiling constructor: " <> pp c
     as <- argTys ty
-    -- as <- vargTys ty
-    report $ " as: " <> pp as
-    RVariant (unqualR c) <$> goFs 1 ({-unDom <$> filter shouldKeep-} as)
+    -- report $ " as: " <> pp as
+    RVariant (unqualR c) <$> goFs 1 as
     where
       goFs :: Int -> Tel :~>* R.StructField
       goFs _ [] = return []
-      -- goFs i ((x, ty):fs) =
-      --   (:) <$> inArgument i (goF (x, ty))
-      --       <*> A.addContext (A.defaultDom (x, ty)) (goFs (i + 1) fs)
-      goFs i (a@(A.unDom -> (x, ty)):fs) =
-        let ctx = A.addContext a in
-        if shouldKeep a then
+      goFs i (a@(A.unDom -> (x, ty)):fs) = do
+        let ctx = A.addContext a
+        keep <- isKeptArg <$> classifyArg a
+        if keep then
           (:) <$> inArgument i (goF (x, ty))
               <*> ctx (goFs (i + 1) fs)
         else

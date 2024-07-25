@@ -97,14 +97,14 @@ freshVarsInCtx n = do
 
 -- ** arguments & visibility
 
+type TelItem = Dom (ArgName, Type)
+type Tel     = [TelItem]
+
 unElims :: [Elim] -> [Term]
 unElims = fmap unArg . argsFromElims
 
 hasQuantityNon0 :: LensQuantity a => a -> Bool
 hasQuantityNon0 = not . hasQuantity0
-
-shouldKeep :: (LensQuantity a, LensHiding a) => a -> Bool
-shouldKeep = visible /\ hasQuantityNon0
 
 shouldKeepTyParam :: PureTCM m => TelItem -> m (Maybe ArgName)
 shouldKeepTyParam d@(unDom -> (x, ty)) = do
@@ -113,6 +113,9 @@ shouldKeepTyParam d@(unDom -> (x, ty)) = do
 
 shouldKeepTel :: PureTCM m => ListTel -> m ListTel
 shouldKeepTel = filterM (fmap isNothing . shouldKeepTyParam)
+
+shouldKeep :: (LensQuantity a, LensHiding a) => a -> Bool
+shouldKeep = visible /\ hasQuantityNon0
 
 -- shouldKeepArgs :: [Arg a] -> [a]
 -- shouldKeepArgs = fmap unArg . filter shouldKeep
@@ -137,6 +140,9 @@ returnTy = flip (.) unEl $ \case
 
 isSortResTy :: PureTCM m => Type -> m Bool
 isSortResTy ty = isSortTy <$> resTy ty
+
+isSrtOrLvlTy :: PureTCM m => Type -> m Bool
+isSrtOrLvlTy ty = (||) <$> isSortResTy ty <*> isLevelType ty
 
 isSortM :: MonadTCEnv m => Term -> m Bool
 isSortM = \case
@@ -173,12 +179,13 @@ etaExpandT n k t = mkTLam nk $ raise nk t `mkTApp` map TVar (downFrom n)
 
 data ClassifiedArg = TyParam ArgName | DroppedArg | KeptArg ArgName Type
 
-onlyKept, notTyParams :: [ClassifiedArg] -> [ClassifiedArg]
-onlyKept = filter \case {KeptArg{} -> True; _ -> False}
-notTyParams = filter (not . \case {TyParam{} -> False; _ -> True})
+isKeptArg, isTyParam :: ClassifiedArg -> Bool
+isKeptArg = \case {KeptArg{} -> True; _ -> False}
+isTyParam = \case {TyParam{} -> True; _ -> False}
 
-type TelItem = Dom (ArgName, Type)
-type Tel     = [TelItem]
+onlyKept, notTyParams :: [ClassifiedArg] -> [ClassifiedArg]
+onlyKept    = filter isKeptArg
+notTyParams = filter (not . isTyParam)
 
 classifyArg :: PureTCM m => TelItem -> m ClassifiedArg
 classifyArg d@(unDom -> (x, ty)) = do
@@ -202,8 +209,8 @@ isErasedTTerm = \case
 onlyNonErased :: [TTerm] -> [TTerm]
 onlyNonErased = filter (not . isErasedTTerm)
 
-isTyParam :: PureEnvTCM m => TTerm -> m Bool
-isTyParam = \case
+isTyParamM :: PureEnvTCM m => TTerm -> m Bool
+isTyParamM = \case
   TDef n -> isSortTy <$> typeOfConst n
   TVar i -> isSortTy <$> lookupCtxTy i
   TApp h _ -> do
@@ -221,7 +228,7 @@ isTyParam = \case
   _ -> return False
 
 separateTyParams :: PureEnvTCM m  => [TTerm] -> m ([TTerm], [TTerm])
-separateTyParams = partitionM isTyParam
+separateTyParams = partitionM isTyParamM
 
 -- ** types & telescopes
 isDependentArrow :: Dom Type -> Bool
@@ -275,6 +282,7 @@ viewTy ty = do
   (tel, resTy) <- telListView ty
   -- let (vas, has) = partition shouldKeep tel
   let (vas, has) = partition visible tel
+  -- (has, vas) <- partitionM (fmap isKeptArg . classifyArg) tel
   return (has, vas, resTy)
 
 argTys :: PureTCM m => Type -> m ListTel

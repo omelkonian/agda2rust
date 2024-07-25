@@ -132,10 +132,10 @@ shouldBox = asks curConstructor >>= \case
 
 setRecordConstructor :: ConHead -> C ()
 setRecordConstructor ConHead{..} = modify $ \s -> s
-  { recordConstructors = S.insert (pp $ unqual conName) (recordConstructors s) }
+  { recordConstructors = S.insert (pp conName) (recordConstructors s) }
 
 isRecordConstructor :: QName -> C Bool
-isRecordConstructor qn = S.member (pp $ unqual qn) . recordConstructors <$> get
+isRecordConstructor qn = S.member (pp qn) . recordConstructors <$> get
 
 setUnusedTyParams :: QName -> [String] -> C ()
 setUnusedTyParams qn ps = modify $ \s -> s

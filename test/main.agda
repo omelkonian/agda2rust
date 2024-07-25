@@ -33,6 +33,7 @@ import RecordFields
 import UnusedArgs
 import ExactSplit
 import OpenModule
+import ConstructorImplicitArgs
 -- import MultiArgFun
 -- import PartialApp
 -- import PartialApp2
@@ -74,6 +75,7 @@ mod RecordFields;
 mod UnusedArgs;
 mod ExactSplit;
 mod OpenModule;
+mod ConstructorImplicitArgs;
 // mod MultiArgFun;
 // mod PartialApp;
 
@@ -113,6 +115,7 @@ fn main() {
   UnusedArgs::main();
   ExactSplit::main();
   OpenModule::main();
+  ConstructorImplicitArgs::main();
 //  MultiArgFun::main();
 //  PartialApp::main();
 }

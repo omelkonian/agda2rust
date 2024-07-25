@@ -35,6 +35,7 @@ mod RecordFields;
 mod UnusedArgs;
 mod ExactSplit;
 mod OpenModule;
+mod ConstructorImplicitArgs;
 // mod MultiArgFun;
 // mod PartialApp;
 
@@ -74,6 +75,7 @@ fn main() {
   UnusedArgs::main();
   ExactSplit::main();
   OpenModule::main();
+  ConstructorImplicitArgs::main();
 //  MultiArgFun::main();
 //  PartialApp::main();
 }

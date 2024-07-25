@@ -224,6 +224,15 @@ phantomField ps
     , RPathSeg' "PhantomData" (RAngles [TupTy (RTyRef <$> ps) ()])
     ]
 
+mkPhantomField :: Expr ()
+mkPhantomField
+  = RPathExpr
+  $ RPath
+    [ RPathSeg "std"
+    , RPathSeg "marker"
+    , RPathSeg "PhantomData"
+    ]
+
 -- ** pretty-printing
 ppR :: (Pretty a, Resolve a) => a -> String
 ppR = show . pretty'

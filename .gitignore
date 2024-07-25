@@ -18,6 +18,7 @@ test/Input.rs
 test/Agda
 test/build
 test/agda2rust
-test/rustp
+test/rustParse
+test/rustPrint
 test/reUnicode
 test/html
