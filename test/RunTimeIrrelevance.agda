@@ -35,8 +35,11 @@ record ErasedRecParam (@0 x : Nat) : Set where
   field y : Nat
         @0 x≡y : x ≡ y
 
-erasedRecParam : {@0 x : Nat} → ErasedRecParam x → Nat
-erasedRecParam (record {y = y}) = y
+erasedRecParam : (@0 x : Nat) → ErasedRecParam x → Nat
+erasedRecParam _ (record {y = y}) = y
+
+erasedRecParamH : {@0 x : Nat} → ErasedRecParam x → Nat
+erasedRecParamH (record {y = y}) = y
 
 -- ** datatypes
 
@@ -73,12 +76,18 @@ fn ᐁ<T>(x : T) -> Box<T> { return Box::new(x); }
 use self::BST::{Leaf,Node};
 
 pub fn main() {
-  println!("{}:\t {} | {} | {} | {} | {} | {} | {:?} | {:?} | {:?}", module_path!(),
+  println!("{}:\t \
+    {} | {} | \
+    {} | {} | {} | {} | \
+    {} | {:?} | {:?} | {:?}", module_path!(),
     erasedFunArg(41),
     erasedHigherOrderFunArg(41),
+
     erasedRec(),
     succ(ErasedField {x: 41}),
     erasedRecParam(ErasedRecParam {y: 42}),
+    erasedRecParamH(ErasedRecParam {y: 42}),
+
     erasedData(),
     erasedClause(ErasedCon::mk(42)),
     erasedConArg(ErasedConArg::mk(42)),

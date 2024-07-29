@@ -70,12 +70,16 @@ instance A.TTerm ~> R.Expr where
           report $ "  etaN: " <> pp etaN
           intros <- asks funIntroVars
           report $ "  intros: " <> pp intros
+          localIntros <- asks localIntroVars
+          report $ "  localIntros: " <> pp localIntros
 
           -- ctxLen <- length <$> currentCtx
           -- let instVars = take 1 $ drop 1 $ A.downFrom ctxLen
           -- inNoFunIntros $ go (etaExpandT etaN intros t0 `A.mkTApp` map A.TVar instVars)
 
-          inNoFunIntros $ go (etaExpandT etaN intros t0)
+          let et = etaExpandT etaN intros localIntros t0
+          report $ "  η: " <> pp t0 <> " ~> " <> pp et
+          inNoFunIntros $ go et
         Nothing -> inNoFunIntros $ do
           -- report $ "  ps: " <> pp ps
           -- report $ "  ts': " <> pp ts'
@@ -105,8 +109,10 @@ instance A.TTerm ~> R.Expr where
       e  <- go t
       e' <- A.addContext [(x, defaultTy)] $ go t'
       return $ rLet [(x, e)] e'
-    t@(A.TCase scrutinee A.CaseInfo{..} defCase alts) -> inNoFunIntros $ do
+    t@(A.TCase scrutinee A.CaseInfo{..} defCase alts) -> {-inNoFunIntros $-} do
       report $ " * compiling case expression:\n" <> pp t
+      intros <- asks funIntroVars
+      report $ "  intros: " <> pp intros
       ctx <- currentCtx
       report $ "  ctx: " <> pp ctx
       report $ "  scrutineeVar: " <> pp scrutinee
@@ -265,7 +271,7 @@ instance A.TAlt ~> R.Arm where
         let pats = RId . R.mkIdent <$> xs <> phantomField
         -- report $ "  pat: " <> pp con <> "(" <> show n <> ")"
         --       <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
-        body' <- A.addContext bodyCtx (go body)
+        body' <- A.addContext bodyCtx $ inLocalIntros (length pats) $ go body
         -- report $ "  body: " <> pp body <> " ~> " <> ppR body'
         return $ RArm (RStructP path (uncurry rFieldP <$> zip pfs pats)) body'
       else case isBlt of
@@ -290,9 +296,11 @@ instance A.TAlt ~> R.Arm where
           let pats = RId . R.mkIdent <$> xs
           -- report $ "  pat: " <> pp con <> "(" <> show n <> ")"
           --       <> " ~> " <> ppR path <> "(" <> intercalate "," (map ppR pats) <> ")"
-          body' <- unboxPats con n xs =<< A.addContext bodyCtx (go body)
+          body'  <- A.addContext bodyCtx $ inLocalIntros (length xs) $ go body
           -- report $ "  body: " <> pp body <> " ~> " <> ppR body'
-          return $ RArm (RTupleP path pats) body'
+          body'' <- unboxPats con n xs body'
+          -- report $ "  body: " <> pp body' <> " ~> " <> ppR body''
+          return $ RArm (RTupleP path pats) body''
       where
       populateArgNames :: A.ListTel -> C (A.ListTel)
       populateArgNames [] = return []

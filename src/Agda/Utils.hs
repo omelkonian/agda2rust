@@ -171,21 +171,23 @@ defNameOfT = \case
   _ -> Nothing
 
 -- | Perform multiple η-expansions on a treeless term.
-etaExpandT :: Int -> Int -> TTerm -> TTerm
-etaExpandT n k t = mkTLam nk $ raise nk t `mkTApp` map TVar (downFrom n)
+etaExpandT :: Int -> Int -> Int -> TTerm -> TTerm
+etaExpandT n k l t
+  = mkTLam nk
+  $ raise nk t `mkTApp` map (raise l . TVar) (downFrom n)
   where nk = max (n - k) 0 -- safeguard
 
 -- ** erasure
 
-data ClassifiedArg = TyParam ArgName | DroppedArg | KeptArg ArgName Type
+data ClassifiedArg
+  = TyParam ArgName
+  | LvlParam
+  | ErasedArg
+  | KeptArg ArgName Type
 
 isKeptArg, isTyParam :: ClassifiedArg -> Bool
 isKeptArg = \case {KeptArg{} -> True; _ -> False}
 isTyParam = \case {TyParam{} -> True; _ -> False}
-
-onlyKept, notTyParams :: [ClassifiedArg] -> [ClassifiedArg]
-onlyKept    = filter isKeptArg
-notTyParams = filter (not . isTyParam)
 
 classifyArg :: PureTCM m => TelItem -> m ClassifiedArg
 classifyArg d@(unDom -> (x, ty)) = do
@@ -193,7 +195,8 @@ classifyArg d@(unDom -> (x, ty)) = do
   isLvl <- isLevelType ty
   return $ if
     | isSrt -> TyParam x
-    | isLvl || hasQuantity0 d -> DroppedArg
+    | isLvl -> LvlParam
+    | hasQuantity0 d -> ErasedArg
     | otherwise -> KeptArg x ty
 
 classifyArgs :: PureTCM m => [TelItem] -> m [ClassifiedArg]
@@ -214,7 +217,7 @@ isTyParamM = \case
   TDef n -> isSortTy <$> typeOfConst n
   TVar i -> isSortTy <$> lookupCtxTy i
   TApp h _ -> do
-    -- report $ "  t (head): " <> pp t
+    -- report $ "  t (head): " <> pp h
     isResTyParam h
     -- return False
     -- let ty = termFromTTerm tt

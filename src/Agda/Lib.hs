@@ -102,7 +102,7 @@ import Agda.TypeChecking.Monad
   , Definition(..), Defn(..)
   , pattern Function, funProjection, funClauses, funWith, funExtLam
   , funInline, funCompiled
-  , Projection(..)
+  , Projection(..), droppedPars
   , pattern Datatype, dataCons, dataPars
   , pattern Constructor
   , pattern Record, recConHead, recPars, recTel

@@ -34,8 +34,10 @@ import UnusedArgs
 import ExactSplit
 import OpenModule
 import ConstructorImplicitArgs
--- import MultiArgFun
--- import PartialApp
+import MultiArgFun
+import Curry
+import PointFree
+import PartialApp
 -- import PartialApp2
 -- import PartialApp3
 
@@ -76,8 +78,10 @@ mod UnusedArgs;
 mod ExactSplit;
 mod OpenModule;
 mod ConstructorImplicitArgs;
-// mod MultiArgFun;
-// mod PartialApp;
+mod MultiArgFun;
+mod Curry;
+mod PointFree;
+mod PartialApp;
 
 fn main() {
   Identity::main();
@@ -116,7 +120,9 @@ fn main() {
   ExactSplit::main();
   OpenModule::main();
   ConstructorImplicitArgs::main();
-//  MultiArgFun::main();
-//  PartialApp::main();
+  MultiArgFun::main();
+  Curry::main();
+  PointFree::main();
+  PartialApp::main();
 }
 #-}

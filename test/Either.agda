@@ -5,6 +5,10 @@ data Either (A B : Set) : Set where
   Left  : A → Either A B
   Right : B → Either A B
 
+fromEitherAB : ∀ {A B : Set} → A → Either A B → A
+fromEitherAB _    (Left  a) = a
+fromEitherAB defA (Right _) = defA
+
 fromEither : ∀ {A : Set} → A → ∀ {B : Set} → Either A B → A
 fromEither _    (Left  a) = a
 fromEither defA (Right _) = defA
@@ -36,7 +40,8 @@ use std::marker::{PhantomData};
 fn __<T>() -> PhantomData<T> { return PhantomData; }
 
 pub fn main() {
-  println!("{}:\t\t\t {} | {} | {} | {} | {}", module_path!(),
+  println!("{}:\t\t\t {} | {} | {} | {} | {} | {}", module_path!(),
+    fromEitherAB::<i32, i32>(41, Either::Left(42)),
     fromEither::<i32, i32>(41, Either::Left(42)),
     fromOnlyLeft::<i32, i32>(OnlyLeft::Left(42)),
     fromOnlyLeftR::<i32, i32>(OnlyLeftR {left: 42, _phantom: __()}),

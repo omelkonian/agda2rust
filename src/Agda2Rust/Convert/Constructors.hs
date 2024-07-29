@@ -20,7 +20,9 @@ instance (A.QName, A.Type) ~> R.Variant where
     report $ "** compiling constructor: " <> pp c
     as <- argTys ty
     -- report $ " as: " <> pp as
-    RVariant (unqualR c) <$> goFs 1 as
+    fs <- goFs 1 as
+    setArity c (length fs)
+    return $ RVariant (unqualR c) fs
     where
       goFs :: Int -> Tel :~>* R.StructField
       goFs _ [] = return []

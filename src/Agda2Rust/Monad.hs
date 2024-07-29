@@ -32,6 +32,8 @@ data Env = Env
     -- ^ the argument (of the current constructor) are we currently compiling
   , funIntroVars   :: Int
     -- ^ the arity of the function we're currently compliling
+  , localIntroVars :: Int
+    -- ^ the number of bound variables we are currently in
   , tyAlias        :: Bool
     -- ^ whether we are currently compiling a type alias
   }
@@ -42,6 +44,7 @@ initEnv = Env
   , curConstructor = Nothing
   , curArgument    = 0
   , funIntroVars   = 0
+  , localIntroVars = 0
   , tyAlias        = False
   }
 
@@ -93,6 +96,10 @@ inArgument n = local $ \e -> e
 inFunIntros :: Int -> C a -> C a
 inFunIntros n = local $ \e -> e
   { funIntroVars = n }
+
+inLocalIntros :: Int -> C a -> C a
+inLocalIntros n = local $ \e -> e
+  { localIntroVars = localIntroVars e + n }
 
 inNoFunIntros :: C a -> C a
 inNoFunIntros = local $ \e -> e

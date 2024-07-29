@@ -95,7 +95,8 @@ instance A.Definition ~> RDef where
       A.Axiom{..} -> do
         report " compiling postulate with `panic!`"
         (tel, resTy) <- telListView defType
-        CompileDef <$> goFn pragma 0 (\_ -> return $ rPanic "POSTULATE") (tel, resTy)
+        CompileDef <$> goFn pragma 0 (tel, resTy) \_ ->
+          return $ rPanic "POSTULATE"
 
       -- ** type aliases
       A.Function{..}
@@ -126,71 +127,16 @@ instance A.Definition ~> RDef where
         report $ " tdef: " <> pp tdef
         telV0 <- telListView defType
         report $ " telV0: " <> pp telV0
-        let (intros, tterm) = A.tLamView tdef
-        report $ " intros: " <> pp intros
-        -- telV <- telListViewUpTo (length (fst telV0) - intros) defType
+        let (topIntros, tterm) = A.tLamView tdef
+        report $ " topIntros: " <> pp topIntros
+        let droppedIntros = A.droppedPars defn
+        report $ " droppedIntros: " <> pp droppedIntros
         telV <- telListViewUpTo (length (fst telV0)) defType
         report $ " telV: " <> pp telV
-        CompileDef <$> goFn pragma 0 (\intros -> {-inFunIntros intros $-} go tterm) telV
-{-
-        let (intros, tterm) = A.tLamView tdef
-        -- report $ " intros: " <> pp intros
-        -- report $ " tterm: " <> pp tterm
-        telV@(tel, _) <- telListView defType
-        -- report $ " tel: " <> pp tel
-        ctel <- classifyArgs tel
-        let telIntros = length (notTyParams ctel)
-        -- report $ " telIntros: " <> pp telIntros
-        let newIntros = telIntros - intros
-        -- report $ " newIntros: " <> pp newIntros
-        CompileDef <$> goFn pragma intros (\_ -> go $ A.raise 0 tterm) telV
--}
-{-
-        report $ " intros: " <> pp intros
-        telV@(tel, resTy) <- telListView defType
-        report $ " tel: " <> pp tel
-        -- report $ " resTy: " <> pp resTy
-
-        -- intros <- calculateIntros introVars tel0
-        -- (tel, resTy) <- telListViewUpTo intros defType
-
-        -- telIntros <- length <$> filterM (fmap not . isTyParamM) tel
-        -- let telIntros = length $ filter hasQuantityNon0 tel
-        -- let telIntros = length tel
-        tel1 <- shouldKeepTel tel
-        report $ " tel1: " <> pp tel1
-        let telIntros = length tel1
-        let newIntros = telIntros - intros
-        report $ " newIntros: " <> pp newIntros
-        when (newIntros < 0) $ error "newIntros is negative!"
-
-        let tterm' = A.raise newIntros tterm
-        -- let tterm' = tterm
-        report $ " tterm': " <> pp tterm'
-        -- let (tterm', _) = stripTopTLams $ etaExpandT newIntros tterm
-
-        CompileDef <$> goFn pragma (inFunIntros newIntros $ go tterm') telV
--}
+        CompileDef <$> goFn pragma (-topIntros) telV \raiseIntros -> do
+          report $ " raiseIntros: " <> pp raiseIntros
+          go (A.raise (raiseIntros - droppedIntros) tterm)
         where
-        -- calculateIntros :: Int -> A.ListTel -> C Int
-        -- calculateIntros _ tel = return (length tel)
-        -- calculateIntros n _ = return n
-        -- calculateIntros = go 0
-        --   where
-        --   go :: Int -> Int -> A.ListTel -> C Int
-        --   go n vIntros (d@(A.unDom -> (x, ty)) : tel) = do
-        --     isSrt <- isSortResTy ty
-        --     isLvl <- A.isLevelType ty
-        --     let shouldDrop = isLvl || A.hasQuantity0 d
-        --         isNotV = isSrt || shouldDrop
-        --     if isNotV then
-        --       A.addContext d $ go (n + 1) vIntros tel
-        --     else if vIntros == 0 then
-        --       return n
-        --     else
-        --       A.addContext d $ go (n + 1) (vIntros - 1) tel
-        --   go n _ [] = return n
-
       d | Just (NoFFI _) <- pragma ->
         panic "pragma (can only qualify pragma for functions)" (pp defName)
 
@@ -250,9 +196,10 @@ instance A.Definition ~> RDef where
       d -> panic "definition" d
 
     -- ** helper for functions and axioms
-    goFn :: Maybe Pragma -> Int -> (Int -> C (R.Expr ())) -> (A.ListTel, A.Type) -> C (R.Item ())
-    goFn pragma intros goBody acc = do
-      (ps, as, resTy, body) <- goFn' 0 acc
+    goFn :: Maybe Pragma -> Int -> (A.ListTel, A.Type) -> (Int -> C (R.Expr ()))
+         -> C (R.Item ())
+    goFn pragma raiseIntros acc goBody = do
+      (ps, as, resTy, body) <- goFn' 0 raiseIntros acc
       report $ "ps: " <> pp ps
       let mkFn | ConstNoFFI <- pragma{-, null as-} = RConstFn
                | otherwise = RFn
@@ -264,29 +211,28 @@ instance A.Definition ~> RDef where
          -> do setArity defName (length as)
                return $ mkFn dx (rTyParam <$> ps) (mkFnDeclTy as resTy) (RBlock body)
       where
-      goFn' :: Int -> (A.ListTel, A.Type) -> C ([String], [R.Arg ()], R.Ty (), R.Expr ())
-      goFn' allIntros (d:tel, resTy) = do
+      goFn' :: Int -> Int -> (A.ListTel, A.Type) -> C ([String], [R.Arg ()], R.Ty (), R.Expr ())
+      goFn' allIntros raiseIntros (d:tel, resTy) = do
         -- report $ "_telArg: " <> pp d
         d' <- renameTelArg d
         -- report $ "_telArg': " <> pp d'
         (ps0, as0) <- goTelArg d'
         -- report $ "ps0: " <> pp ps0
         -- report $ "as0: " <> A.ppShow as0
-        (ps, as, resTy, body) <- A.addContext d' (goFn' (allIntros + length as0) (tel, resTy))
+        (ps, as, resTy, body) <- A.addContext d' $
+          goFn' (allIntros + length as0) (raiseIntros + 1) (tel, resTy)
         return $ (ps0 <> ps, as0 <> as, resTy, body)
-      goFn' allIntros ([], resTy) = do
+      goFn' allIntros raiseIntros ([], resTy) = do
         resTy' <- go resTy
-        {-
-        let newIntros = max (allIntros - intros) 0
-        body <- inFunIntros newIntros $ goBody newIntros
-        -}
-        body <- goBody allIntros
+        report $ " allIntros: " <> pp allIntros
+        body <- inFunIntros allIntros $ goBody raiseIntros
         return ([], [], resTy', body)
 
       goTelArg :: TelItem -> C ([String], [R.Arg ()])
       goTelArg = classifyArg >=> \case
         TyParam x -> return ([x], [])
-        DroppedArg -> return ([], [])
+        LvlParam -> return ([], [])
+        ErasedArg -> return ([], [])
         KeptArg x ty -> go ty >>= \ty' -> return ([], [RArg (R.mkIdent x) ty'])
 
       renameTelArg :: TelItem -> C TelItem

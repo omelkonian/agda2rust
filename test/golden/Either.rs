@@ -5,6 +5,13 @@ pub enum Either<A, B> {
   Right(B),
 }
 
+pub fn fromEitherAB<A, B>(x: A, x0: Either<A, B>) -> A {
+  match x0 {
+    Either::Left(x1) => x1,
+    Either::Right(x1) => x,
+  }
+}
+
 pub fn fromEither<A, B>(x: A, x0: Either<A, B>) -> A {
   match x0 {
     Either::Left(x1) => x1,
@@ -57,7 +64,8 @@ use std::marker::{PhantomData};
 fn __<T>() -> PhantomData<T> { return PhantomData; }
 
 pub fn main() {
-  println!("{}:\t\t\t {} | {} | {} | {} | {}", module_path!(),
+  println!("{}:\t\t\t {} | {} | {} | {} | {} | {}", module_path!(),
+    fromEitherAB::<i32, i32>(41, Either::Left(42)),
     fromEither::<i32, i32>(41, Either::Left(42)),
     fromOnlyLeft::<i32, i32>(OnlyLeft::Left(42)),
     fromOnlyLeftR::<i32, i32>(OnlyLeftR {left: 42, _phantom: __()}),
