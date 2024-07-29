@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>PointFree</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="1" class="Comment">-- Issue #2</a>
+<a id="13" class="Keyword">open</a> <a id="18" class="Keyword">import</a> <a id="25" href="Agda.Builtin.Nat.html" class="Module">Agda.Builtin.Nat</a> <a id="42" class="Keyword">using</a> <a id="48" class="Symbol">(</a><a id="49" href="Agda.Builtin.Nat.html#234" class="InductiveConstructor">suc</a><a id="52" class="Symbol">)</a> <a id="54" class="Keyword">renaming</a> <a id="63" class="Symbol">(</a><a id="64" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a> <a id="68" class="Symbol">to</a> <a id="71" class="Datatype">ℕ</a><a id="72" class="Symbol">)</a>
+
+<a id="75" class="Symbol">{-#</a> <a id="79" class="Keyword">FOREIGN</a> <a id="87" class="Pragma">AGDA2RUST</a>
+<a id="97" class="Pragma">#[derive(Debug)]</a>
+<a id="114" class="Symbol">#-}</a>
+<a id="118" class="Keyword">data</a> <a id="Foo"></a><a id="123" href="PointFree.html#123" class="Datatype">Foo</a> <a id="127" class="Symbol">:</a> <a id="129" href="Agda.Primitive.html#388" class="Primitive">Set</a> <a id="133" class="Keyword">where</a>
+  <a id="Foo.foo"></a><a id="141" href="PointFree.html#141" class="InductiveConstructor">foo</a> <a id="145" class="Symbol">:</a> <a id="147" href="PointFree.html#71" class="Datatype">ℕ</a> <a id="149" class="Symbol">→</a> <a id="151" href="PointFree.html#123" class="Datatype">Foo</a>
+
+<a id="f"></a><a id="156" href="PointFree.html#156" class="Function">f</a> <a id="158" class="Symbol">:</a> <a id="160" href="PointFree.html#71" class="Datatype">ℕ</a> <a id="162" class="Symbol">→</a> <a id="164" href="PointFree.html#123" class="Datatype">Foo</a>
+<a id="168" href="PointFree.html#156" class="Function">f</a> <a id="170" class="Symbol">=</a> <a id="172" href="PointFree.html#141" class="InductiveConstructor">foo</a>
+
+<a id="g"></a><a id="177" href="PointFree.html#177" class="Function">g</a> <a id="179" class="Symbol">:</a> <a id="181" href="PointFree.html#71" class="Datatype">ℕ</a> <a id="183" class="Symbol">→</a> <a id="185" href="PointFree.html#71" class="Datatype">ℕ</a>
+<a id="187" href="PointFree.html#177" class="Function">g</a> <a id="189" class="Symbol">=</a> <a id="191" href="Agda.Builtin.Nat.html#234" class="InductiveConstructor">suc</a>
+
+<a id="h"></a><a id="196" href="PointFree.html#196" class="Function">h</a> <a id="198" class="Symbol">:</a> <a id="200" href="PointFree.html#71" class="Datatype">ℕ</a> <a id="202" class="Symbol">→</a> <a id="204" href="PointFree.html#71" class="Datatype">ℕ</a>
+<a id="206" href="PointFree.html#196" class="Function">h</a> <a id="208" class="Symbol">=</a> <a id="210" href="PointFree.html#177" class="Function">g</a>
+
+<a id="213" class="Symbol">{-#</a> <a id="217" class="Keyword">FOREIGN</a> <a id="225" class="Pragma">AGDA2RUST</a>
+<a id="235" class="Pragma">pub</a> <a id="239" class="Pragma">fn</a> <a id="242" class="Pragma">main()</a> <a id="249" class="Pragma">{</a>
+  <a id="253" class="Pragma">println!(&quot;{}:\t\t</a> <a id="271" class="Pragma">{:?}</a> <a id="276" class="Pragma">|</a> <a id="278" class="Pragma">{}</a> <a id="281" class="Pragma">|</a> <a id="283" class="Pragma">{}&quot;,</a> <a id="288" class="Pragma">module_path!(),</a>
+    <a id="308" class="Pragma">f(42),</a>
+    <a id="319" class="Pragma">g(41),</a>
+    <a id="330" class="Pragma">h(41),</a>
+  <a id="339" class="Pragma">);</a>
+<a id="342" class="Pragma">}</a>
+<a id="344" class="Symbol">#-}</a>
+</pre><div class="split right"><embed src="build/PointFree.unicode.html"/></div></body></html>

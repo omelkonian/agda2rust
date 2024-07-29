@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Curry</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="split left Agda"><a id="id"></a><a id="1" href="Curry.html" class="Function">id</a> <a id="it"></a><a id="4" href="Curry.html#4" class="Function">it</a> <a id="7" class="Symbol">:</a> <a id="9" class="Symbol">∀</a> <a id="11" class="Symbol">{</a><a id="12" href="Curry.html#12" class="Bound">A</a> <a id="14" class="Symbol">:</a> <a id="16" href="Agda.Primitive.html#388" class="Primitive">Set</a><a id="19" class="Symbol">}</a> <a id="21" class="Symbol">→</a> <a id="23" href="Curry.html#12" class="Bound">A</a> <a id="25" class="Symbol">→</a> <a id="27" href="Curry.html#12" class="Bound">A</a>
+<a id="29" href="Curry.html" class="Function">id</a> <a id="32" href="Curry.html#32" class="Bound">x</a> <a id="34" class="Symbol">=</a> <a id="36" href="Curry.html#32" class="Bound">x</a>
+<a id="38" href="Curry.html#4" class="Function">it</a> <a id="41" class="Symbol">=</a> <a id="43" href="Curry.html" class="Function">id</a>
+
+<a id="k"></a><a id="47" href="Curry.html#47" class="Function">k</a> <a id="drop"></a><a id="49" href="Curry.html#49" class="Function">drop</a> <a id="54" class="Symbol">:</a> <a id="56" class="Symbol">∀</a> <a id="58" class="Symbol">{</a><a id="59" href="Curry.html#59" class="Bound">A</a> <a id="61" href="Curry.html#61" class="Bound">B</a> <a id="63" class="Symbol">:</a> <a id="65" href="Agda.Primitive.html#388" class="Primitive">Set</a><a id="68" class="Symbol">}</a> <a id="70" class="Symbol">→</a> <a id="72" href="Curry.html#59" class="Bound">A</a> <a id="74" class="Symbol">→</a> <a id="76" href="Curry.html#61" class="Bound">B</a> <a id="78" class="Symbol">→</a> <a id="80" href="Curry.html#59" class="Bound">A</a>
+<a id="82" href="Curry.html#47" class="Function">k</a> <a id="84" href="Curry.html#84" class="Bound">x</a> <a id="86" class="Symbol">_</a> <a id="88" class="Symbol">=</a> <a id="90" href="Curry.html#84" class="Bound">x</a>
+<a id="92" href="Curry.html#49" class="Function">drop</a> <a id="97" class="Symbol">=</a> <a id="99" href="Curry.html#47" class="Function">k</a>
+
+<a id="102" class="Symbol">{-#</a> <a id="106" class="Keyword">FOREIGN</a> <a id="114" class="Pragma">AGDA2RUST</a>
+<a id="124" class="Pragma">pub</a> <a id="128" class="Pragma">fn</a> <a id="131" class="Pragma">main()</a> <a id="138" class="Pragma">{</a>
+  <a id="142" class="Pragma">println!(&quot;{}:\t\t\t</a> <a id="162" class="Pragma">{}</a> <a id="165" class="Pragma">|</a> <a id="167" class="Pragma">{}</a> <a id="170" class="Pragma">|</a> <a id="172" class="Pragma">{}</a> <a id="175" class="Pragma">|</a> <a id="177" class="Pragma">{}&quot;,</a> <a id="182" class="Pragma">module_path!(),</a>
+    <a id="202" class="Pragma">id(42),</a>
+    <a id="214" class="Pragma">it(42),</a>
+    <a id="226" class="Pragma">k(42,</a> <a id="232" class="Pragma">0),</a>
+    <a id="240" class="Pragma">drop(42,</a> <a id="249" class="Pragma">0)</a>
+  <a id="254" class="Pragma">);</a>
+<a id="257" class="Pragma">}</a>
+<a id="259" class="Symbol">#-}</a>
+</pre><div class="split right"><embed src="build/Curry.unicode.html"/></div></body></html>
