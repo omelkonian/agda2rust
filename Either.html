@@ -37,21 +37,18 @@
 <a id="872" href="Either.html#823" class="Function">fromOnlyLeftR2</a> <a id="887" href="Either.html#887" class="Bound">r</a> <a id="889" class="Symbol">=</a> <a id="891" href="Either.html#887" class="Bound">r</a> <a id="893" class="Symbol">.</a><a id="894" href="Either.html#730" class="Field">left</a> <a id="899" class="Symbol">.</a><a id="900" href="Either.html#730" class="Field">left</a>
 
 <a id="906" class="Symbol">{-#</a> <a id="910" class="Keyword">FOREIGN</a> <a id="918" class="Pragma">AGDA2RUST</a>
-<a id="928" class="Pragma">use</a> <a id="932" class="Pragma">std::marker::{PhantomData};</a>
-<a id="960" class="Pragma">fn</a> <a id="963" class="Pragma">__&lt;T&gt;()</a> <a id="971" class="Pragma">-&gt;</a> <a id="974" class="Pragma">PhantomData&lt;T&gt;</a> <a id="989" class="Pragma">{</a> <a id="991" class="Pragma">return</a> <a id="998" class="Pragma">PhantomData;</a> <a id="1011" class="Pragma">}</a>
-
-<a id="1014" class="Pragma">pub</a> <a id="1018" class="Pragma">fn</a> <a id="1021" class="Pragma">main()</a> <a id="1028" class="Pragma">{</a>
-  <a id="1032" class="Pragma">println!(&quot;{}:\t\t\t</a> <a id="1052" class="Pragma">{}</a> <a id="1055" class="Pragma">|</a> <a id="1057" class="Pragma">{}</a> <a id="1060" class="Pragma">|</a> <a id="1062" class="Pragma">{}</a> <a id="1065" class="Pragma">|</a> <a id="1067" class="Pragma">{}</a> <a id="1070" class="Pragma">|</a> <a id="1072" class="Pragma">{}</a> <a id="1075" class="Pragma">|</a> <a id="1077" class="Pragma">{}&quot;,</a> <a id="1082" class="Pragma">module_path!(),</a>
-    <a id="1102" class="Pragma">fromEitherAB::&lt;i32,</a> <a id="1122" class="Pragma">i32&gt;(41,</a> <a id="1131" class="Pragma">Either::Left(42)),</a>
-    <a id="1154" class="Pragma">fromEither::&lt;i32,</a> <a id="1172" class="Pragma">i32&gt;(41,</a> <a id="1181" class="Pragma">Either::Left(42)),</a>
-    <a id="1204" class="Pragma">fromOnlyLeft::&lt;i32,</a> <a id="1224" class="Pragma">i32&gt;(OnlyLeft::Left(42)),</a>
-    <a id="1254" class="Pragma">fromOnlyLeftR::&lt;i32,</a> <a id="1275" class="Pragma">i32&gt;(OnlyLeftR</a> <a id="1290" class="Pragma">{left:</a> <a id="1297" class="Pragma">42,</a> <a id="1301" class="Pragma">_phantom:</a> <a id="1311" class="Pragma">__()}),</a>
-    <a id="1323" class="Pragma">fromOnlyLeft2::&lt;i32,</a> <a id="1344" class="Pragma">i32,</a> <a id="1349" class="Pragma">i32&gt;(OnlyLeft::Left(OnlyLeft::Left(42))),</a>
-    <a id="1395" class="Pragma">fromOnlyLeftR2::&lt;i32,</a> <a id="1417" class="Pragma">i32,</a> <a id="1422" class="Pragma">i32&gt;(OnlyLeftR</a>
-      <a id="1443" class="Pragma">{left:</a> <a id="1450" class="Pragma">OnlyLeftR</a> <a id="1460" class="Pragma">{left:</a> <a id="1467" class="Pragma">42,</a> <a id="1471" class="Pragma">_phantom:</a> <a id="1481" class="Pragma">__()},</a>
-      <a id="1494" class="Pragma">_phantom:</a> <a id="1504" class="Pragma">__()}</a>
-    <a id="1514" class="Pragma">),</a>
-  <a id="1519" class="Pragma">);</a>
-<a id="1522" class="Pragma">}</a>
-<a id="1524" class="Symbol">#-}</a>
+<a id="928" class="Pragma">pub</a> <a id="932" class="Pragma">fn</a> <a id="935" class="Pragma">main()</a> <a id="942" class="Pragma">{</a>
+  <a id="946" class="Pragma">println!(&quot;{}:\t\t</a> <a id="964" class="Pragma">{}</a> <a id="967" class="Pragma">|</a> <a id="969" class="Pragma">{}</a> <a id="972" class="Pragma">|</a> <a id="974" class="Pragma">{}</a> <a id="977" class="Pragma">|</a> <a id="979" class="Pragma">{}</a> <a id="982" class="Pragma">|</a> <a id="984" class="Pragma">{}</a> <a id="987" class="Pragma">|</a> <a id="989" class="Pragma">{}&quot;,</a> <a id="994" class="Pragma">module_path!(),</a>
+    <a id="1014" class="Pragma">fromEitherAB::&lt;i32,</a> <a id="1034" class="Pragma">i32&gt;(41,</a> <a id="1043" class="Pragma">Either::Left(42)),</a>
+    <a id="1066" class="Pragma">fromEither::&lt;i32,</a> <a id="1084" class="Pragma">i32&gt;(41,</a> <a id="1093" class="Pragma">Either::Left(42)),</a>
+    <a id="1116" class="Pragma">fromOnlyLeft::&lt;i32,</a> <a id="1136" class="Pragma">i32&gt;(OnlyLeft::Left(42)),</a>
+    <a id="1166" class="Pragma">fromOnlyLeftR::&lt;i32,</a> <a id="1187" class="Pragma">i32&gt;(OnlyLeftR</a> <a id="1202" class="Pragma">{left:</a> <a id="1209" class="Pragma">42,</a> <a id="1213" class="Pragma">_phantom:</a> <a id="1223" class="Pragma">__()}),</a>
+    <a id="1235" class="Pragma">fromOnlyLeft2::&lt;i32,</a> <a id="1256" class="Pragma">i32,</a> <a id="1261" class="Pragma">i32&gt;(OnlyLeft::Left(OnlyLeft::Left(42))),</a>
+    <a id="1307" class="Pragma">fromOnlyLeftR2::&lt;i32,</a> <a id="1329" class="Pragma">i32,</a> <a id="1334" class="Pragma">i32&gt;(OnlyLeftR</a>
+      <a id="1355" class="Pragma">{left:</a> <a id="1362" class="Pragma">OnlyLeftR</a> <a id="1372" class="Pragma">{left:</a> <a id="1379" class="Pragma">42,</a> <a id="1383" class="Pragma">_phantom:</a> <a id="1393" class="Pragma">__()},</a>
+      <a id="1406" class="Pragma">_phantom:</a> <a id="1416" class="Pragma">__()}</a>
+    <a id="1426" class="Pragma">),</a>
+  <a id="1431" class="Pragma">);</a>
+<a id="1434" class="Pragma">}</a>
+<a id="1436" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/Either.unicode.html"/></div></body></html>

@@ -72,28 +72,26 @@
   <a id="BST.Node"></a><a id="1624" href="RunTimeIrrelevance.html#1624" class="InductiveConstructor">Node</a> <a id="1629" class="Symbol">:</a> <a id="1631" class="Symbol">(</a><a id="1632" href="RunTimeIrrelevance.html#1632" class="Bound">x</a> <a id="1634" class="Symbol">:</a> <a id="1636" href="Agda.Builtin.Nat.html#203" class="Datatype">Nat</a><a id="1639" class="Symbol">)</a> <a id="1641" class="Symbol">(</a><a id="1642" href="RunTimeIrrelevance.html#1642" class="Bound">l</a> <a id="1644" class="Symbol">:</a> <a id="1646" href="RunTimeIrrelevance.html#1532" class="Datatype">BST</a> <a id="1650" href="RunTimeIrrelevance.html#1540" class="Bound">lower</a> <a id="1656" href="RunTimeIrrelevance.html#1632" class="Bound">x</a><a id="1657" class="Symbol">)</a> <a id="1659" class="Symbol">(</a><a id="1660" href="RunTimeIrrelevance.html#1660" class="Bound">r</a> <a id="1662" class="Symbol">:</a> <a id="1664" href="RunTimeIrrelevance.html#1532" class="Datatype">BST</a> <a id="1668" href="RunTimeIrrelevance.html#1632" class="Bound">x</a> <a id="1670" href="RunTimeIrrelevance.html#1546" class="Bound">upper</a><a id="1675" class="Symbol">)</a> <a id="1677" class="Symbol">→</a> <a id="1679" href="RunTimeIrrelevance.html#1532" class="Datatype">BST</a> <a id="1683" href="RunTimeIrrelevance.html#1540" class="Bound">lower</a> <a id="1689" href="RunTimeIrrelevance.html#1546" class="Bound">upper</a>
 
 <a id="1696" class="Symbol">{-#</a> <a id="1700" class="Keyword">FOREIGN</a> <a id="1708" class="Pragma">AGDA2RUST</a>
-<a id="1718" class="Pragma">fn</a> <a id="1721" class="Pragma">ᐁ&lt;T&gt;(x</a> <a id="1728" class="Pragma">:</a> <a id="1730" class="Pragma">T)</a> <a id="1733" class="Pragma">-&gt;</a> <a id="1736" class="Pragma">Box&lt;T&gt;</a> <a id="1743" class="Pragma">{</a> <a id="1745" class="Pragma">return</a> <a id="1752" class="Pragma">Box::new(x);</a> <a id="1765" class="Pragma">}</a>
+<a id="1718" class="Pragma">use</a> <a id="1722" class="Pragma">self::BST::{Leaf,Node};</a>
 
-<a id="1768" class="Pragma">use</a> <a id="1772" class="Pragma">self::BST::{Leaf,Node};</a>
+<a id="1747" class="Pragma">pub</a> <a id="1751" class="Pragma">fn</a> <a id="1754" class="Pragma">main()</a> <a id="1761" class="Pragma">{</a>
+  <a id="1765" class="Pragma">println!(&quot;{}:\t</a> <a id="1781" class="Pragma">\</a>
+    <a id="1787" class="Pragma">{}</a> <a id="1790" class="Pragma">|</a> <a id="1792" class="Pragma">{}</a> <a id="1795" class="Pragma">|</a> <a id="1797" class="Pragma">\</a>
+    <a id="1803" class="Pragma">{}</a> <a id="1806" class="Pragma">|</a> <a id="1808" class="Pragma">{}</a> <a id="1811" class="Pragma">|</a> <a id="1813" class="Pragma">{}</a> <a id="1816" class="Pragma">|</a> <a id="1818" class="Pragma">{}</a> <a id="1821" class="Pragma">|</a> <a id="1823" class="Pragma">\</a>
+    <a id="1829" class="Pragma">{}</a> <a id="1832" class="Pragma">|</a> <a id="1834" class="Pragma">{:?}</a> <a id="1839" class="Pragma">|</a> <a id="1841" class="Pragma">{:?}</a> <a id="1846" class="Pragma">|</a> <a id="1848" class="Pragma">{:?}&quot;,</a> <a id="1855" class="Pragma">module_path!(),</a>
+    <a id="1875" class="Pragma">erasedFunArg(41),</a>
+    <a id="1897" class="Pragma">erasedHigherOrderFunArg(41),</a>
 
-<a id="1797" class="Pragma">pub</a> <a id="1801" class="Pragma">fn</a> <a id="1804" class="Pragma">main()</a> <a id="1811" class="Pragma">{</a>
-  <a id="1815" class="Pragma">println!(&quot;{}:\t</a> <a id="1831" class="Pragma">\</a>
-    <a id="1837" class="Pragma">{}</a> <a id="1840" class="Pragma">|</a> <a id="1842" class="Pragma">{}</a> <a id="1845" class="Pragma">|</a> <a id="1847" class="Pragma">\</a>
-    <a id="1853" class="Pragma">{}</a> <a id="1856" class="Pragma">|</a> <a id="1858" class="Pragma">{}</a> <a id="1861" class="Pragma">|</a> <a id="1863" class="Pragma">{}</a> <a id="1866" class="Pragma">|</a> <a id="1868" class="Pragma">{}</a> <a id="1871" class="Pragma">|</a> <a id="1873" class="Pragma">\</a>
-    <a id="1879" class="Pragma">{}</a> <a id="1882" class="Pragma">|</a> <a id="1884" class="Pragma">{:?}</a> <a id="1889" class="Pragma">|</a> <a id="1891" class="Pragma">{:?}</a> <a id="1896" class="Pragma">|</a> <a id="1898" class="Pragma">{:?}&quot;,</a> <a id="1905" class="Pragma">module_path!(),</a>
-    <a id="1925" class="Pragma">erasedFunArg(41),</a>
-    <a id="1947" class="Pragma">erasedHigherOrderFunArg(41),</a>
+    <a id="1931" class="Pragma">erasedRec(),</a>
+    <a id="1948" class="Pragma">succ(ErasedField</a> <a id="1965" class="Pragma">{x:</a> <a id="1969" class="Pragma">41}),</a>
+    <a id="1979" class="Pragma">erasedRecParam(ErasedRecParam</a> <a id="2009" class="Pragma">{y:</a> <a id="2013" class="Pragma">42}),</a>
+    <a id="2023" class="Pragma">erasedRecParamH(ErasedRecParam</a> <a id="2054" class="Pragma">{y:</a> <a id="2058" class="Pragma">42}),</a>
 
-    <a id="1981" class="Pragma">erasedRec(),</a>
-    <a id="1998" class="Pragma">succ(ErasedField</a> <a id="2015" class="Pragma">{x:</a> <a id="2019" class="Pragma">41}),</a>
-    <a id="2029" class="Pragma">erasedRecParam(ErasedRecParam</a> <a id="2059" class="Pragma">{y:</a> <a id="2063" class="Pragma">42}),</a>
-    <a id="2073" class="Pragma">erasedRecParamH(ErasedRecParam</a> <a id="2104" class="Pragma">{y:</a> <a id="2108" class="Pragma">42}),</a>
-
-    <a id="2119" class="Pragma">erasedData(),</a>
-    <a id="2137" class="Pragma">erasedClause(ErasedCon::mk(42)),</a>
-    <a id="2174" class="Pragma">erasedConArg(ErasedConArg::mk(42)),</a>
-    <a id="2214" class="Pragma">Node(4,</a> <a id="2222" class="Pragma">ᐁ(Node(2,</a> <a id="2232" class="Pragma">ᐁ(Leaf()),</a> <a id="2243" class="Pragma">ᐁ(Leaf()))),</a> <a id="2256" class="Pragma">ᐁ(Leaf())),</a>
-  <a id="2270" class="Pragma">);</a>
-<a id="2273" class="Pragma">}</a>
-<a id="2275" class="Symbol">#-}</a>
+    <a id="2069" class="Pragma">erasedData(),</a>
+    <a id="2087" class="Pragma">erasedClause(ErasedCon::mk(42)),</a>
+    <a id="2124" class="Pragma">erasedConArg(ErasedConArg::mk(42)),</a>
+    <a id="2164" class="Pragma">Node(4,</a> <a id="2172" class="Pragma">ᐁ(Node(2,</a> <a id="2182" class="Pragma">ᐁ(Leaf()),</a> <a id="2193" class="Pragma">ᐁ(Leaf()))),</a> <a id="2206" class="Pragma">ᐁ(Leaf())),</a>
+  <a id="2220" class="Pragma">);</a>
+<a id="2223" class="Pragma">}</a>
+<a id="2225" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/RunTimeIrrelevance.unicode.html"/></div></body></html>

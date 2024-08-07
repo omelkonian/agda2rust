@@ -7,124 +7,158 @@
 <a id="80" class="Keyword">import</a> <a id="87" href="Product.html" class="Module">Product</a>
 <a id="95" class="Keyword">import</a> <a id="102" href="Either.html" class="Module">Either</a>
 <a id="109" class="Keyword">import</a> <a id="116" href="Maybe.html" class="Module">Maybe</a>
-<a id="122" class="Comment">-- import Exp</a>
-<a id="136" class="Keyword">import</a> <a id="143" href="Nat0.html" class="Module">Nat0</a>
-<a id="148" class="Keyword">import</a> <a id="155" href="Nat.html" class="Module">Nat</a>
-<a id="159" class="Keyword">import</a> <a id="166" href="List0.html" class="Module">List0</a>
-<a id="172" class="Keyword">import</a> <a id="179" href="List.html" class="Module">List</a>
-<a id="184" class="Keyword">import</a> <a id="191" href="Singleton.html" class="Module">Singleton</a>
-<a id="201" class="Keyword">import</a> <a id="208" href="RunTimeIrrelevance.html" class="Module">RunTimeIrrelevance</a>
-<a id="227" class="Keyword">import</a> <a id="234" href="Postulates.html" class="Module">Postulates</a>
-<a id="245" class="Keyword">import</a> <a id="252" href="Constants.html" class="Module">Constants</a>
-<a id="262" class="Comment">-- import Float0</a>
-<a id="279" class="Keyword">import</a> <a id="286" href="Float.html" class="Module">Float</a>
-<a id="292" class="Keyword">import</a> <a id="299" href="Char.html" class="Module">Char</a>
-<a id="304" class="Comment">-- import String0</a>
-<a id="322" class="Keyword">import</a> <a id="329" href="String.html" class="Module">String</a>
-<a id="336" class="Keyword">import</a> <a id="343" href="Prim.html" class="Module">Prim</a>
-<a id="348" class="Keyword">import</a> <a id="355" href="Bool00.html" class="Module">Bool00</a>
-<a id="362" class="Comment">-- import Bool0</a>
-<a id="378" class="Keyword">import</a> <a id="385" href="Bool.html" class="Module">Bool</a>
-<a id="390" class="Keyword">import</a> <a id="397" href="Int.html" class="Module">Int</a>
-<a id="401" class="Keyword">import</a> <a id="408" href="TypeAliases.html" class="Module">TypeAliases</a>
-<a id="420" class="Keyword">import</a> <a id="427" href="OverloadedConstructors.html" class="Module">OverloadedConstructors</a>
-<a id="450" class="Keyword">import</a> <a id="457" href="OverloadedFields.html" class="Module">OverloadedFields</a>
-<a id="474" class="Keyword">import</a> <a id="481" href="ErasedFields.html" class="Module">ErasedFields</a>
-<a id="494" class="Keyword">import</a> <a id="501" href="RecordFields.html" class="Module">RecordFields</a>
-<a id="514" class="Keyword">import</a> <a id="521" href="UnusedArgs.html" class="Module">UnusedArgs</a>
-<a id="532" class="Keyword">import</a> <a id="539" href="ExactSplit.html" class="Module">ExactSplit</a>
-<a id="550" class="Keyword">import</a> <a id="557" href="OpenModule.html" class="Module">OpenModule</a>
-<a id="568" class="Keyword">import</a> <a id="575" href="ConstructorImplicitArgs.html" class="Module">ConstructorImplicitArgs</a>
-<a id="599" class="Keyword">import</a> <a id="606" href="MultiArgFun.html" class="Module">MultiArgFun</a>
-<a id="618" class="Keyword">import</a> <a id="625" href="Curry.html" class="Module">Curry</a>
-<a id="631" class="Keyword">import</a> <a id="638" href="PointFree.html" class="Module">PointFree</a>
-<a id="648" class="Keyword">import</a> <a id="655" href="PartialApp.html" class="Module">PartialApp</a>
-<a id="666" class="Comment">-- import PartialApp2</a>
-<a id="688" class="Comment">-- import PartialApp3</a>
+<a id="122" class="Keyword">import</a> <a id="129" href="Nat0.html" class="Module">Nat0</a>
+<a id="134" class="Keyword">import</a> <a id="141" href="Nat.html" class="Module">Nat</a>
+<a id="145" class="Keyword">import</a> <a id="152" href="List0.html" class="Module">List0</a>
+<a id="158" class="Keyword">import</a> <a id="165" href="List.html" class="Module">List</a>
+<a id="170" class="Keyword">import</a> <a id="177" href="Singleton.html" class="Module">Singleton</a>
+<a id="187" class="Keyword">import</a> <a id="194" href="RunTimeIrrelevance.html" class="Module">RunTimeIrrelevance</a>
+<a id="213" class="Keyword">import</a> <a id="220" href="Postulates.html" class="Module">Postulates</a>
+<a id="231" class="Keyword">import</a> <a id="238" href="Constants.html" class="Module">Constants</a>
+<a id="248" class="Comment">-- import Float0</a>
+<a id="265" class="Keyword">import</a> <a id="272" href="Float.html" class="Module">Float</a>
+<a id="278" class="Keyword">import</a> <a id="285" href="Char.html" class="Module">Char</a>
+<a id="290" class="Comment">-- import String0</a>
+<a id="308" class="Keyword">import</a> <a id="315" href="String.html" class="Module">String</a>
+<a id="322" class="Keyword">import</a> <a id="329" href="Prim.html" class="Module">Prim</a>
+<a id="334" class="Keyword">import</a> <a id="341" href="Bool00.html" class="Module">Bool00</a>
+<a id="348" class="Comment">-- import Bool0</a>
+<a id="364" class="Keyword">import</a> <a id="371" href="Bool.html" class="Module">Bool</a>
+<a id="376" class="Keyword">import</a> <a id="383" href="Int.html" class="Module">Int</a>
+<a id="387" class="Keyword">import</a> <a id="394" href="TypeAliases.html" class="Module">TypeAliases</a>
+<a id="406" class="Keyword">import</a> <a id="413" href="OverloadedCons.html" class="Module">OverloadedCons</a>
+<a id="428" class="Keyword">import</a> <a id="435" href="OverloadedFields.html" class="Module">OverloadedFields</a>
+<a id="452" class="Keyword">import</a> <a id="459" href="ErasedFields.html" class="Module">ErasedFields</a>
+<a id="472" class="Keyword">import</a> <a id="479" href="RecordFields.html" class="Module">RecordFields</a>
+<a id="492" class="Keyword">import</a> <a id="499" href="UnusedArgs.html" class="Module">UnusedArgs</a>
+<a id="510" class="Keyword">import</a> <a id="517" href="ExactSplit.html" class="Module">ExactSplit</a>
+<a id="528" class="Keyword">import</a> <a id="535" href="OpenModule.html" class="Module">OpenModule</a>
+<a id="546" class="Keyword">import</a> <a id="553" href="ConsImplicitArgs.html" class="Module">ConsImplicitArgs</a>
 
-<a id="711" class="Symbol">{-#</a> <a id="715" class="Keyword">FOREIGN</a> <a id="723" class="Pragma">AGDA2RUST</a>
-<a id="733" class="Pragma">mod</a> <a id="737" class="Pragma">Identity;</a>
-<a id="747" class="Pragma">mod</a> <a id="751" class="Pragma">Numbers;</a>
-<a id="760" class="Pragma">mod</a> <a id="764" class="Pragma">Simplification;</a>
-<a id="780" class="Pragma">mod</a> <a id="784" class="Pragma">Top;</a>
-<a id="789" class="Pragma">mod</a> <a id="793" class="Pragma">Newtype;</a>
-<a id="802" class="Pragma">mod</a> <a id="806" class="Pragma">Product;</a>
-<a id="815" class="Pragma">mod</a> <a id="819" class="Pragma">Either;</a>
-<a id="827" class="Pragma">mod</a> <a id="831" class="Pragma">Maybe;</a>
-<a id="838" class="Pragma">//</a> <a id="841" class="Pragma">mod</a> <a id="845" class="Pragma">Exp;</a>
-<a id="850" class="Pragma">mod</a> <a id="854" class="Pragma">Nat0;</a>
-<a id="860" class="Pragma">mod</a> <a id="864" class="Pragma">Nat;</a>
-<a id="869" class="Pragma">mod</a> <a id="873" class="Pragma">List0;</a>
-<a id="880" class="Pragma">mod</a> <a id="884" class="Pragma">List;</a>
-<a id="890" class="Pragma">mod</a> <a id="894" class="Pragma">Singleton;</a>
-<a id="905" class="Pragma">mod</a> <a id="909" class="Pragma">RunTimeIrrelevance;</a>
-<a id="929" class="Pragma">mod</a> <a id="933" class="Pragma">Postulates;</a>
-<a id="945" class="Pragma">mod</a> <a id="949" class="Pragma">Constants;</a>
-<a id="960" class="Pragma">//</a> <a id="963" class="Pragma">mod</a> <a id="967" class="Pragma">Float0;</a>
-<a id="975" class="Pragma">mod</a> <a id="979" class="Pragma">Float;</a>
-<a id="986" class="Pragma">mod</a> <a id="990" class="Pragma">Char;</a>
-<a id="996" class="Pragma">//</a> <a id="999" class="Pragma">mod</a> <a id="1003" class="Pragma">String0;</a>
-<a id="1012" class="Pragma">mod</a> <a id="1016" class="Pragma">String;</a>
-<a id="1024" class="Pragma">mod</a> <a id="1028" class="Pragma">Prim;</a>
-<a id="1034" class="Pragma">mod</a> <a id="1038" class="Pragma">Bool00;</a>
-<a id="1046" class="Pragma">//</a> <a id="1049" class="Pragma">mod</a> <a id="1053" class="Pragma">Bool0;</a>
-<a id="1060" class="Pragma">mod</a> <a id="1064" class="Pragma">Bool;</a>
-<a id="1070" class="Pragma">mod</a> <a id="1074" class="Pragma">Int;</a>
-<a id="1079" class="Pragma">mod</a> <a id="1083" class="Pragma">TypeAliases;</a>
-<a id="1096" class="Pragma">mod</a> <a id="1100" class="Pragma">OverloadedConstructors;</a>
-<a id="1124" class="Pragma">mod</a> <a id="1128" class="Pragma">OverloadedFields;</a>
-<a id="1146" class="Pragma">mod</a> <a id="1150" class="Pragma">ErasedFields;</a>
-<a id="1164" class="Pragma">mod</a> <a id="1168" class="Pragma">RecordFields;</a>
-<a id="1182" class="Pragma">mod</a> <a id="1186" class="Pragma">UnusedArgs;</a>
-<a id="1198" class="Pragma">mod</a> <a id="1202" class="Pragma">ExactSplit;</a>
-<a id="1214" class="Pragma">mod</a> <a id="1218" class="Pragma">OpenModule;</a>
-<a id="1230" class="Pragma">mod</a> <a id="1234" class="Pragma">ConstructorImplicitArgs;</a>
-<a id="1259" class="Pragma">mod</a> <a id="1263" class="Pragma">MultiArgFun;</a>
-<a id="1276" class="Pragma">mod</a> <a id="1280" class="Pragma">Curry;</a>
-<a id="1287" class="Pragma">mod</a> <a id="1291" class="Pragma">PointFree;</a>
-<a id="1302" class="Pragma">mod</a> <a id="1306" class="Pragma">PartialApp;</a>
+<a id="571" class="Comment">-- ** partial application / currying</a>
+<a id="608" class="Keyword">import</a> <a id="615" href="MultiArgFun.html" class="Module">MultiArgFun</a>
+<a id="627" class="Keyword">import</a> <a id="634" href="Curry.html" class="Module">Curry</a>
+<a id="640" class="Keyword">import</a> <a id="647" href="PointFree.html" class="Module">PointFree</a>
+<a id="657" class="Keyword">import</a> <a id="664" href="PartialApp.html" class="Module">PartialApp</a>
+<a id="675" class="Keyword">import</a> <a id="682" href="PartialAppM.html" class="Module">PartialAppM</a>
+<a id="694" class="Keyword">import</a> <a id="701" href="PartialAppId.html" class="Module">PartialAppId</a>
+<a id="714" class="Keyword">import</a> <a id="721" href="EtaExpansion.html" class="Module">EtaExpansion</a>
+<a id="734" class="Keyword">import</a> <a id="741" href="PartialAppSwap.html" class="Module">PartialAppSwap</a>
 
-<a id="1319" class="Pragma">fn</a> <a id="1322" class="Pragma">main()</a> <a id="1329" class="Pragma">{</a>
-  <a id="1333" class="Pragma">Identity::main();</a>
-  <a id="1353" class="Pragma">Numbers::main();</a>
-  <a id="1372" class="Pragma">Simplification::main();</a>
-  <a id="1398" class="Pragma">Top::main();</a>
-  <a id="1413" class="Pragma">Newtype::main();</a>
-  <a id="1432" class="Pragma">Product::main();</a>
-  <a id="1451" class="Pragma">Either::main();</a>
-  <a id="1469" class="Pragma">Maybe::main();</a>
-<a id="1484" class="Pragma">//</a>  <a id="1488" class="Pragma">Exp::main();</a>
-  <a id="1503" class="Pragma">Nat0::main();</a>
-  <a id="1519" class="Pragma">Nat::main();</a>
-  <a id="1534" class="Pragma">List0::main();</a>
-  <a id="1551" class="Pragma">List::main();</a>
-  <a id="1567" class="Pragma">Singleton::main();</a>
-  <a id="1588" class="Pragma">RunTimeIrrelevance::main();</a>
-  <a id="1618" class="Pragma">Postulates::main();</a>
-  <a id="1640" class="Pragma">Constants::main();</a>
-  <a id="1661" class="Pragma">//</a> <a id="1664" class="Pragma">Float0::main();</a>
-  <a id="1682" class="Pragma">Float::main();</a>
-  <a id="1699" class="Pragma">Char::main();</a>
-  <a id="1715" class="Pragma">//</a> <a id="1718" class="Pragma">String0::main();</a>
-  <a id="1737" class="Pragma">String::main();</a>
-  <a id="1755" class="Pragma">Prim::main();</a>
-  <a id="1771" class="Pragma">Bool00::main();</a>
-  <a id="1789" class="Pragma">//</a> <a id="1792" class="Pragma">Bool0::main();</a>
-  <a id="1809" class="Pragma">Bool::main();</a>
-  <a id="1825" class="Pragma">Int::main();</a>
-  <a id="1840" class="Pragma">TypeAliases::main();</a>
-  <a id="1863" class="Pragma">OverloadedConstructors::main();</a>
-  <a id="1897" class="Pragma">OverloadedFields::main();</a>
-  <a id="1925" class="Pragma">ErasedFields::main();</a>
-  <a id="1949" class="Pragma">RecordFields::main();</a>
-  <a id="1973" class="Pragma">UnusedArgs::main();</a>
-  <a id="1995" class="Pragma">ExactSplit::main();</a>
-  <a id="2017" class="Pragma">OpenModule::main();</a>
-  <a id="2039" class="Pragma">ConstructorImplicitArgs::main();</a>
-  <a id="2074" class="Pragma">MultiArgFun::main();</a>
-  <a id="2097" class="Pragma">Curry::main();</a>
-  <a id="2114" class="Pragma">PointFree::main();</a>
-  <a id="2135" class="Pragma">PartialApp::main();</a>
-<a id="2155" class="Pragma">}</a>
-<a id="2157" class="Symbol">#-}</a>
+<a id="757" class="Comment">-- ** closures</a>
+<a id="772" class="Comment">-- import Closures</a>
+<a id="791" class="Comment">-- import PartialAppConst</a>
+<a id="817" class="Comment">-- import PartialAppSwapId</a>
+
+<a id="845" class="Comment">-- ** non-linearity</a>
+<a id="865" class="Comment">-- import NonLinearity</a>
+<a id="888" class="Comment">-- import Exp</a>
+
+<a id="903" class="Symbol">{-#</a> <a id="907" class="Keyword">FOREIGN</a> <a id="915" class="Pragma">AGDA2RUST</a>
+<a id="925" class="Pragma">mod</a> <a id="929" class="Pragma">Identity;</a>
+<a id="939" class="Pragma">mod</a> <a id="943" class="Pragma">Numbers;</a>
+<a id="952" class="Pragma">mod</a> <a id="956" class="Pragma">Simplification;</a>
+<a id="972" class="Pragma">mod</a> <a id="976" class="Pragma">Top;</a>
+<a id="981" class="Pragma">mod</a> <a id="985" class="Pragma">Newtype;</a>
+<a id="994" class="Pragma">mod</a> <a id="998" class="Pragma">Product;</a>
+<a id="1007" class="Pragma">mod</a> <a id="1011" class="Pragma">Either;</a>
+<a id="1019" class="Pragma">mod</a> <a id="1023" class="Pragma">Maybe;</a>
+<a id="1030" class="Pragma">mod</a> <a id="1034" class="Pragma">Nat0;</a>
+<a id="1040" class="Pragma">mod</a> <a id="1044" class="Pragma">Nat;</a>
+<a id="1049" class="Pragma">mod</a> <a id="1053" class="Pragma">List0;</a>
+<a id="1060" class="Pragma">mod</a> <a id="1064" class="Pragma">List;</a>
+<a id="1070" class="Pragma">mod</a> <a id="1074" class="Pragma">Singleton;</a>
+<a id="1085" class="Pragma">mod</a> <a id="1089" class="Pragma">RunTimeIrrelevance;</a>
+<a id="1109" class="Pragma">mod</a> <a id="1113" class="Pragma">Postulates;</a>
+<a id="1125" class="Pragma">mod</a> <a id="1129" class="Pragma">Constants;</a>
+<a id="1140" class="Pragma">//</a> <a id="1143" class="Pragma">mod</a> <a id="1147" class="Pragma">Float0;</a>
+<a id="1155" class="Pragma">mod</a> <a id="1159" class="Pragma">Float;</a>
+<a id="1166" class="Pragma">mod</a> <a id="1170" class="Pragma">Char;</a>
+<a id="1176" class="Pragma">//</a> <a id="1179" class="Pragma">mod</a> <a id="1183" class="Pragma">String0;</a>
+<a id="1192" class="Pragma">mod</a> <a id="1196" class="Pragma">String;</a>
+<a id="1204" class="Pragma">mod</a> <a id="1208" class="Pragma">Prim;</a>
+<a id="1214" class="Pragma">mod</a> <a id="1218" class="Pragma">Bool00;</a>
+<a id="1226" class="Pragma">//</a> <a id="1229" class="Pragma">mod</a> <a id="1233" class="Pragma">Bool0;</a>
+<a id="1240" class="Pragma">mod</a> <a id="1244" class="Pragma">Bool;</a>
+<a id="1250" class="Pragma">mod</a> <a id="1254" class="Pragma">Int;</a>
+<a id="1259" class="Pragma">mod</a> <a id="1263" class="Pragma">TypeAliases;</a>
+<a id="1276" class="Pragma">mod</a> <a id="1280" class="Pragma">OverloadedCons;</a>
+<a id="1296" class="Pragma">mod</a> <a id="1300" class="Pragma">OverloadedFields;</a>
+<a id="1318" class="Pragma">mod</a> <a id="1322" class="Pragma">ErasedFields;</a>
+<a id="1336" class="Pragma">mod</a> <a id="1340" class="Pragma">RecordFields;</a>
+<a id="1354" class="Pragma">mod</a> <a id="1358" class="Pragma">UnusedArgs;</a>
+<a id="1370" class="Pragma">mod</a> <a id="1374" class="Pragma">ExactSplit;</a>
+<a id="1386" class="Pragma">mod</a> <a id="1390" class="Pragma">OpenModule;</a>
+<a id="1402" class="Pragma">mod</a> <a id="1406" class="Pragma">ConsImplicitArgs;</a>
+
+<a id="1425" class="Pragma">mod</a> <a id="1429" class="Pragma">MultiArgFun;</a>
+<a id="1442" class="Pragma">mod</a> <a id="1446" class="Pragma">Curry;</a>
+<a id="1453" class="Pragma">mod</a> <a id="1457" class="Pragma">PointFree;</a>
+<a id="1468" class="Pragma">mod</a> <a id="1472" class="Pragma">PartialApp;</a>
+<a id="1484" class="Pragma">mod</a> <a id="1488" class="Pragma">PartialAppM;</a>
+<a id="1501" class="Pragma">mod</a> <a id="1505" class="Pragma">PartialAppId;</a>
+<a id="1519" class="Pragma">mod</a> <a id="1523" class="Pragma">EtaExpansion;</a>
+<a id="1537" class="Pragma">mod</a> <a id="1541" class="Pragma">PartialAppSwap;</a>
+
+<a id="1558" class="Pragma">//</a> <a id="1561" class="Pragma">mod</a> <a id="1565" class="Pragma">Closures;</a>
+<a id="1575" class="Pragma">//</a> <a id="1578" class="Pragma">mod</a> <a id="1582" class="Pragma">PartialAppConst;</a>
+<a id="1599" class="Pragma">//</a> <a id="1602" class="Pragma">mod</a> <a id="1606" class="Pragma">PartialAppSwapId;</a>
+
+<a id="1625" class="Pragma">//</a> <a id="1628" class="Pragma">mod</a> <a id="1632" class="Pragma">NonLinearity;</a>
+<a id="1646" class="Pragma">//</a> <a id="1649" class="Pragma">mod</a> <a id="1653" class="Pragma">Exp;</a>
+
+<a id="1659" class="Pragma">fn</a> <a id="1662" class="Pragma">main()</a> <a id="1669" class="Pragma">{</a>
+  <a id="1673" class="Pragma">Identity::main();</a>
+  <a id="1693" class="Pragma">Numbers::main();</a>
+  <a id="1712" class="Pragma">Simplification::main();</a>
+  <a id="1738" class="Pragma">Top::main();</a>
+  <a id="1753" class="Pragma">Newtype::main();</a>
+  <a id="1772" class="Pragma">Product::main();</a>
+  <a id="1791" class="Pragma">Either::main();</a>
+  <a id="1809" class="Pragma">Maybe::main();</a>
+  <a id="1826" class="Pragma">Nat0::main();</a>
+  <a id="1842" class="Pragma">Nat::main();</a>
+  <a id="1857" class="Pragma">List0::main();</a>
+  <a id="1874" class="Pragma">List::main();</a>
+  <a id="1890" class="Pragma">Singleton::main();</a>
+  <a id="1911" class="Pragma">RunTimeIrrelevance::main();</a>
+  <a id="1941" class="Pragma">Postulates::main();</a>
+  <a id="1963" class="Pragma">Constants::main();</a>
+  <a id="1984" class="Pragma">//</a> <a id="1987" class="Pragma">Float0::main();</a>
+  <a id="2005" class="Pragma">Float::main();</a>
+  <a id="2022" class="Pragma">Char::main();</a>
+  <a id="2038" class="Pragma">//</a> <a id="2041" class="Pragma">String0::main();</a>
+  <a id="2060" class="Pragma">String::main();</a>
+  <a id="2078" class="Pragma">Prim::main();</a>
+  <a id="2094" class="Pragma">Bool00::main();</a>
+  <a id="2112" class="Pragma">//</a> <a id="2115" class="Pragma">Bool0::main();</a>
+  <a id="2132" class="Pragma">Bool::main();</a>
+  <a id="2148" class="Pragma">Int::main();</a>
+  <a id="2163" class="Pragma">TypeAliases::main();</a>
+  <a id="2186" class="Pragma">OverloadedCons::main();</a>
+  <a id="2212" class="Pragma">OverloadedFields::main();</a>
+  <a id="2240" class="Pragma">ErasedFields::main();</a>
+  <a id="2264" class="Pragma">RecordFields::main();</a>
+  <a id="2288" class="Pragma">UnusedArgs::main();</a>
+  <a id="2310" class="Pragma">ExactSplit::main();</a>
+  <a id="2332" class="Pragma">OpenModule::main();</a>
+  <a id="2354" class="Pragma">ConsImplicitArgs::main();</a>
+
+  <a id="2383" class="Pragma">MultiArgFun::main();</a>
+  <a id="2406" class="Pragma">Curry::main();</a>
+  <a id="2423" class="Pragma">PointFree::main();</a>
+  <a id="2444" class="Pragma">PartialApp::main();</a>
+  <a id="2466" class="Pragma">PartialAppM::main();</a>
+  <a id="2489" class="Pragma">PartialAppId::main();</a>
+  <a id="2513" class="Pragma">EtaExpansion::main();</a>
+  <a id="2537" class="Pragma">PartialAppSwap::main();</a>
+
+<a id="2562" class="Pragma">//</a>  <a id="2566" class="Pragma">Closures::main();</a>
+<a id="2584" class="Pragma">//</a>  <a id="2588" class="Pragma">PartialAppConst::main();</a>
+<a id="2613" class="Pragma">//</a>  <a id="2617" class="Pragma">PartialAppSwapId::main();</a>
+
+<a id="2644" class="Pragma">//</a>  <a id="2648" class="Pragma">NonLinearity::main();</a>
+<a id="2670" class="Pragma">//</a>  <a id="2674" class="Pragma">Exp::main();</a>
+<a id="2687" class="Pragma">}</a>
+<a id="2689" class="Symbol">#-}</a>
 </pre><div class="split right"><embed src="build/main.unicode.html"/></div></body></html>

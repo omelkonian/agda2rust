@@ -76,31 +76,34 @@
   </style>
 </head>
 <body>
-<div class="sourceCode" id="cb1"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="at">#![</span>allow<span class="at">(</span>dead_code<span class="op">,</span>non_snake_case<span class="op">,</span>unused_variables<span class="op">,</span>non_camel_case_types<span class="op">,</span>non_upper_case_globals<span class="op">,</span>unreachable_patterns<span class="at">)]</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="at">#[</span>derive<span class="at">(</span><span class="bu">Debug</span><span class="at">)]</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">enum</span> Foo <span class="op">{</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  foo(<span class="dt">i32</span>)<span class="op">,</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="op">}</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> f(x<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> Foo <span class="op">{</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>  <span class="pp">Foo::</span>foo(x)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="op">}</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> g(x<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>  <span class="dv">1</span> <span class="op">+</span> x</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="op">}</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> h(x<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a>  g(x)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="op">}</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> main() <span class="op">{</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>  <span class="pp">println!</span>(<span class="st">&quot;{}:</span><span class="sc">\t\t</span><span class="st"> {:?} | {} | {}&quot;</span><span class="op">,</span> <span class="pp">module_path!</span>()<span class="op">,</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>    f(<span class="dv">42</span>)<span class="op">,</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>    g(<span class="dv">41</span>)<span class="op">,</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>    h(<span class="dv">41</span>)<span class="op">,</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>  )<span class="op">;</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="at">#![</span>feature<span class="at">(</span>type_alias_impl_trait<span class="op">,</span>impl_trait_in_fn_trait_return<span class="op">,</span>tuple_trait<span class="op">,</span>unboxed_closures<span class="op">,</span>fn_traits<span class="op">,</span>const_trait_impl<span class="op">,</span>effects<span class="at">)]</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="at">#![</span>allow<span class="at">(</span>dead_code<span class="op">,</span>non_snake_case<span class="op">,</span>unused_variables<span class="op">,</span>non_camel_case_types<span class="op">,</span>non_upper_case_globals<span class="op">,</span>unreachable_patterns<span class="at">)]</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">use</span> <span class="pp">unicurry::</span><span class="op">*;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="at">#[</span>derive<span class="at">(</span><span class="bu">Debug</span><span class="at">)]</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">enum</span> Foo <span class="op">{</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  foo(<span class="dt">i32</span>)<span class="op">,</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> f(x<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> Foo <span class="op">{</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  <span class="pp">apply!</span>(<span class="pp">Foo::</span>foo<span class="op">,</span> x)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> g(x<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  <span class="dv">1</span> <span class="op">+</span> x</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> h(x<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>  <span class="pp">apply!</span>(g<span class="op">,</span> x)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>  <span class="pp">println!</span>(<span class="st">&quot;{}:</span><span class="sc">\t\t</span><span class="st"> {:?} | {} | {}&quot;</span><span class="op">,</span> <span class="pp">module_path!</span>()<span class="op">,</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>    f(<span class="dv">42</span>)<span class="op">,</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>    g(<span class="dv">41</span>)<span class="op">,</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>    h(<span class="dv">41</span>)<span class="op">,</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>  )<span class="op">;</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>

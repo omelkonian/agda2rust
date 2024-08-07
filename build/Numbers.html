@@ -76,41 +76,44 @@
   </style>
 </head>
 <body>
-<div class="sourceCode" id="cb1"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="at">#![</span>allow<span class="at">(</span>dead_code<span class="op">,</span>non_snake_case<span class="op">,</span>unused_variables<span class="op">,</span>non_camel_case_types<span class="op">,</span>non_upper_case_globals<span class="op">,</span>unreachable_patterns<span class="at">)]</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> answer() <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="dv">42</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="op">}</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> suc(x<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>  <span class="dv">1</span> <span class="op">+</span> x</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="op">}</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> add_answer(x<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>  answer() <span class="op">+</span> x</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="op">}</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> add(x<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span> x0<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>  x <span class="op">+</span> x0</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="op">}</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> add3(x<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span> x0<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span> x1<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>  x <span class="op">+</span> x0 <span class="op">+</span> x1</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="op">}</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> add3b(x<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span> x0<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span> x1<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>  add(x<span class="op">,</span> add(x0<span class="op">,</span> x1))</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a><span class="op">}</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> main() <span class="op">{</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>  <span class="pp">println!</span>(<span class="st">&quot;{}:</span><span class="sc">\t\t\t</span><span class="st"> {} | {} | {} | {} | {} | {}&quot;</span><span class="op">,</span> <span class="pp">module_path!</span>()<span class="op">,</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>    answer()<span class="op">,</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>    suc(<span class="dv">41</span>)<span class="op">,</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>    add_answer(<span class="dv">0</span>)<span class="op">,</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>    add(<span class="dv">40</span><span class="op">,</span> <span class="dv">2</span>)<span class="op">,</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>    add3(<span class="dv">40</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span>)<span class="op">,</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>    add3b(<span class="dv">40</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span>)<span class="op">,</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>  )<span class="op">;</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode rust"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="at">#![</span>feature<span class="at">(</span>type_alias_impl_trait<span class="op">,</span>impl_trait_in_fn_trait_return<span class="op">,</span>tuple_trait<span class="op">,</span>unboxed_closures<span class="op">,</span>fn_traits<span class="op">,</span>const_trait_impl<span class="op">,</span>effects<span class="at">)]</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="at">#![</span>allow<span class="at">(</span>dead_code<span class="op">,</span>non_snake_case<span class="op">,</span>unused_variables<span class="op">,</span>non_camel_case_types<span class="op">,</span>non_upper_case_globals<span class="op">,</span>unreachable_patterns<span class="at">)]</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">use</span> <span class="pp">unicurry::</span><span class="op">*;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> answer() <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>  <span class="dv">42</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> suc(x<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>  <span class="dv">1</span> <span class="op">+</span> x</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> add_answer(x<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>  answer() <span class="op">+</span> x</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> add(x<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span> x0<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>  x <span class="op">+</span> x0</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> add3(x<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span> x0<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span> x1<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>  x <span class="op">+</span> x0 <span class="op">+</span> x1</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> add3b(x<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span> x0<span class="op">:</span> <span class="dt">i32</span><span class="op">,</span> x1<span class="op">:</span> <span class="dt">i32</span>) <span class="op">-&gt;</span> <span class="dt">i32</span> <span class="op">{</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>  <span class="pp">apply!</span>(add<span class="op">,</span> x<span class="op">,</span> <span class="pp">apply!</span>(add<span class="op">,</span> x0<span class="op">,</span> x1))</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a><span class="op">}</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a><span class="kw">pub</span> <span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>  <span class="pp">println!</span>(<span class="st">&quot;{}:</span><span class="sc">\t\t</span><span class="st"> {} | {} | {} | {} | {} | {}&quot;</span><span class="op">,</span> <span class="pp">module_path!</span>()<span class="op">,</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>    answer()<span class="op">,</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>    suc(<span class="dv">41</span>)<span class="op">,</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>    add_answer(<span class="dv">0</span>)<span class="op">,</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>    add(<span class="dv">40</span><span class="op">,</span> <span class="dv">2</span>)<span class="op">,</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>    add3(<span class="dv">40</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span>)<span class="op">,</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>    add3b(<span class="dv">40</span><span class="op">,</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span>)<span class="op">,</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>  )<span class="op">;</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>
