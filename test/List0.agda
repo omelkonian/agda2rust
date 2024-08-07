@@ -2,23 +2,26 @@
 #[derive(Debug)]
 #-}
 data List {a} (A : Set a) : Set a where
-  []  : List A
-  _∷_ : (x : A) (xs : List A) → List A
+  nil  : List A
+  cons : (x : A) (xs : List A) → List A
 infixr 4 _∷_
+
+pattern [] = nil
+pattern _∷_ x xs = cons x xs
 
 private variable A B : Set
 
-_++_ : List A → List A → List A
-[]       ++ ys = ys
-(x ∷ xs) ++ ys = x ∷ (xs ++ ys)
+cat : List A → List A → List A
+cat []       ys = ys
+cat (x ∷ xs) ys = x ∷ cat xs ys
 
 map : (A → B) → List A → List B
-map f [] = []
+map f []       = []
 map f (x ∷ xs) = f x ∷ map f xs
 
 flatten : List (List A) → List A
 flatten [] = []
-flatten (xs ∷ xss) = xs ++ flatten xss
+flatten (xs ∷ xss) = cat xs (flatten xss)
 
 head : List (List A) → List A
 head [] = []
@@ -53,17 +56,15 @@ testHead : List Nat
 testHead = head [ [ 42 ⨾ 2 ⨾ 3 ] ⨾ [] ⨾ [] ]
 
 {-# FOREIGN AGDA2RUST
-fn ᐁ<T>(x : T) -> Box<T> { return Box::new(x); }
-
-use self::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};
+use self::List::{nil,cons};
 
 pub fn main() {
-  println!("{}:\t\t\t {:?} | {:?} | {:?} | {} | {:?}", module_path!(),
+  println!("{}:\t\t {:?} | {:?} | {:?} | {} | {:?}", module_path!(),
     headNum(empty),
     single(42),
-    map(|x| x + 1, _Ֆ43ՖՖ43Ֆ_(
-      _Ֆ8759Ֆ_(3, ᐁ(Ֆ91ՖՖ93Ֆ())),
-      _Ֆ8759Ֆ_(1, ᐁ(Ֆ91ՖՖ93Ֆ()))
+    map(ᐁF(|x| x + 1), cat(
+      cons(3, ᐁ(nil())),
+      cons(1, ᐁ(nil()))
     )),
     testFlatten(),
     testHead(),

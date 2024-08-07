@@ -1,0 +1,32 @@
+[package]
+name = "agda2rust-test"
+version = "0.1.0"
+edition = "2021"
+authors = ["melkon.or@gmail.com"]
+include = ["test/main.rs", "test/unicurry.rs", "test/build/*.rs", "test/golden/*.rs", "Cargo.toml"]
+
+[[bin]]
+name = "main"
+path = "test/main.rs"
+
+[[bin]]
+name = "mainTests"
+path = "test/build/main.rs"
+
+[lib]
+name = "unicurry"
+path = "test/unicurry.rs"
+
+[[bin]]
+name = "curry"
+path = "test/curry.rs"
+
+[dependencies]
+# curry = "0.1.0"
+currying = "0.2.2"
+cutlass = "0.1.0"
+# currycompose = "0.1.0"
+partial_application = "0.2.1"
+naan = "0.1.32"
+fp-core = "0.1.9"
+tupleops = "0.1.1"

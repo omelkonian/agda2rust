@@ -31,18 +31,20 @@ zipWith f _        []       = []
 zipWith f (a ∷ as) (b ∷ bs) = f a b ∷ zipWith f as bs
 
 {-# FOREIGN AGDA2RUST
-fn ᐁ<T>(x : T) -> Box<T> { return Box::new(x); }
-
 use self::List::{Ֆ91ՖՖ93Ֆ,_Ֆ8759Ֆ_};
 
 pub fn main() {
-  println!("{}:\t\t\t {} | {} | {}", module_path!(),
+  println!("{}:\t\t {} | {} | {} | {}", module_path!(),
     testSum(),
-    sum(map(|x| x + 1, _Ֆ43ՖՖ43Ֆ_(
+    sum(_Ֆ43ՖՖ43Ֆ_(
+     _Ֆ8759Ֆ_(40, ᐁ(Ֆ91ՖՖ93Ֆ())),
+     _Ֆ8759Ֆ_(2, ᐁ(Ֆ91ՖՖ93Ֆ()))
+    )),
+    sum(map(ᐁF(move |x| x + 1), _Ֆ43ՖՖ43Ֆ_(
      _Ֆ8759Ֆ_(39, ᐁ(Ֆ91ՖՖ93Ֆ())),
      _Ֆ8759Ֆ_(1, ᐁ(Ֆ91ՖՖ93Ֆ()))
     ))),
-    sum(zipWith(|x, y| x + y,
+    sum(zipWith(ᐁF(move |x| ᐁF(move |y| x + y)),
      _Ֆ8759Ֆ_(40, ᐁ(Ֆ91ՖՖ93Ֆ())),
      _Ֆ8759Ֆ_(2, ᐁ(Ֆ91ՖՖ93Ֆ()))
     )),

@@ -3,6 +3,7 @@
 -- | Agda utilities.
 module Agda.Utils where
 
+import Control.Monad.Error.Class ( MonadError )
 import Control.Monad.IO.Class ( MonadIO )
 import Control.Monad ( filterM )
 import Control.Arrow ( first )
@@ -205,8 +206,12 @@ classifyArgs = mapM classifyArg
 isErasedTTerm :: TTerm -> Bool
 isErasedTTerm = \case
   TErased -> True
-  TUnit   -> True
   TSort   -> True
+  _       -> False
+
+isUnitTTerm :: TTerm -> Bool
+isUnitTTerm = \case
+  TUnit   -> True
   _       -> False
 
 onlyNonErased :: [TTerm] -> [TTerm]
@@ -214,6 +219,7 @@ onlyNonErased = filter (not . isErasedTTerm)
 
 isTyParamM :: PureEnvTCM m => TTerm -> m Bool
 isTyParamM = \case
+  TUnit -> return True
   TDef n -> isSortTy <$> typeOfConst n
   TVar i -> isSortTy <$> lookupCtxTy i
   TApp h _ -> do
@@ -226,12 +232,12 @@ isTyParamM = \case
       isResTyParam = \case
         TDef n -> isSortTy <$> (resTy =<< typeOfConst n)
         TVar i -> isSortTy <$> (resTy =<< lookupCtxTy i)
-        _ -> pure False
+        _ -> return False
         -- t -> panic "result type parameter" t
   _ -> return False
 
 separateTyParams :: PureEnvTCM m  => [TTerm] -> m ([TTerm], [TTerm])
-separateTyParams = partitionM isTyParamM
+separateTyParams = partitionM isTyParamM . filter (not . isErasedTTerm)
 
 -- ** types & telescopes
 isDependentArrow :: Dom Type -> Bool
@@ -257,6 +263,7 @@ termFromTTerm = \case
       Var n [] -> Var n as'
       Def qn [] -> Def qn as'
       _ -> panic "treeless head" t
+  TUnit -> Dummy "()" []
   t -> panic "tterm (to convert to term)" t
 
 typeFromTTerm :: TTerm -> Type

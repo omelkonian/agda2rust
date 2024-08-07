@@ -165,10 +165,16 @@ ignoredRustWarnings =
   -- , "uncommon_codepoints" -- only crate-level attribute
   ]
 experimentRustFeatures =
-  []
-  -- [ "type_alias_impl_trait"
-  -- , "impl_trait_in_fn_trait_return"
-  -- ]
+  -- []
+  [ "type_alias_impl_trait"
+  , "impl_trait_in_fn_trait_return"
+  , "tuple_trait"
+  , "unboxed_closures"
+  , "fn_traits"
+
+  , "const_trait_impl"
+  , "effects"
+  ]
 
 writeModule :: Options -> ModuleEnv -> IsMain -> TopLevelModuleName
             -> [Maybe CompiledDef] -> TCM ModuleRes
@@ -180,6 +186,8 @@ writeModule opts _ _ m (catMaybes -> cdefs) = do
       outFile = fromMaybe outDir (optOutDir opts) <> "/" <> rustFn
       outS =  mkDirective "feature" experimentRustFeatures
            <> mkDirective "allow" ignoredRustWarnings
+           <> "\n"
+           <> includeRTS
            <> "\n"
            <> fixCode code
   runC0 $ report $ "\n************** MODULE: " <> rustFn <> " ***************\n"
@@ -201,6 +209,8 @@ writeModule opts _ _ m (catMaybes -> cdefs) = do
     mkDirective group items
       | null items = ""
       | otherwise  = "#![" <> group <> "(" <> intercalate "," items <> ")]\n"
+
+    includeRTS = "use unicurry::*;\n"
 
     -- c.f. test/RustPrintBug
     fixCode :: String -> String

@@ -1,8 +1,8 @@
 :def! . readFile
 :def! reset (\_ -> return ":. .ghci\n")
 :def! testC (\x -> return $ ":r\n :set args -itest -otest/build -v agda2rust:10 test/" <> x <> ".agda\n main")
-:def! test (\x -> return $ ":r\n :set args -itest -otest/build -v agda2rust:10 test/" <> x <> ".agda\n main\n:!rustc -A uncommon_codepoints test/build/" <> x <> ".rs && ./" <> x <> "&& rm ./" <> x)
+:def! test (\x -> return $ ":r\n :set args -itest -otest/build -v agda2rust:10 test/" <> x <> ".agda\n main\n:!cargo run --example " <> x <> " 2>/dev/null")
 :def! main (\_ -> return $ ":r\n :set args -itest -v agda2rust:10 test/Input.agda\n main")
-:def! allTests (\_ -> return $ ":r\n :set args -itest -otest/build -v agda2rust:10 test/main.agda\n main")
+:def! allTests (\_ -> return $ ":r\n :set args -itest -otest/build -v agda2rust:10 test/main.agda\n main\n:!cargo run --bin mainTests 2>/dev/null")
 :def! parseRust (\x -> return $ ":r\n :set args " <> x <> ".rs\n main")
 :def! printRust (\_ -> return $ ":r\n main")

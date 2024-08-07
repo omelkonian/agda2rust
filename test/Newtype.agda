@@ -11,7 +11,7 @@ k (mk a) _ = a
 
 {-# FOREIGN AGDA2RUST
 pub fn main() {
-  println!("{}:\t\t\t {}", module_path!(),
+  println!("{}:\t\t {}", module_path!(),
     k(Newtype::mk(42), Newtype::mk(0)),
   );
 }

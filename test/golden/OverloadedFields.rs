@@ -1,4 +1,7 @@
+#![feature(type_alias_impl_trait,impl_trait_in_fn_trait_return,tuple_trait,unboxed_closures,fn_traits,const_trait_impl,effects)]
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
+
+use unicurry::*;
 
 pub struct X {
   pub id: i32,
@@ -29,15 +32,15 @@ pub fn exY() -> Y {
 }
 
 pub fn idX(x: X) -> i32 {
-  X·id(x)
+  apply!(X·id, x)
 }
 
 pub fn idY(x: Y) -> i32 {
-  Y·id(x)
+  apply!(Y·id, x)
 }
 
 pub fn main() {
-  println!("{}:\t\t {} | {} | {} | {} ", module_path!(),
+  println!("{}:\t {} | {} | {} | {} ", module_path!(),
     X·id(X{id: 42}),
     Y·id(Y{id: 42}),
     idX(exX()),

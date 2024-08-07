@@ -1,6 +1,6 @@
 module Agda2Rust.Convert.Class where
 
-import Utils ( enumerate )
+import Utils ( enumerate0 )
 import Agda2Rust.Monad ( C, inArgument )
 
 type (:~>)  a b = a -> C (b ())
@@ -15,7 +15,7 @@ class (~>) a b | a -> b where
 
 -- | Iteratively convert a list of arguments (keeping track of their index).
 gos :: forall a b. a ~> b => [a] :~>* b
-gos = igos . enumerate
+gos = igos . enumerate0
   where
   igos :: [(Int, a)] :~>* b
   igos [] = return []

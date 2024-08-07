@@ -90,7 +90,7 @@ pred (suc n) = n
 
 {-# FOREIGN AGDA2RUST
 pub fn main() {
-  println!("{}:\t\t {} | {} | {} | {}", module_path!(),
+  println!("{}:\t {} | {} | {} | {}", module_path!(),
     unmk(Point·slot(exPoint())),
     matchPoint(exPoint()),
     Header·slotNo(Header {slotNo: 42, .. Default::default()}),

@@ -71,8 +71,6 @@ data BST (@0 lower upper : Nat) : Set where
   Node : (x : Nat) (l : BST lower x) (r : BST x upper) → BST lower upper
 
 {-# FOREIGN AGDA2RUST
-fn ᐁ<T>(x : T) -> Box<T> { return Box::new(x); }
-
 use self::BST::{Leaf,Node};
 
 pub fn main() {

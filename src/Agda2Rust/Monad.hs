@@ -7,9 +7,7 @@ import qualified Data.Set as S ( Set, empty, insert, member )
 import qualified Data.Map as M ( Map, empty, insert, lookup )
 
 import Utils
-import Agda
-  ( TCM, liftTCM, QName, ConHead(..), ifM
-  , unqual, pp )
+import Agda ( TCM, liftTCM, QName, Type, ConHead(..), ifM, unqual, pp, erasedArity )
 import Agda.Builtins ( isBuiltinDef )
 import Agda2Rust.Pragma ( PragmaQualifier )
 
@@ -28,7 +26,7 @@ data Env = Env
     -- ^ the datatype are we currently compiling
   , curConstructor :: Maybe QName
     -- ^ the constructor (of the current datatype) are we currently compiling
-  , curArgument    :: Int
+  , curArgument    :: Maybe Int
     -- ^ the argument (of the current constructor) are we currently compiling
   , funIntroVars   :: Int
     -- ^ the arity of the function we're currently compliling
@@ -36,16 +34,19 @@ data Env = Env
     -- ^ the number of bound variables we are currently in
   , tyAlias        :: Bool
     -- ^ whether we are currently compiling a type alias
+  -- , argTypes       :: Maybe [Type]
+    -- ^ types of the current application's arguments
   }
 
 initEnv :: Env
 initEnv = Env
   { curDatatype    = Nothing
   , curConstructor = Nothing
-  , curArgument    = 0
+  , curArgument    = Nothing
   , funIntroVars   = 0
   , localIntroVars = 0
   , tyAlias        = False
+  -- , argTypes       = Nothing
   }
 
 type QNameS   = String
@@ -91,7 +92,7 @@ inNonConstructor = local $ \e -> e
 
 inArgument :: Int -> C a -> C a
 inArgument n = local $ \e -> e
-  { curArgument = n }
+  { curArgument = Just n }
 
 inFunIntros :: Int -> C a -> C a
 inFunIntros n = local $ \e -> e
@@ -109,9 +110,9 @@ inTyAlias :: C a -> C a
 inTyAlias = local $ \e -> e
   { tyAlias = True }
 
-nextArgument :: Int -> C a -> C a
-nextArgument n = local $ \e -> e
-  { curArgument = 1 + curArgument e }
+-- inArgTypes :: [Type] -> C a -> C a
+-- inArgTypes tys = local $ \e -> e
+--   { argTypes = Just tys }
 
 setBoxedConstructor :: (String, Int) -> C ()
 setBoxedConstructor n = modify $ \s -> s
@@ -120,7 +121,7 @@ setBoxedConstructor n = modify $ \s -> s
 setBox :: C ()
 setBox = do
   Just cn <- asks curConstructor
-  i <- asks curArgument
+  Just i <- asks curArgument
   report $ "* setting box " <> pp (cn, i)
   setBoxedConstructor (pp cn, i)
 
@@ -131,7 +132,7 @@ shouldBox :: C Bool
 shouldBox = asks curConstructor >>= \case
   Nothing -> return False
   Just cn -> do
-    i <- asks curArgument
+    Just i <- asks curArgument
     -- report $ "* should box? " <> pp (cn, i)
     ret <- getBox (cn, i)
     -- report $ if ret then " yes!" else " no!"
@@ -173,3 +174,12 @@ setArity qn n = modify \s -> s
 
 getArity :: QName -> C (Maybe Int)
 getArity qn = M.lookup (pp qn) . arities <$> get
+
+-- getArgArity :: C (Maybe Int)
+-- getArgArity = asks curArgument >>= \case
+--   Nothing -> return Nothing
+--   Just i -> do
+--     mtys <- asks argTypes
+--     case mtys of
+--       Nothing -> return Nothing
+--       Just tys -> return $ Just $ erasedArity (tys !! i)

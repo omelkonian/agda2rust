@@ -1,4 +1,7 @@
+#![feature(type_alias_impl_trait,impl_trait_in_fn_trait_return,tuple_trait,unboxed_closures,fn_traits,const_trait_impl,effects)]
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
+
+use unicurry::*;
 
 pub fn id<A>(x: A) -> A {
   x
@@ -25,7 +28,7 @@ pub fn id0H<A>(x: A) -> A {
 }
 
 pub fn main() {
-  println!("{}:\t\t\t {} | {} | {} | {} | {} | {}", module_path!(),
+  println!("{}:\t\t {} | {} | {} | {} | {} | {}", module_path!(),
     id(42),
     id0(42),
     idՖ10216Ֆ_Ֆ10217Ֆ_(42),

@@ -36,11 +36,8 @@ fromOnlyLeftR2 : OnlyLeftR (OnlyLeftR A B) C → A
 fromOnlyLeftR2 r = r .left .left
 
 {-# FOREIGN AGDA2RUST
-use std::marker::{PhantomData};
-fn __<T>() -> PhantomData<T> { return PhantomData; }
-
 pub fn main() {
-  println!("{}:\t\t\t {} | {} | {} | {} | {} | {}", module_path!(),
+  println!("{}:\t\t {} | {} | {} | {} | {} | {}", module_path!(),
     fromEitherAB::<i32, i32>(41, Either::Left(42)),
     fromEither::<i32, i32>(41, Either::Left(42)),
     fromOnlyLeft::<i32, i32>(OnlyLeft::Left(42)),

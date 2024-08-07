@@ -1,4 +1,7 @@
+#![feature(type_alias_impl_trait,impl_trait_in_fn_trait_return,tuple_trait,unboxed_closures,fn_traits,const_trait_impl,effects)]
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
+
+use unicurry::*;
 
 pub enum Bool {
   r#false(),
@@ -27,7 +30,7 @@ pub fn rՖ35Ֆfalse() -> Bool {
 }
 
 pub fn testBool() -> Bool {
-  _Ֆ8743Ֆ_(rՖ35Ֆtrue(), rՖ35Ֆfalse())
+  apply!(_Ֆ8743Ֆ_, rՖ35Ֆtrue(), rՖ35Ֆfalse())
 }
 
 pub fn bool2Nat(x: Bool) -> i32 {
@@ -45,7 +48,13 @@ pub fn isZero(x: i32) -> Bool {
 }
 
 pub fn toNonZero(x: i32) -> i32 {
-  { let x0 = isZero(x); match x0 { Bool::r#false() => x, Bool::r#true() => 1 } }
+  {
+    let x0 = apply!(isZero, x);
+    match x0 {
+      Bool::r#false() => x,
+      Bool::r#true() => 1,
+    }
+  }
 }
 
 pub fn if_then_else_<A>(x: Bool, x0: A, x1: A) -> A {
@@ -56,11 +65,11 @@ pub fn if_then_else_<A>(x: Bool, x0: A, x1: A) -> A {
 }
 
 pub fn testIte() -> i32 {
-  if_then_else_::<i32>(Bool::r#true(), 42, 0)
+  apply!(if_then_else_::<i32>, Bool::r#true(), 42, 0)
 }
 
 pub fn main () {
-  println!("{}:\t\t\t {} | {} | {} | {}", module_path!(),
+  println!("{}:\t\t {} | {} | {} | {}", module_path!(),
     bool2Nat(testBool()),
     bool2Nat(isZero(5)),
     toNonZero(42),

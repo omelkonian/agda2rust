@@ -6,7 +6,6 @@ import Newtype
 import Product
 import Either
 import Maybe
--- import Exp
 import Nat0
 import Nat
 import List0
@@ -26,20 +25,33 @@ import Bool00
 import Bool
 import Int
 import TypeAliases
-import OverloadedConstructors
+import OverloadedCons
 import OverloadedFields
 import ErasedFields
 import RecordFields
 import UnusedArgs
 import ExactSplit
 import OpenModule
-import ConstructorImplicitArgs
+import ConsImplicitArgs
+
+-- ** partial application / currying
 import MultiArgFun
 import Curry
 import PointFree
 import PartialApp
--- import PartialApp2
--- import PartialApp3
+import PartialAppM
+import PartialAppId
+import EtaExpansion
+import PartialAppSwap
+
+-- ** closures
+-- import Closures
+-- import PartialAppConst
+-- import PartialAppSwapId
+
+-- ** non-linearity
+-- import NonLinearity
+-- import Exp
 
 {-# FOREIGN AGDA2RUST
 mod Identity;
@@ -50,7 +62,6 @@ mod Newtype;
 mod Product;
 mod Either;
 mod Maybe;
-// mod Exp;
 mod Nat0;
 mod Nat;
 mod List0;
@@ -70,18 +81,30 @@ mod Bool00;
 mod Bool;
 mod Int;
 mod TypeAliases;
-mod OverloadedConstructors;
+mod OverloadedCons;
 mod OverloadedFields;
 mod ErasedFields;
 mod RecordFields;
 mod UnusedArgs;
 mod ExactSplit;
 mod OpenModule;
-mod ConstructorImplicitArgs;
+mod ConsImplicitArgs;
+
 mod MultiArgFun;
 mod Curry;
 mod PointFree;
 mod PartialApp;
+mod PartialAppM;
+mod PartialAppId;
+mod EtaExpansion;
+mod PartialAppSwap;
+
+// mod Closures;
+// mod PartialAppConst;
+// mod PartialAppSwapId;
+
+// mod NonLinearity;
+// mod Exp;
 
 fn main() {
   Identity::main();
@@ -92,7 +115,6 @@ fn main() {
   Product::main();
   Either::main();
   Maybe::main();
-//  Exp::main();
   Nat0::main();
   Nat::main();
   List0::main();
@@ -112,17 +134,29 @@ fn main() {
   Bool::main();
   Int::main();
   TypeAliases::main();
-  OverloadedConstructors::main();
+  OverloadedCons::main();
   OverloadedFields::main();
   ErasedFields::main();
   RecordFields::main();
   UnusedArgs::main();
   ExactSplit::main();
   OpenModule::main();
-  ConstructorImplicitArgs::main();
+  ConsImplicitArgs::main();
+
   MultiArgFun::main();
   Curry::main();
   PointFree::main();
   PartialApp::main();
+  PartialAppM::main();
+  PartialAppId::main();
+  EtaExpansion::main();
+  PartialAppSwap::main();
+
+//  Closures::main();
+//  PartialAppConst::main();
+//  PartialAppSwapId::main();
+
+//  NonLinearity::main();
+//  Exp::main();
 }
 #-}

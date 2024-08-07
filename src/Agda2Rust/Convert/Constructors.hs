@@ -20,7 +20,7 @@ instance (A.QName, A.Type) ~> R.Variant where
     report $ "** compiling constructor: " <> pp c
     as <- argTys ty
     -- report $ " as: " <> pp as
-    fs <- goFs 1 as
+    fs <- goFs 0 as
     setArity c (length fs)
     return $ RVariant (unqualR c) fs
     where

@@ -30,7 +30,7 @@ testBar with bar 21 1 +Bar bar 21 2
 
 {-# FOREIGN AGDA2RUST
 pub fn main() {
-  println!("{}:\t\t {} | {} | {} | {}", module_path!(),
+  println!("{}:\t {} | {} | {} | {}", module_path!(),
     testFoo(),
     testBar(),
     getFoo(Foo{foo: 42}),

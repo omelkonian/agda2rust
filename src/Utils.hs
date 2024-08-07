@@ -7,9 +7,9 @@ import Unicode.Char.Identifiers ( isXIDStart, isXIDContinue )
 import Data.Char ( ord )
 
 -- ** basics
-enumerate0, enumerate :: [a] -> [(Int, a)]
+enumerate0, enumerate1 :: [a] -> [(Int, a)]
 enumerate0 = zip [0..]
-enumerate  = zip [1..]
+enumerate1 = zip [1..]
 
 (/\), (\/) :: (a -> Bool) -> (a -> Bool) -> (a -> Bool)
 (p /\ q) x = p x && q x

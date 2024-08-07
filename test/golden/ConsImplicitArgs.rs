@@ -1,4 +1,7 @@
+#![feature(type_alias_impl_trait,impl_trait_in_fn_trait_return,tuple_trait,unboxed_closures,fn_traits,const_trait_impl,effects)]
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
+
+use unicurry::*;
 
 pub enum Bar {
   bar(),
@@ -15,7 +18,7 @@ pub fn fooToNat(x: Foo) -> i32 {
 }
 
 pub fn testFoo() -> Foo {
-  Foo::foo(Bar::bar())
+  apply!(Foo::foo, Bar::bar())
 }
 
 pub enum BarA<A> {
@@ -35,7 +38,7 @@ pub fn fooAToNat(x: FooA<i32>) -> i32 {
 }
 
 pub fn testFooA() -> FooA<i32> {
-  FooA::foo(BarA::bar(42))
+  apply!(FooA::foo, apply!(BarA::bar, 42))
 }
 
 pub struct BarR { }

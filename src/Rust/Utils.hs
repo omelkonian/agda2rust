@@ -3,7 +3,9 @@
 module Rust.Utils where
 
 import Data.Generics      ( Data, listify )
+import Data.List          ( intersperse )
 import Data.List.NonEmpty ( NonEmpty((:|)) )
+import Data.Maybe         ( isJust )
 
 import Rust.Lib
 
@@ -86,6 +88,7 @@ pattern RTyAlias' x ts ty = TyAlias [] PublicV x ty (RForall ts) ()
 -- ** traits
 pattern RTrait tb = TraitObject (tb :| []) ()
 pattern RImpl tb = ImplTrait (tb :| []) ()
+pattern RDyn tb = RTrait tb
 
 -- ** function types
 pattern RFn' isConst x ps ty b =
@@ -100,20 +103,29 @@ rUnArg (Arg _ ty _) = ty
 rMkArg :: Ty () -> Arg ()
 rMkArg ty = Arg Nothing ty ()
 
-mkFnTy :: [Arg ()] -> Ty () -> Ty ()
-mkFnTy [] b = b
-mkFnTy (a:as) b = RImplFn (rUnArg a) (mkFnTy as b)
+mkImplFnTy, mkBoxFnTy, mkFnTy :: [Arg ()] -> Ty () -> Ty ()
+mkImplFnTy = flip $ foldr (RImplFn . rUnArg)
+mkBoxFnTy  = flip $ foldr (RBoxFn  . rUnArg)
+mkFnTy     = mkBoxFnTy
 
 mkFnDeclTy :: [Arg ()] -> Ty () -> FnDecl ()
 -- mkFnDeclTy as b = RFnTy [] (mkFnTy as b) -- curried
 mkFnDeclTy = RFnTy
 
+pattern RDynFn a b = RDyn (RTyBoundPath [RPathSeg' "Fn" (RParens' [a] b)])
 pattern RTraitFn a b = RTrait (RTyBoundPath [RPathSeg' "Fn" (RParens' [a] b)])
 pattern RImplFn a b = RImpl (RTyBoundPath [RPathSeg' "Fn" (RParens' [a] b)])
+pattern RBoxFn a b = RBoxTy (RDynFn a b)
+pattern RRcFn a b = RRcTy (RDynFn a b)
+pattern RBorrowFn a b = RBorrowTy (RDynFn a b)
 rImplFn a b | RImpl (RTyBoundPath [RPathSeg' "Fn" (RParens' as b')]) <- b
             = RImpl (RTyBoundPath [RPathSeg' "Fn" (RParens' (a : as) b')])
             | otherwise
             = RImplFn a b
+-- rMkFn = rImplFn
+-- rMkFn = RBoxFn
+-- rMkFn = RBorrowFn
+rMkFn = RRcFn
 
 pattern RBareFn x a b = BareFn Normal Rust [] (RFnTy [RArg x a] b) ()
 rBareFn x a b | BareFn Normal Rust [] (RFnTy as b') () <- b
@@ -124,18 +136,47 @@ rBareFn x a b | BareFn Normal Rust [] (RFnTy as b') () <- b
 -- ** function calls
 pattern RCall f xs = Call [] (RExprRef f) xs ()
 rCall f xs | null xs   = RExprRef f
-           | otherwise = RCall f xs
+           | otherwise = rApply f xs
 pattern RCall' f ts xs = Call [] (RExprRef' f ts) xs ()
-rCall' f ts xs | null ts   = RCall f xs
-               | otherwise = RCall' f ts xs
+rCall' f ts xs
+  | null xs && null ts = RCall f xs
+  | null ts   = rApply f xs
+  | null xs   = RCall' f ts xs
+  | otherwise = rApply' f ts xs
 
 pattern RCallCon con xs = Call [] con xs ()
+rCallCon con xs | null xs   = RCallCon con xs
+                | otherwise = rApply con xs
 pattern RMkStruct path fs = Struct [] path fs Nothing ()
 
 pattern RMacroCall f xs = MacExpr [] (Mac f xs ()) ()
 rPanic s = RMacroCall (RRef "panic") (RStrTok s)
 rImpossible = rPanic "IMPOSSIBLE"
 rUnreachable = RMacroCall (RRef "unreachable") RNoTok
+
+rApply' f ts xs
+  = rApply (RExprRef' f ts) xs
+
+rApply :: (Pretty a, Resolve a) => a -> [Expr ()] -> Expr ()
+rApply f xs
+  -- | null xs
+  -- = RCall f []
+  -- | otherwise
+  = RMacroCall (RRef "apply")
+  $ Tree (Delimited RNoSpan NoDelim ts)
+  where
+
+  comma :: TokenStream
+  comma = Tree $ Token RNoSpan Comma
+
+  f' :: TokenStream
+  f' = toTokenStream f
+
+  args :: [TokenStream]
+  args = map toTokenStream xs
+
+  ts :: TokenStream
+  ts = Stream $ intersperse comma (f':args)
 
 -- ** closures
 pattern RInferArg x = RArg x (Infer ())
@@ -149,7 +190,7 @@ rMoveLam = rLam' Value
 rMoveLams :: [Arg ()] -> Expr () -> Expr ()
 rMoveLams = \case
   []     -> id
-  (Arg (Just (IdentP _ x _ _)) _ _ : xs) -> rMoveLam [x] . rMoveLams xs
+  (Arg (Just (IdentP _ x _ _)) _ _ : xs) -> RRc . rMoveLam [x] . rMoveLams xs
 
 -- ** constants
 pattern RConstFn x ps ty b = RFn' Const x ps ty b
@@ -209,8 +250,13 @@ pattern RPointer ty = Rptr Nothing Immutable ty ()
 pattern RBorrowTy ty = Rptr Nothing Immutable ty ()
 pattern RBorrow   e  = AddrOf [] Immutable e ()
 
-pattern RBoxTy   ty = RTyRef' "Box" [ ty ]
-pattern RBox     e  = RCallCon (RExprConRef "Box" "new") [ e ]
+pattern RBoxTy ty = RTyRef' "Box" [ ty ]
+-- pattern RBox   e  = RCallCon (RExprConRef "Box" "new") [ e ]
+pattern RBox   e  = RCall "ᐁ" [ e ]
+
+pattern RRcTy ty = RTyRef' "Rc" [ ty ]
+-- pattern RRc   e  = RCallCon (RExprConRef "Rc" "new") [ e ]
+pattern RRc   e  = RCall "ᐁF" [ e ]
 
 rBox = RBox
 
@@ -236,6 +282,67 @@ mkPhantomField
 -- ** pretty-printing
 ppR :: (Pretty a, Resolve a) => a -> String
 ppR = show . pretty'
+
+-- ** tokenization
+toTokens :: (Pretty a, Resolve a) => a -> [Token]
+toTokens x =
+  let inp = inputStreamFromString (ppR x)
+  in case execParser (lexTokens lexNonSpace) inp initPos of
+    Left pf  -> error $ show pf
+    Right ts -> unspan <$> ts
+
+isDelim :: Token -> Bool
+isDelim = \case { OpenDelim{} -> True; CloseDelim{} -> True; _ -> False }
+
+isOpenDelim :: Token -> Maybe Delim
+isOpenDelim = \case { OpenDelim d -> Just d; _ -> Nothing }
+
+isCloseDelim :: Token -> Maybe Delim
+isCloseDelim = \case { CloseDelim d -> Just d; _ -> Nothing }
+
+toTokenStream :: (Pretty a, Resolve a) => a -> TokenStream
+toTokenStream = Stream . mkTokenStream . toTokens
+  where
+  mkTokenStreamNoDelim :: [Token] -> TokenStream
+  mkTokenStreamNoDelim = Stream . map (Tree . Token RNoSpan)
+
+  closingDelim :: [Token] -> Delim -> Int -> [Delim] -> Int
+  closingDelim [] _ _ _ = error "no closing delim"
+  closingDelim (t:ts) d i ds
+    -- closing our delimiter
+    | Just d' <- isCloseDelim t
+    , d' == d
+    , ds == []
+    = i
+    -- closing other delimiter
+    | Just d' <- isCloseDelim t
+    , d'':ds' <- ds
+    , d' == d''
+    = closingDelim ts d (1 + i) ds'
+    -- opening other delimiter
+    | Just d' <- isOpenDelim t
+    = closingDelim ts d (1 + i) (d':ds)
+    -- non-delimiter token
+    | otherwise
+    = closingDelim ts d (1 + i) ds
+
+  mkTokenStream :: [Token] -> [TokenStream]
+  mkTokenStream ts
+    -- | any isDelim ts
+    | any (isJust . isOpenDelim) ts
+    -- && any (isJust . isCloseDelim) ts
+    = let
+        (ts0, OpenDelim  d:ts')  = break (isJust . isOpenDelim) ts
+        i = closingDelim ts' d 0 []
+        (tsD, CloseDelim _:ts'') = splitAt i ts'
+        -- (tsD, CloseDelim _:ts'') = break (== CloseDelim d) ts'
+        -- (tsD, CloseDelim _:ts'') = break (isJust . isCloseDelim) ts'
+      in
+         [mkTokenStreamNoDelim ts0]
+      <> [Tree $ Delimited RNoSpan d $ Stream $ mkTokenStream tsD]
+      <> mkTokenStream ts''
+    | otherwise
+    = [mkTokenStreamNoDelim ts]
 
 -- ** tracking variable usage
 idUses :: Data a => Ident -> a -> [Ident]

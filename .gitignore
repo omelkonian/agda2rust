@@ -14,7 +14,7 @@ jAgda*
 *.rlib
 target/
 # Test suite
-test/Input.rs
+test/input.rs
 test/Agda
 test/build
 test/agda2rust

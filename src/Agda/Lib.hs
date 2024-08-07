@@ -1,6 +1,7 @@
 -- | Re-export things from the Agda library.
 module Agda.Lib
-  ( module Agda.Syntax.Position
+  ( module Data.Word
+  , module Agda.Syntax.Position
   , module Agda.Syntax.Common
   , module Agda.Syntax.TopLevelModuleName
   , module Agda.Syntax.Abstract.Name
@@ -34,7 +35,10 @@ module Agda.Lib
   , module Agda.Utils.Maybe
   , module Agda.Utils.List
   , module Agda.Utils.Lens
+  , module Agda.Utils.Impossible
   ) where
+
+import Data.Word ( Word64 )
 
 -- * common syntax
 import Agda.Syntax.Position
@@ -94,7 +98,8 @@ import Agda.Compiler.Treeless.EliminateLiteralPatterns
 import Agda.TypeChecking.Monad
   ( TCM, MonadTCM(liftTCM), MonadTCEnv, MonadReduce
   , PureTCM, ReadTCState, HasConstInfo, MonadAddContext
-  , HasBuiltins, BuiltinId, getBuiltinName'
+  , TCErr
+  , HasBuiltins, BuiltinId, getBuiltinName', litType
   , typeOfConst, getConstInfo, instantiateDef
   , typeOfBV
   , getContext, addContext
@@ -119,11 +124,12 @@ import Agda.TypeChecking.Records
 import Agda.TypeChecking.Level
   ( isLevelType )
 import Agda.TypeChecking.Substitute
-  ( TelV(..), raise, Subst(..), DeBruijn(..) )
+  ( TelV(..), Subst(..), DeBruijn(..)
+  , raise, raiseFrom, strengthen, piApply )
 import Agda.TypeChecking.Telescope
-  ( telViewPath, telViewUpTo, telView, typeArity )
+  ( telViewPath, telViewUpTo, telView, typeArity, piApplyM )
 import Agda.TypeChecking.Primitive
-  ( isBuiltin )
+  ( isBuiltin, primType, Nat(..) )
 import Agda.TypeChecking.Reduce
   ( reduce )
 import Agda.TypeChecking.CheckInternal
@@ -153,10 +159,12 @@ import Text.Show.Pretty
 
 -- * Agda utilities
 import Agda.Utils.Monad
-  ( ifM, mapMaybeM, partitionM, ifM, whenM )
+  ( ifM, mapMaybeM, partitionM, ifM, whenM, concatMapM )
 import Agda.Utils.Maybe
   ( ifJustM, boolToMaybe )
 import Agda.Utils.List
   ( downFrom, updateLast )
 import Agda.Utils.Lens
   ( (^.) )
+import Agda.Utils.Impossible
+  ( impossible )

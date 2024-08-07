@@ -1,4 +1,7 @@
+#![feature(type_alias_impl_trait,impl_trait_in_fn_trait_return,tuple_trait,unboxed_closures,fn_traits,const_trait_impl,effects)]
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
+
+use unicurry::*;
 
 pub fn exB(x: bool, x0: i32, x1: i32) -> i32 {
   match x {
@@ -84,32 +87,36 @@ pub fn addN(x: i32, x0: i32) -> i32 {
   x + x0
 }
 
-pub fn apply2(x: impl Fn(i32, i32) -> i32, x0: i32, x1: i32) -> i32 {
-  x(x0, x1)
+pub fn apply2(
+  x: Rc<dyn Fn(i32) -> Rc<dyn Fn(i32) -> i32>>,
+  x0: i32,
+  x1: i32,
+) -> i32 {
+  apply!(x, x0, x1)
 }
 
 pub fn x() -> i32 {
-  apply2(|x, x0| x + x0, 40, 2)
+  apply!(apply2, ᐁF(move|x|ᐁF(move|x0|x+x0)), 40, 2)
 }
 
 pub fn y() -> i32 {
-  apply2(|x, x0| exF(x, x0), 40, 2)
+  apply!(apply2, ᐁF(move|x|ᐁF(move|x0|apply!(exF, x, x0))), 40, 2)
 }
 
 pub fn z() -> i32 {
-  apply2(|x, x0| x + x0, 40, 2)
+  apply!(apply2, ᐁF(move|x|ᐁF(move|x0|x+x0)), 40, 2)
 }
 
 pub fn w() -> i32 {
-  apply2(|x, x0| exG(x, x0), 40, 2)
+  apply!(apply2, ᐁF(move|x|ᐁF(move|x0|apply!(exG, x, x0))), 40, 2)
 }
 
 pub fn q() -> i32 {
-  addN(40, 2)
+  apply!(addN, 40, 2)
 }
 
 pub fn r() -> i32 {
-  exG(40, 2)
+  apply!(exG, 40, 2)
 }
 
 pub fn main() {

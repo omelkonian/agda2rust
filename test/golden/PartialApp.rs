@@ -1,19 +1,22 @@
+#![feature(type_alias_impl_trait,impl_trait_in_fn_trait_return,tuple_trait,unboxed_closures,fn_traits,const_trait_impl,effects)]
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
+
+use unicurry::*;
 
 #[path = "Agda/Builtin/List.rs"] mod ListMod;
 use self::ListMod::List;
-pub fn map<A, B>(x: impl Fn(A) -> B, x0: List<A>) -> List<B> {
+pub fn map<A, B>(x: Rc<dyn Fn(A) -> B>, x0: List<A>) -> List<B> {
   match x0 {
     List::Ֆ91ՖՖ93Ֆ() => List::Ֆ91ՖՖ93Ֆ(),
     List::_Ֆ8759Ֆ_(x1, xs) => {
       let xs = *xs;
-      List::_Ֆ8759Ֆ_(x(x1), Box::new(map::<A, B>(x, xs)))
+      apply!(List::_Ֆ8759Ֆ_, apply!(x, x1), ᐁ(apply!(map::<A, B>, x, xs)))
     },
   }
 }
 
 pub fn zipWith<A, B, C>(
-  x: impl Fn(A, B) -> C,
+  x: Rc<dyn Fn(A) -> Rc<dyn Fn(B) -> C>>,
   x0: List<A>,
   x1: List<B>,
 ) -> List<C> {
@@ -27,7 +30,11 @@ pub fn zipWith<A, B, C>(
           List::Ֆ91ՖՖ93Ֆ() => List::Ֆ91ՖՖ93Ֆ(),
           List::_Ֆ8759Ֆ_(x4, xs0) => {
             let xs0 = *xs0;
-            List::_Ֆ8759Ֆ_(x(x3, x4), Box::new(zipWith::<A, B, C>(x, xs, xs0)))
+            apply!(
+                List::_Ֆ8759Ֆ_, apply!(x, x3, x4), ᐁ(
+                  apply!(zipWith::<A, B, C>, x, xs, xs0)
+                )
+            )
           },
         }
       },
@@ -37,53 +44,60 @@ pub fn zipWith<A, B, C>(
 }
 
 pub fn incr(x: List<i32>) -> List<i32> {
-  map::<i32, i32>(|x0| 1 + x0, x)
+  apply!(map::<i32, i32>, ᐁF(move|x0|1+x0), x)
 }
 
 pub fn incr2(x: List<i32>) -> List<i32> {
-  map::<i32, i32>(|x0| 1 + x0, x)
+  apply!(map::<i32, i32>, ᐁF(move|x0|1+x0), x)
 }
 
 pub fn sum(x: List<i32>) -> i32 {
   match x {
     List::Ֆ91ՖՖ93Ֆ() => 0,
-    List::_Ֆ8759Ֆ_(x0, xs) => { let xs = *xs; sum(xs) + x0 },
+    List::_Ֆ8759Ֆ_(x0, xs) => { let xs = *xs; apply!(sum, xs) + x0 },
   }
 }
 
 pub fn testPartialAdd() -> i32 {
-  sum(map::<i32, i32>(
-    |x| 1 + x,
-    List::_Ֆ8759Ֆ_(
-      20,
-      Box::new(List::_Ֆ8759Ֆ_(20, Box::new(List::Ֆ91ՖՖ93Ֆ()))),
-    ),
-  ))
+  apply!(
+      sum, apply!(
+        map::<i32, i32>, ᐁF(move|x|1+x), apply!(
+          List::_Ֆ8759Ֆ_, 20, ᐁ(apply!(List::_Ֆ8759Ֆ_, 20, ᐁ(List::Ֆ91ՖՖ93Ֆ())))
+        )
+      )
+  )
 }
 
 pub fn testIncr() -> i32 {
-  sum(incr(List::_Ֆ8759Ֆ_(
-    20,
-    Box::new(List::_Ֆ8759Ֆ_(20, Box::new(List::Ֆ91ՖՖ93Ֆ()))),
-  )))
+  apply!(
+      sum, apply!(
+        incr, apply!(
+          List::_Ֆ8759Ֆ_, 20, ᐁ(apply!(List::_Ֆ8759Ֆ_, 20, ᐁ(List::Ֆ91ՖՖ93Ֆ())))
+        )
+      )
+  )
 }
 
 pub fn testIncr2() -> i32 {
-  sum(incr2(List::_Ֆ8759Ֆ_(
-    20,
-    Box::new(List::_Ֆ8759Ֆ_(20, Box::new(List::Ֆ91ՖՖ93Ֆ()))),
-  )))
+  apply!(
+      sum, apply!(
+        incr2, apply!(
+          List::_Ֆ8759Ֆ_, 20, ᐁ(apply!(List::_Ֆ8759Ֆ_, 20, ᐁ(List::Ֆ91ՖՖ93Ֆ())))
+        )
+      )
+  )
 }
 
 pub fn testPartialAdd2() -> i32 {
-  sum(zipWith::<i32, i32, i32>(
-    |x, x0| x + x0,
-    List::_Ֆ8759Ֆ_(
-      20,
-      Box::new(List::_Ֆ8759Ֆ_(20, Box::new(List::Ֆ91ՖՖ93Ֆ()))),
-    ),
-    List::_Ֆ8759Ֆ_(1, Box::new(List::_Ֆ8759Ֆ_(1, Box::new(List::Ֆ91ՖՖ93Ֆ())))),
-  ))
+  apply!(
+      sum, apply!(
+        zipWith::<i32, i32, i32>, ᐁF(move|x|ᐁF(move|x0|x+x0)), apply!(
+          List::_Ֆ8759Ֆ_, 20, ᐁ(apply!(List::_Ֆ8759Ֆ_, 20, ᐁ(List::Ֆ91ՖՖ93Ֆ())))
+        ), apply!(
+          List::_Ֆ8759Ֆ_, 1, ᐁ(apply!(List::_Ֆ8759Ֆ_, 1, ᐁ(List::Ֆ91ՖՖ93Ֆ())))
+        )
+      )
+  )
 }
 
 pub fn constNat(x: i32, x0: i32) -> i32 {
@@ -91,31 +105,39 @@ pub fn constNat(x: i32, x0: i32) -> i32 {
 }
 
 pub fn testConstNat() -> i32 {
-  sum(map::<i32, i32>(
-    |x| constNat(21, x),
-    List::_Ֆ8759Ֆ_(1, Box::new(List::_Ֆ8759Ֆ_(2, Box::new(List::Ֆ91ՖՖ93Ֆ())))),
-  ))
-}
-
-pub fn sumWith(x: impl Fn(i32) -> i32, x0: List<i32>) -> i32 {
-  sum(map::<i32, i32>(x, x0))
-}
-
-pub fn testSumWith() -> i32 {
-  sumWith(
-    |x| 1 + x,
-    List::_Ֆ8759Ֆ_(40, Box::new(List::_Ֆ8759Ֆ_(0, Box::new(List::Ֆ91ՖՖ93Ֆ())))),
+  apply!(
+      sum, apply!(
+        map::<i32, i32>, ᐁF(move|x|apply!(constNat, 21, x)), apply!(
+          List::_Ֆ8759Ֆ_, 1, ᐁ(apply!(List::_Ֆ8759Ֆ_, 2, ᐁ(List::Ֆ91ՖՖ93Ֆ())))
+        )
+      )
   )
 }
 
-pub fn sumWithConst(x: impl Fn(i32, i32) -> i32, x0: List<i32>) -> i32 {
-  sum(map::<i32, i32>(|x1| x(21, x1), x0))
+pub fn sumWith(x: Rc<dyn Fn(i32) -> i32>, x0: List<i32>) -> i32 {
+  apply!(sum, apply!(map::<i32, i32>, x, x0))
+}
+
+pub fn testSumWith() -> i32 {
+  apply!(
+      sumWith, ᐁF(move|x|1+x), apply!(
+        List::_Ֆ8759Ֆ_, 40, ᐁ(apply!(List::_Ֆ8759Ֆ_, 0, ᐁ(List::Ֆ91ՖՖ93Ֆ())))
+      )
+  )
+}
+
+pub fn sumWithConst(
+  x: Rc<dyn Fn(i32) -> Rc<dyn Fn(i32) -> i32>>,
+  x0: List<i32>,
+) -> i32 {
+  apply!(sum, apply!(map::<i32, i32>, ᐁF(move|x1|apply!(x, 21, x1)), x0))
 }
 
 pub fn testSumWithConst() -> i32 {
-  sumWithConst(
-    |x, x0| constNat(x, x0),
-    List::_Ֆ8759Ֆ_(1, Box::new(List::_Ֆ8759Ֆ_(2, Box::new(List::Ֆ91ՖՖ93Ֆ())))),
+  apply!(
+      sumWithConst, ᐁF(move|x|ᐁF(move|x0|apply!(constNat, x, x0))), apply!(
+        List::_Ֆ8759Ֆ_, 1, ᐁ(apply!(List::_Ֆ8759Ֆ_, 2, ᐁ(List::Ֆ91ՖՖ93Ֆ())))
+      )
   )
 }
 
@@ -136,7 +158,7 @@ pub fn addSomeNat(x: SomeNat, x0: i32) -> i32 {
 }
 
 pub fn testSomeNat() -> i32 {
-  addSomeNat(SomeNat { someNat: 40 }, 2)
+  apply!(addSomeNat, SomeNat { someNat: 40 } , 2)
 }
 
 pub fn main() {

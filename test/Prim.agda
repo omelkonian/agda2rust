@@ -11,7 +11,7 @@ testLevel _ = 42
 
 {-# FOREIGN AGDA2RUST
 pub fn main () {
-  println!("{}:\t\t\t {}", module_path!(),
+  println!("{}:\t\t {}", module_path!(),
     testLevel()
   );
 }

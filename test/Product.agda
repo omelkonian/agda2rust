@@ -18,18 +18,18 @@ fst = proj₁
 
 {-# FOREIGN AGDA2RUST
 pub fn main() {
-  println!("{}:\t\t\t {} | {} | {}", module_path!(),
+  println!("{}:\t\t {} | {} | {}", module_path!(),
     mapSnd(
-      |x| x + 1
-      , _Ֆ215Ֆ_ {projՖ8321Ֆ: 0, projՖ8322Ֆ: 41}
+      ᐁF(|x| x + 1),
+      _Ֆ215Ֆ_ {projՖ8321Ֆ: 0, projՖ8322Ֆ: 41}
     ).projՖ8322Ֆ,
     _Ֆ215Ֆ_·projՖ8321Ֆ(mapFst(
-      |x| x + 1
-      , _Ֆ215Ֆ_ {projՖ8321Ֆ: 41, projՖ8322Ֆ: 40}
+      ᐁF(|x| x + 1),
+      _Ֆ215Ֆ_ {projՖ8321Ֆ: 41, projՖ8322Ֆ: 40}
     )),
     fst(mapFst(
-      |x| x + 1
-      , _Ֆ215Ֆ_ {projՖ8321Ֆ: 41, projՖ8322Ֆ: 40}
+      ᐁF(|x| x + 1),
+      _Ֆ215Ֆ_ {projՖ8321Ֆ: 41, projՖ8322Ֆ: 40}
     )),
 );
 }

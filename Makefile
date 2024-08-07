@@ -12,7 +12,7 @@ repl :
 	cabal repl agda2rust # e.g. `:set args -itest -otest/build test/AllTests.agda ... main ... :r ... main`
 
 rustp :
-	cabal repl rustp # e.g. `:rustp Input`
+	cabal repl rustPrint # e.g. `:rustPrint input`
 
 test/agda2rust : $(shell find src/ -name '*.hs')
 	cabal install agda2rust:agda2rust agda2rust:reUnicode \

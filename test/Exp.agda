@@ -38,14 +38,12 @@ eval env (Var x)    = env x
 -- ... | F = geval env r
 
 {-# FOREIGN AGDA2RUST
-fn ᐁ<T>(x : T) -> Box<T> { return Box::new(x); }
-
 use self::Exp::{Plus,Int,Var};
 
 pub fn main() {
   println!("{}:\t\t\t {} | {}", module_path!(),
-    eval(|x| x, exampleExp()),
-    eval(|x| x + 1, Plus(ᐁ(Int(5)),ᐁ(Var(36)))),
+    eval(ᐁF(|x| x), exampleExp()),
+    eval(ᐁF(|x| x + 1), Plus(ᐁ(Int(5)),ᐁ(Var(36)))),
   );
 }
 #-}

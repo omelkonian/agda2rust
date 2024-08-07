@@ -48,61 +48,28 @@ instance A.TTerm ~> R.Expr where
       --   Nothing -> RExprRef . R.mkIdent <$> lookupCtxVar i
       RExprRef . R.mkIdent <$> lookupCtxVar i
     A.TLit l -> rLit <$> go l
-    t@(A.TDef _)  -> go (A.TApp t [])
-    t@(A.TCon _)  -> go (A.TApp t [])
-    t@(A.TPrim _) -> go (A.TApp t [])
-    t0@(A.TApp t (onlyNonErased -> ts)) -> do
-      report $ " * compiling application: " <> pp t <> " $ " <> pp ts
-      (cn, h) <- goHead t
-      report $ "   cn: " <> pp cn
-      (ts', ps) <- separateTyParams ts -- `catchError` \_ -> pure (ts, [])
-      report $ "  ps: " <> pp ps
-      report $ "  ts': " <> pp ts'
-      ar <- arityOf t
-      report $ "  arity: " <> pp ar
-      shouldEtaExpand <- do
-        return $ case ar of
-          Nothing  -> Nothing
-          Just arN -> if d > 0 then Just d else Nothing
-            where d = arN - length ts'
-      case shouldEtaExpand of
-        Just etaN -> do
-          report $ "  etaN: " <> pp etaN
-          intros <- asks funIntroVars
-          report $ "  intros: " <> pp intros
-          localIntros <- asks localIntroVars
-          report $ "  localIntros: " <> pp localIntros
-
-          -- ctxLen <- length <$> currentCtx
-          -- let instVars = take 1 $ drop 1 $ A.downFrom ctxLen
-          -- inNoFunIntros $ go (etaExpandT etaN intros t0 `A.mkTApp` map A.TVar instVars)
-
-          let et = etaExpandT etaN intros localIntros t0
-          report $ "  η: " <> pp t0 <> " ~> " <> pp et
-          inNoFunIntros $ go et
-        Nothing -> inNoFunIntros $ do
-          -- report $ "  ps: " <> pp ps
-          -- report $ "  ts': " <> pp ts'
-          ps' <- gos (typeFromTTerm <$> ps)
-          -- report $ "  ps': " <> show ps'
-          ts'' <- maybe inNonConstructor inConstructor cn $ gos ts'
-          -- report $ "  ts'': " <> ppR ts''
-          toBox <- shouldBox
-          return $ (if toBox then rBox else id) (h ps' ts'')
-{-
-    t0@(A.TLam t) {-| 0 `A.freeIn` t-} -> do
-      report $ " * compiling lambda term: " <> pp t0
-      x <- freshVarInCtx "x"
-      rMoveLam [R.mkIdent x] <$> A.addContext [(x, defaultTy)] (go t)
--}
-    t0@(A.TLam t) -> inNoFunIntros $ do
+    t0@(A.TLam t) -> {-| 0 `A.freeIn` t-} {-inNoFunIntros $ -}do
       report $ " * compiling lambda term: " <> pp t0
       let (n, b) = A.tLamView t0
-      -- report $ "  n: " <> pp n
-      -- report $ "  b: " <> pp b
-      xs <- freshVarsInCtx n
-      -- report $ "  xs: " <> pp xs
-      rLam (R.mkIdent <$> xs) <$> A.addContext (zip xs $ repeat defaultTy) (go b)
+      report $ "  n: " <> pp n
+      report $ "  b: " <> pp b
+      intros <- asks funIntroVars
+      report $ "  intros: " <> pp intros
+      localIntros <- asks localIntroVars
+      report $ "  localIntros: " <> pp localIntros
+
+      if intros >= n then do
+        let b' = A.raiseFrom 1 (-1) b
+        report $ "  b': " <> pp b'
+        go b'
+      else if intros == 0 then do
+        xs <- freshVarsInCtx n
+        report $ "  xs: " <> pp xs
+        body <- A.addContext (zip xs $ repeat defaultTy) (go b)
+        return $ rMoveLams (RInferArg . R.mkIdent <$> xs) body
+      else
+        error "INTROS!=N!=0"
+
     t0@(A.TLet t t') -> do
       report $ " * compiling let: " <> pp t0
       x <- freshVarInCtx "_"
@@ -133,14 +100,64 @@ instance A.TTerm ~> R.Expr where
           return [RArm RWildP catchAll]
       return $ rMatch (RExprRef $ R.mkIdent x) (arms <> defArm)
 
-    -- A.TUnit ->
+    -- A.TUnit -> return $ RExprRef "_"
+    -- A.TErased -> return $ RExprRef "_"
     -- A.TSort ->
-    -- A.TErased ->
     -- A.TCoerce t -> go t
 
     A.TError err -> do
       let msg = A.ppShow err
       return $ RMacroCall (RRef "panic") (RStrTok msg)
+
+    t@(A.TDef _)  -> go (A.TApp t [])
+    t@(A.TCon _)  -> go (A.TApp t [])
+    t@(A.TPrim _) -> go (A.TApp t [])
+    t0@(A.TApp t ts0@(onlyNonErased -> ts)) -> do
+      report $ " * compiling application: " <> pp t <> " $ " <> pp ts0
+      -- ty <- getTypeT t
+      -- report $ "  ty: " <> pp ty
+      -- ty0 <- getTypeT t0
+      -- report $ "  ty0: " <> pp ty0
+      ar <- arityOf t
+      report $ "  arity(t): " <> pp ar
+      -- appAr <- arityOf t0
+      -- report $ "  arity(t0): " <> pp appAr
+
+      (cn, h) <- goHead t
+      -- report $ "   cn: " <> pp cn
+
+      (ts', ps) <- separateTyParams ts0 -- `catchError` \_ -> pure (ts, [])
+      report $ "  ps: " <> pp ps
+      report $ "  ts': " <> pp ts'
+
+      shouldEtaExpand <- do
+        return $ case ar of
+          Nothing  -> Nothing
+          Just arN -> if d > 0 then Just d else Nothing
+            where d = arN - length ts'
+      case shouldEtaExpand of
+        Just etaN -> do
+          report $ "  etaN: " <> pp etaN
+          intros <- asks funIntroVars
+          report $ "  intros: " <> pp intros
+          localIntros <- asks localIntroVars
+          report $ "  localIntros: " <> pp localIntros
+          let et = etaExpandT etaN intros localIntros t0
+          report $ "  η: " <> pp t0 <> " ~> " <> pp et
+          inNoFunIntros $ go et
+        Nothing -> inNoFunIntros $ do
+          -- report $ "  ps: " <> pp ps
+          -- report $ "  ts': " <> pp ts'
+          ps' <- gos (typeFromTTerm <$> ps)
+          -- report $ "  ps': " <> show ps'
+          {-aTys <- A.liftTCM $ getArgTypesT t ts
+          report $ "  aTys: " <> pp aTys-}
+          ts'' <- maybe inNonConstructor inConstructor cn
+                -- $ inArgTypes {-aTys -}undefined
+                $ gos ts'
+          -- report $ "  ts'': " <> ppR ts''
+          toBox <- shouldBox
+          return $ (if toBox then rBox else id) (h ps' ts'')
     t -> panic "treeless term" t
     where
     shouldKeepAlt :: A.TAlt -> C Bool
@@ -151,7 +168,8 @@ instance A.TTerm ~> R.Expr where
       A.TAGuard{} -> pure True
       A.TALit{}   -> pure True
 
-    goHead :: A.TTerm -> C (Maybe A.QName, ([R.Ty ()] -> [R.Expr ()] -> R.Expr ()))
+    goHead :: A.TTerm
+           -> C (Maybe A.QName , ([R.Ty ()] -> [R.Expr ()] -> R.Expr ()))
     goHead = \case
       A.TDef qn ->
         ifJustM (getFFI qn) (return . compileFFIHead) $ do
@@ -166,6 +184,7 @@ instance A.TTerm ~> R.Expr where
           getRid A.Defn{..}
             | Just (recName, recField) <- isRecordProjection theDef
             = unqualField recName recField
+
             | otherwise
             = unqualR defName
       A.TCon cn -> do
@@ -179,7 +198,7 @@ instance A.TTerm ~> R.Expr where
           let xs = unqualR . A.unArg <$> filter hasQuantityNon0 conFields
           let Just (qn, _) = isRec
           hasPhantomField <- hasUnusedTyParams qn
-          return (Just cn , \[] es ->
+          return (Just cn, \[] es ->
             RMkStruct h (zipWith (\x e -> R.Field x (Just e) ()) xs es
                           <> [R.Field "_phantom" (Just mkPhantomField) () | hasPhantomField]))
         else if isJust isBlt then do
@@ -187,7 +206,7 @@ instance A.TTerm ~> R.Expr where
           return (Nothing, \[] [] -> compileBuiltinTerm bltE)
         else do
           h <- qualR cn
-          return (Just cn, \[] es -> RCallCon (RPathExpr h) es)
+          return (Just cn, \[] es -> rCallCon (RPathExpr h) es)
       A.TPrim prim | Just binOp <- getBinOp prim ->
         return (Nothing, \[] [x, y] -> RBin binOp x y)
       A.TPrim A.PSeq ->
@@ -197,7 +216,7 @@ instance A.TTerm ~> R.Expr where
         -- return (Nothing, rCall f)
         (f, ty) <- lookupCtx n
         toConst <- isNullary ty
-        return (Nothing, \[] -> (if toConst then rCall else RCall) (R.mkIdent f))
+        return (Nothing, \[] -> (if toConst then rCall else rApply) (R.mkIdent f))
       hd -> panic "head" (A.ppShow hd)
 
     getBinOp :: A.TPrim -> Maybe R.BinOp
@@ -226,19 +245,23 @@ instance A.TTerm ~> R.Expr where
       -- A.PIf ->
       -- A.PSeq ->
       -- A.PITo64 ->
+      -- A.PITo64 ->
 
     arityOf :: A.TTerm -> C (Maybe Int)
-    arityOf t = report ("  arityOf: " <> pp t) >> case t of
+    arityOf t = {-report ("  arityOf: " <> pp t) >>-} case t of
       A.TDef n  -> getArity n
       A.TCon n  -> getArity n
       A.TPrim _ -> return $ Just 2 -- TODO: generalize this to 1/2/3
       A.TVar i  -> Just . erasedArity <$> lookupCtxTy i
-      -- A.TApp t ts -> do
-      --   (ts, _) <- separateTyParams ts
-      --   headAr <- arityOf t
-      --   let ar = headAr - length ts
-      --   when (ar < 0) $ error "[arityOf] negative arity!"
-      --   return ar
+      A.TApp t ts -> do
+        (ts, _) <- separateTyParams ts
+        Just headAr <- arityOf t
+        report $ "    headAr: " <> pp headAr
+        let ar = headAr - length ts
+        report $ "    ar: " <> pp ar
+        when (ar < 0) $ error "[arityOf] negative arity!"
+        return $ Just ar
+      A.TLam t -> fmap (1 +) <$> arityOf t
       _ -> panic "tterm [arityOf]" t
 
 -- | Compiling match clauses into case expressions.
@@ -312,7 +335,7 @@ instance A.TAlt ~> R.Arm where
       unboxPats :: A.QName -> Int -> [String] -> R.Expr () :~> R.Expr
       unboxPats con n xs e = inConstructor con $ do
         -- report $ "* unboxing " <> show xs
-        ps <- flip mapMaybeM (enumerate xs) $ \(i, x) -> inArgument i $ do
+        ps <- flip mapMaybeM (enumerate0 xs) $ \(i, x) -> inArgument i $ do
           toBox <- shouldBox
           return $ if toBox then Just (x, RDeref (R.mkIdent x))
                             else Nothing

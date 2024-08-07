@@ -49,7 +49,7 @@ instance A.Type ~> R.Ty where
       -- ** function types
       A.Pi a@(A.unDom -> ty) b@(A.unAbs -> b') -> do
         insideTyAlias <- asks tyAlias
-        let mkFn = if insideTyAlias then rBareFn (R.mkIdent x) else rImplFn
+        let mkFn = if insideTyAlias then rBareFn (R.mkIdent x) else rMkFn
             -- ^ use bare functions due to limitations in type aliases
             --   c.f. https://github.com/rust-lang/rust/issues/63063
             x    = A.bareNameWithDefault (A.absName b) (A.domName a)
@@ -71,6 +71,9 @@ instance A.Type ~> R.Ty where
       -- TODO: currently only supports const lambdas `λ _ -> ...`
       A.Lam _ (A.Abs x ty) ->
         A.addContext [(x, defaultTy)] $ go (typeFromTerm ty)
+
+      A.Dummy "()" [] ->
+        return $ RTyRef (R.mkIdent "_")
 
       -- otherwise, error
       ty -> panic "type" ty

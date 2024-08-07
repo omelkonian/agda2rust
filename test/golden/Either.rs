@@ -1,4 +1,7 @@
+#![feature(type_alias_impl_trait,impl_trait_in_fn_trait_return,tuple_trait,unboxed_closures,fn_traits,const_trait_impl,effects)]
 #![allow(dead_code,non_snake_case,unused_variables,non_camel_case_types,non_upper_case_globals,unreachable_patterns)]
+
+use unicurry::*;
 
 pub enum Either<A, B> {
   Left(A),
@@ -53,18 +56,15 @@ pub fn OnlyLeftR·left<A, B>(r: OnlyLeftR<A, B>) -> A {
 }
 
 pub fn fromOnlyLeftR<A, B>(x: OnlyLeftR<A, B>) -> A {
-  OnlyLeftR·left(x)
+  apply!(OnlyLeftR·left, x)
 }
 
 pub fn fromOnlyLeftR2<A, B, C>(x: OnlyLeftR<OnlyLeftR<A, B>, C>) -> A {
-  OnlyLeftR·left(OnlyLeftR·left(x))
+  apply!(OnlyLeftR·left, apply!(OnlyLeftR·left, x))
 }
 
-use std::marker::{PhantomData};
-fn __<T>() -> PhantomData<T> { return PhantomData; }
-
 pub fn main() {
-  println!("{}:\t\t\t {} | {} | {} | {} | {} | {}", module_path!(),
+  println!("{}:\t\t {} | {} | {} | {} | {} | {}", module_path!(),
     fromEitherAB::<i32, i32>(41, Either::Left(42)),
     fromEither::<i32, i32>(41, Either::Left(42)),
     fromOnlyLeft::<i32, i32>(OnlyLeft::Left(42)),

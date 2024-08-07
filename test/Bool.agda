@@ -30,7 +30,7 @@ testIte = if true then 42 else 0
 
 {-# FOREIGN AGDA2RUST
 pub fn main () {
-  println!("{}:\t\t\t {} | {}", module_path!(),
+  println!("{}:\t\t {} | {}", module_path!(),
     bool2Nat(testBool()),
     testIte(),
   );
