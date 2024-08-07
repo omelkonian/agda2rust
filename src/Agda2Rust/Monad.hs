@@ -34,8 +34,6 @@ data Env = Env
     -- ^ the number of bound variables we are currently in
   , tyAlias        :: Bool
     -- ^ whether we are currently compiling a type alias
-  -- , argTypes       :: Maybe [Type]
-    -- ^ types of the current application's arguments
   }
 
 initEnv :: Env
@@ -110,10 +108,6 @@ inTyAlias :: C a -> C a
 inTyAlias = local $ \e -> e
   { tyAlias = True }
 
--- inArgTypes :: [Type] -> C a -> C a
--- inArgTypes tys = local $ \e -> e
---   { argTypes = Just tys }
-
 setBoxedConstructor :: (String, Int) -> C ()
 setBoxedConstructor n = modify $ \s -> s
   { boxedConstructors = S.insert n (boxedConstructors s) }
@@ -174,12 +168,3 @@ setArity qn n = modify \s -> s
 
 getArity :: QName -> C (Maybe Int)
 getArity qn = M.lookup (pp qn) . arities <$> get
-
--- getArgArity :: C (Maybe Int)
--- getArgArity = asks curArgument >>= \case
---   Nothing -> return Nothing
---   Just i -> do
---     mtys <- asks argTypes
---     case mtys of
---       Nothing -> return Nothing
---       Just tys -> return $ Just $ erasedArity (tys !! i)

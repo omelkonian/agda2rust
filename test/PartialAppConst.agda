@@ -28,3 +28,43 @@ pub fn main() {
   );
 }
 #-}
+
+{-
+record SomeNat : Set where
+  constructor `_
+  field someNat : Nat
+
+g : @0 SomeNat → SomeNat → (Nat → Nat)
+g _ (` n) = n +_
+
+h : SomeNat → (Nat → Nat)
+h (` n) = _+ n
+
+-- f g h : SomeNat → (Nat → Nat)
+-- f (` n) m = n + m
+-- g (` n) = n +_
+-- h (` n) = _+ n
+
+-- x = f (` 40) 2
+-- y = g (` 40) 2
+-- z = h (` 40) 2
+
+{-
+h : @0 SomeNat → SomeNat → Bool → (Nat → Nat)
+-- h _ (` n) b = λ where
+--   T → n +_
+--   F → _+ 0
+h _ (` n) b = if b then (n +_) else (_+ 0)
+-}
+
+{-# FOREIGN AGDA2RUST
+pub fn main() {
+  println!("{}:\t\t\t {} | {} | {}", module_path!(),
+    x(),
+    y(),
+    z(),
+  );
+}
+#-}
+
+-}

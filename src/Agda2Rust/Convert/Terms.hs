@@ -150,11 +150,7 @@ instance A.TTerm ~> R.Expr where
           -- report $ "  ts': " <> pp ts'
           ps' <- gos (typeFromTTerm <$> ps)
           -- report $ "  ps': " <> show ps'
-          {-aTys <- A.liftTCM $ getArgTypesT t ts
-          report $ "  aTys: " <> pp aTys-}
-          ts'' <- maybe inNonConstructor inConstructor cn
-                -- $ inArgTypes {-aTys -}undefined
-                $ gos ts'
+          ts'' <- maybe inNonConstructor inConstructor cn $ gos ts'
           -- report $ "  ts'': " <> ppR ts''
           toBox <- shouldBox
           return $ (if toBox then rBox else id) (h ps' ts'')
