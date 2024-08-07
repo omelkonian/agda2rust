@@ -165,13 +165,11 @@ ignoredRustWarnings =
   -- , "uncommon_codepoints" -- only crate-level attribute
   ]
 experimentRustFeatures =
-  -- []
   [ "type_alias_impl_trait"
   , "impl_trait_in_fn_trait_return"
   , "tuple_trait"
   , "unboxed_closures"
   , "fn_traits"
-
   , "const_trait_impl"
   , "effects"
   ]

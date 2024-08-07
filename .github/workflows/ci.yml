@@ -58,7 +58,10 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         profile: minimal
-        toolchain: nightly
+        toolchain: nightly-2024-06-10
+
+    - name: Setup Rust nightly
+      run: rustup default nightly-2024-06-10
 
     - name: Run test suite
       run: make test
