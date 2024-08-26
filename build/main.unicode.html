@@ -116,75 +116,79 @@
 <span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a><span class="kw">mod</span> ExactSplit<span class="op">;</span></span>
 <span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a><span class="kw">mod</span> OpenModule<span class="op">;</span></span>
 <span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a><span class="kw">mod</span> ConsImplicitArgs<span class="op">;</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a><span class="kw">mod</span> MultiArgFun<span class="op">;</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a><span class="kw">mod</span> Curry<span class="op">;</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a><span class="kw">mod</span> PointFree<span class="op">;</span></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a><span class="kw">mod</span> PartialApp<span class="op">;</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a><span class="kw">mod</span> PartialAppM<span class="op">;</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a><span class="kw">mod</span> PartialAppId<span class="op">;</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a><span class="kw">mod</span> EtaExpansion<span class="op">;</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a><span class="kw">mod</span> PartialAppSwap<span class="op">;</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true"></a><span class="co">// mod Closures;</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true"></a><span class="co">// mod PartialAppConst;</span></span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true"></a><span class="co">// mod PartialAppSwapId;</span></span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true"></a></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true"></a><span class="co">// mod NonLinearity;</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true"></a><span class="co">// mod Exp;</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true"></a></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true"></a>  <span class="pp">Identity::</span>main()<span class="op">;</span></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true"></a>  <span class="pp">Numbers::</span>main()<span class="op">;</span></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true"></a>  <span class="pp">Simplification::</span>main()<span class="op">;</span></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true"></a>  <span class="pp">Top::</span>main()<span class="op">;</span></span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true"></a>  <span class="pp">Newtype::</span>main()<span class="op">;</span></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true"></a>  <span class="bu">Product</span><span class="pp">::</span>main()<span class="op">;</span></span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true"></a>  <span class="pp">Either::</span>main()<span class="op">;</span></span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true"></a>  <span class="pp">Maybe::</span>main()<span class="op">;</span></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true"></a>  <span class="pp">Nat0::</span>main()<span class="op">;</span></span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true"></a>  <span class="pp">Nat::</span>main()<span class="op">;</span></span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true"></a>  <span class="pp">List0::</span>main()<span class="op">;</span></span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true"></a>  <span class="pp">List::</span>main()<span class="op">;</span></span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true"></a>  <span class="pp">Singleton::</span>main()<span class="op">;</span></span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true"></a>  <span class="pp">RunTimeIrrelevance::</span>main()<span class="op">;</span></span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true"></a>  <span class="pp">Postulates::</span>main()<span class="op">;</span></span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true"></a>  <span class="pp">Constants::</span>main()<span class="op">;</span></span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true"></a>  <span class="co">// Float0::main();</span></span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true"></a>  <span class="pp">Float::</span>main()<span class="op">;</span></span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true"></a>  <span class="pp">Char::</span>main()<span class="op">;</span></span>
-<span id="cb1-78"><a href="#cb1-78" aria-hidden="true"></a>  <span class="co">// String0::main();</span></span>
-<span id="cb1-79"><a href="#cb1-79" aria-hidden="true"></a>  <span class="dt">String</span><span class="pp">::</span>main()<span class="op">;</span></span>
-<span id="cb1-80"><a href="#cb1-80" aria-hidden="true"></a>  <span class="pp">Prim::</span>main()<span class="op">;</span></span>
-<span id="cb1-81"><a href="#cb1-81" aria-hidden="true"></a>  <span class="pp">Bool00::</span>main()<span class="op">;</span></span>
-<span id="cb1-82"><a href="#cb1-82" aria-hidden="true"></a>  <span class="co">// Bool0::main();</span></span>
-<span id="cb1-83"><a href="#cb1-83" aria-hidden="true"></a>  <span class="pp">Bool::</span>main()<span class="op">;</span></span>
-<span id="cb1-84"><a href="#cb1-84" aria-hidden="true"></a>  <span class="pp">Int::</span>main()<span class="op">;</span></span>
-<span id="cb1-85"><a href="#cb1-85" aria-hidden="true"></a>  <span class="pp">TypeAliases::</span>main()<span class="op">;</span></span>
-<span id="cb1-86"><a href="#cb1-86" aria-hidden="true"></a>  <span class="pp">OverloadedCons::</span>main()<span class="op">;</span></span>
-<span id="cb1-87"><a href="#cb1-87" aria-hidden="true"></a>  <span class="pp">OverloadedFields::</span>main()<span class="op">;</span></span>
-<span id="cb1-88"><a href="#cb1-88" aria-hidden="true"></a>  <span class="pp">ErasedFields::</span>main()<span class="op">;</span></span>
-<span id="cb1-89"><a href="#cb1-89" aria-hidden="true"></a>  <span class="pp">RecordFields::</span>main()<span class="op">;</span></span>
-<span id="cb1-90"><a href="#cb1-90" aria-hidden="true"></a>  <span class="pp">UnusedArgs::</span>main()<span class="op">;</span></span>
-<span id="cb1-91"><a href="#cb1-91" aria-hidden="true"></a>  <span class="pp">ExactSplit::</span>main()<span class="op">;</span></span>
-<span id="cb1-92"><a href="#cb1-92" aria-hidden="true"></a>  <span class="pp">OpenModule::</span>main()<span class="op">;</span></span>
-<span id="cb1-93"><a href="#cb1-93" aria-hidden="true"></a>  <span class="pp">ConsImplicitArgs::</span>main()<span class="op">;</span></span>
-<span id="cb1-94"><a href="#cb1-94" aria-hidden="true"></a></span>
-<span id="cb1-95"><a href="#cb1-95" aria-hidden="true"></a>  <span class="pp">MultiArgFun::</span>main()<span class="op">;</span></span>
-<span id="cb1-96"><a href="#cb1-96" aria-hidden="true"></a>  <span class="pp">Curry::</span>main()<span class="op">;</span></span>
-<span id="cb1-97"><a href="#cb1-97" aria-hidden="true"></a>  <span class="pp">PointFree::</span>main()<span class="op">;</span></span>
-<span id="cb1-98"><a href="#cb1-98" aria-hidden="true"></a>  <span class="pp">PartialApp::</span>main()<span class="op">;</span></span>
-<span id="cb1-99"><a href="#cb1-99" aria-hidden="true"></a>  <span class="pp">PartialAppM::</span>main()<span class="op">;</span></span>
-<span id="cb1-100"><a href="#cb1-100" aria-hidden="true"></a>  <span class="pp">PartialAppId::</span>main()<span class="op">;</span></span>
-<span id="cb1-101"><a href="#cb1-101" aria-hidden="true"></a>  <span class="pp">EtaExpansion::</span>main()<span class="op">;</span></span>
-<span id="cb1-102"><a href="#cb1-102" aria-hidden="true"></a>  <span class="pp">PartialAppSwap::</span>main()<span class="op">;</span></span>
-<span id="cb1-103"><a href="#cb1-103" aria-hidden="true"></a></span>
-<span id="cb1-104"><a href="#cb1-104" aria-hidden="true"></a><span class="co">//  Closures::main();</span></span>
-<span id="cb1-105"><a href="#cb1-105" aria-hidden="true"></a><span class="co">//  PartialAppConst::main();</span></span>
-<span id="cb1-106"><a href="#cb1-106" aria-hidden="true"></a><span class="co">//  PartialAppSwapId::main();</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a><span class="kw">mod</span> Where<span class="op">;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a><span class="kw">mod</span> Levels<span class="op">;</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a><span class="kw">mod</span> MultiArgFun<span class="op">;</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a><span class="kw">mod</span> Curry<span class="op">;</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a><span class="kw">mod</span> PointFree<span class="op">;</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a><span class="kw">mod</span> PartialApp<span class="op">;</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a><span class="kw">mod</span> PartialAppM<span class="op">;</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a><span class="kw">mod</span> PartialAppId<span class="op">;</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a><span class="kw">mod</span> EtaExpansion<span class="op">;</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true"></a><span class="kw">mod</span> PartialAppSwap<span class="op">;</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true"></a><span class="co">// mod Closures;</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true"></a><span class="co">// mod PartialAppConst;</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true"></a><span class="co">// mod PartialAppSwapId;</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true"></a><span class="co">// mod NonLinearity;</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true"></a><span class="co">// mod Exp;</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true"></a>  <span class="pp">Identity::</span>main()<span class="op">;</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true"></a>  <span class="pp">Numbers::</span>main()<span class="op">;</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true"></a>  <span class="pp">Simplification::</span>main()<span class="op">;</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true"></a>  <span class="pp">Top::</span>main()<span class="op">;</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true"></a>  <span class="pp">Newtype::</span>main()<span class="op">;</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true"></a>  <span class="bu">Product</span><span class="pp">::</span>main()<span class="op">;</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true"></a>  <span class="pp">Either::</span>main()<span class="op">;</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true"></a>  <span class="pp">Maybe::</span>main()<span class="op">;</span></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true"></a>  <span class="pp">Nat0::</span>main()<span class="op">;</span></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true"></a>  <span class="pp">Nat::</span>main()<span class="op">;</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true"></a>  <span class="pp">List0::</span>main()<span class="op">;</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true"></a>  <span class="pp">List::</span>main()<span class="op">;</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true"></a>  <span class="pp">Singleton::</span>main()<span class="op">;</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true"></a>  <span class="pp">RunTimeIrrelevance::</span>main()<span class="op">;</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true"></a>  <span class="pp">Postulates::</span>main()<span class="op">;</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true"></a>  <span class="pp">Constants::</span>main()<span class="op">;</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true"></a>  <span class="co">// Float0::main();</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true"></a>  <span class="pp">Float::</span>main()<span class="op">;</span></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true"></a>  <span class="pp">Char::</span>main()<span class="op">;</span></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true"></a>  <span class="co">// String0::main();</span></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true"></a>  <span class="dt">String</span><span class="pp">::</span>main()<span class="op">;</span></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true"></a>  <span class="pp">Prim::</span>main()<span class="op">;</span></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true"></a>  <span class="pp">Bool00::</span>main()<span class="op">;</span></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true"></a>  <span class="co">// Bool0::main();</span></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true"></a>  <span class="pp">Bool::</span>main()<span class="op">;</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true"></a>  <span class="pp">Int::</span>main()<span class="op">;</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true"></a>  <span class="pp">TypeAliases::</span>main()<span class="op">;</span></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true"></a>  <span class="pp">OverloadedCons::</span>main()<span class="op">;</span></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true"></a>  <span class="pp">OverloadedFields::</span>main()<span class="op">;</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true"></a>  <span class="pp">ErasedFields::</span>main()<span class="op">;</span></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true"></a>  <span class="pp">RecordFields::</span>main()<span class="op">;</span></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true"></a>  <span class="pp">UnusedArgs::</span>main()<span class="op">;</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true"></a>  <span class="pp">ExactSplit::</span>main()<span class="op">;</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true"></a>  <span class="pp">OpenModule::</span>main()<span class="op">;</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true"></a>  <span class="pp">ConsImplicitArgs::</span>main()<span class="op">;</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true"></a>  <span class="pp">Where::</span>main()<span class="op">;</span></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true"></a>  <span class="pp">Levels::</span>main()<span class="op">;</span></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true"></a>  <span class="pp">MultiArgFun::</span>main()<span class="op">;</span></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true"></a>  <span class="pp">Curry::</span>main()<span class="op">;</span></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true"></a>  <span class="pp">PointFree::</span>main()<span class="op">;</span></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true"></a>  <span class="pp">PartialApp::</span>main()<span class="op">;</span></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true"></a>  <span class="pp">PartialAppM::</span>main()<span class="op">;</span></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true"></a>  <span class="pp">PartialAppId::</span>main()<span class="op">;</span></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true"></a>  <span class="pp">EtaExpansion::</span>main()<span class="op">;</span></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true"></a>  <span class="pp">PartialAppSwap::</span>main()<span class="op">;</span></span>
 <span id="cb1-107"><a href="#cb1-107" aria-hidden="true"></a></span>
-<span id="cb1-108"><a href="#cb1-108" aria-hidden="true"></a><span class="co">//  NonLinearity::main();</span></span>
-<span id="cb1-109"><a href="#cb1-109" aria-hidden="true"></a><span class="co">//  Exp::main();</span></span>
-<span id="cb1-110"><a href="#cb1-110" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true"></a><span class="co">//  Closures::main();</span></span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true"></a><span class="co">//  PartialAppConst::main();</span></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true"></a><span class="co">//  PartialAppSwapId::main();</span></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true"></a><span class="co">//  NonLinearity::main();</span></span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true"></a><span class="co">//  Exp::main();</span></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>
