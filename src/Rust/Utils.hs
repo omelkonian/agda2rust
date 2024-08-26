@@ -91,9 +91,10 @@ pattern RImpl tb = ImplTrait (tb :| []) ()
 pattern RDyn tb = RTrait tb
 
 -- ** function types
-pattern RFn' isConst x ps ty b =
-  Fn [] PublicV x ty Normal isConst Rust (RForall ps) b ()
-pattern RFn x ps ty b = RFn' NotConst x ps ty b
+pattern RFn' isPublic isConst x ps ty b =
+  Fn [] isPublic x ty Normal isConst Rust (RForall ps) b ()
+pattern RFn x ps ty b = RFn' PublicV NotConst x ps ty b
+pattern RPrivFn x ps ty b = RFn' InheritedV NotConst x ps ty b
 
 pattern RFnTy as b = FnDecl as (Just b) False ()
 
@@ -193,7 +194,7 @@ rMoveLams = \case
   (Arg (Just (IdentP _ x _ _)) _ _ : xs) -> RRc . rMoveLam [x] . rMoveLams xs
 
 -- ** constants
-pattern RConstFn x ps ty b = RFn' Const x ps ty b
+pattern RConstFn x ps ty b = RFn' PublicV Const x ps ty b
 pattern RConst x ty b = ConstItem [] PublicV x ty b ()
 pattern RStatic x ty b = Static [] PublicV x ty Immutable b ()
 

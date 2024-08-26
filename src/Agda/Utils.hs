@@ -118,6 +118,11 @@ shouldKeepTel = filterM (fmap isNothing . shouldKeepTyParam)
 shouldKeep :: (LensQuantity a, LensHiding a) => a -> Bool
 shouldKeep = visible /\ hasQuantityNon0
 
+shouldKeepRecField :: PureTCM m => TelItem -> m Bool
+shouldKeepRecField d@(unDom -> (x, ty)) = do
+  isLvl <- isLevelType ty
+  return $ hasQuantityNon0 d && not isLvl
+
 -- shouldKeepArgs :: [Arg a] -> [a]
 -- shouldKeepArgs = fmap unArg . filter shouldKeep
 
@@ -235,6 +240,26 @@ isTyParamM = \case
         _ -> return False
         -- t -> panic "result type parameter" t
   _ -> return False
+
+isLevelM :: PureEnvTCM m => TTerm -> m Bool
+isLevelM = \case
+  TUnit -> return True
+  TErased -> return True
+  TDef n -> isLvl =<< typeOfConst n
+  TVar i -> isLvl =<< lookupCtxTy i
+  TApp h _ -> isResTyParam h
+    where
+    isResTyParam = \case
+      TDef n -> isLvl =<< resTy =<< typeOfConst n
+      TVar i -> isLvl =<< resTy =<< lookupCtxTy i
+      _ -> return False
+      -- t -> panic "result type parameter" t
+  _ -> return False
+  where
+  isLvl ty = do
+    isLvlTy <- isLevelType ty
+    let isLvlUniv = pp ty == "Agda.Primitive.LevelUniv"
+    return (isLvlTy || isLvlUniv)
 
 separateTyParams :: PureEnvTCM m  => [TTerm] -> m ([TTerm], [TTerm])
 separateTyParams = partitionM isTyParamM . filter (not . isErasedTTerm)

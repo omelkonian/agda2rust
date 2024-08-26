@@ -51,20 +51,20 @@ instance A.TTerm ~> R.Expr where
     t0@(A.TLam t) -> {-| 0 `A.freeIn` t-} {-inNoFunIntros $ -}do
       report $ " * compiling lambda term: " <> pp t0
       let (n, b) = A.tLamView t0
-      report $ "  n: " <> pp n
-      report $ "  b: " <> pp b
+      -- report $ "  n: " <> pp n
+      -- report $ "  b: " <> pp b
       intros <- asks funIntroVars
-      report $ "  intros: " <> pp intros
+      -- report $ "  intros: " <> pp intros
       localIntros <- asks localIntroVars
-      report $ "  localIntros: " <> pp localIntros
+      -- report $ "  localIntros: " <> pp localIntros
 
       if intros >= n then do
         let b' = A.raiseFrom 1 (-1) b
-        report $ "  b': " <> pp b'
+        -- report $ "  b': " <> pp b'
         go b'
       else if intros == 0 then do
         xs <- freshVarsInCtx n
-        report $ "  xs: " <> pp xs
+        -- report $ "  xs: " <> pp xs
         body <- A.addContext (zip xs $ repeat defaultTy) (go b)
         return $ rMoveLams (RInferArg . R.mkIdent <$> xs) body
       else
@@ -79,12 +79,12 @@ instance A.TTerm ~> R.Expr where
     t@(A.TCase scrutinee A.CaseInfo{..} defCase alts) -> {-inNoFunIntros $-} do
       report $ " * compiling case expression:\n" <> pp t
       intros <- asks funIntroVars
-      report $ "  intros: " <> pp intros
+      -- report $ "  intros: " <> pp intros
       ctx <- currentCtx
-      report $ "  ctx: " <> pp ctx
-      report $ "  scrutineeVar: " <> pp scrutinee
+      -- report $ "  ctx: " <> pp ctx
+      -- report $ "  scrutineeVar: " <> pp scrutinee
       (x, ty) <- lookupCtx scrutinee -- (pred (length ctx) - scrutinee)
-      report $ "  scrutinee: " <> x <> " : " <> pp ty
+      -- report $ "  scrutinee: " <> x <> " : " <> pp ty
       arms <- traverse go =<< filterM shouldKeepAlt alts
       defArm <- case defCase of
         A.TError _ -> do
@@ -119,29 +119,31 @@ instance A.TTerm ~> R.Expr where
       -- ty0 <- getTypeT t0
       -- report $ "  ty0: " <> pp ty0
       ar <- arityOf t
-      report $ "  arity(t): " <> pp ar
+      -- report $ "  arity(t): " <> pp ar
       -- appAr <- arityOf t0
       -- report $ "  arity(t0): " <> pp appAr
 
       (cn, h) <- goHead t
       -- report $ "   cn: " <> pp cn
 
-      (ts', ps) <- separateTyParams ts0 -- `catchError` \_ -> pure (ts, [])
-      report $ "  ps: " <> pp ps
-      report $ "  ts': " <> pp ts'
+      (ts0', ps) <- separateTyParams ts0 -- `catchError` \_ -> pure (ts, [])
+      -- report $ "  ts0': " <> pp ts0'
+      ts' <- filterM (fmap not . isLevelM) ts0'
+      -- report $ "  ps: " <> pp ps
+      -- report $ "  ts': " <> pp ts'
 
       shouldEtaExpand <- do
         return $ case ar of
           Nothing  -> Nothing
           Just arN -> if d > 0 then Just d else Nothing
-            where d = arN - length ts'
+            where d = arN - length ts0'
       case shouldEtaExpand of
         Just etaN -> do
-          report $ "  etaN: " <> pp etaN
+          -- report $ "  etaN: " <> pp etaN
           intros <- asks funIntroVars
-          report $ "  intros: " <> pp intros
+          -- report $ "  intros: " <> pp intros
           localIntros <- asks localIntroVars
-          report $ "  localIntros: " <> pp localIntros
+          -- report $ "  localIntros: " <> pp localIntros
           let et = etaExpandT etaN intros localIntros t0
           report $ "  η: " <> pp t0 <> " ~> " <> pp et
           inNoFunIntros $ go et
@@ -171,18 +173,10 @@ instance A.TTerm ~> R.Expr where
         ifJustM (getFFI qn) (return . compileFFIHead) $ do
         ifM (isConst qn) (return $ compileFFIHead (Just Const, pp $ A.unqual qn)) $ do
           report $ " * compiling head of application (definition: " <> pp qn <> ")"
-          rn <- getRid <$> A.getConstInfo qn
+          rn <- defNameR <$> A.getConstInfo qn
           -- toConst <- isNullary =<< A.typeOfConst qn
           -- return (Nothing, (if toConst then rCall else RCall) (unqualR qn))
           return (Nothing, \ts -> rCall' rn ts)
-          where
-          getRid :: A.Definition -> R.Ident
-          getRid A.Defn{..}
-            | Just (recName, recField) <- isRecordProjection theDef
-            = unqualField recName recField
-
-            | otherwise
-            = unqualR defName
       A.TCon cn -> do
         report $ " * compiling head of application (constructor: " <> pp cn <> ")"
         isRec <- A.isRecordConstructor cn
@@ -252,9 +246,9 @@ instance A.TTerm ~> R.Expr where
       A.TApp t ts -> do
         (ts, _) <- separateTyParams ts
         Just headAr <- arityOf t
-        report $ "    headAr: " <> pp headAr
+        -- report $ "    headAr: " <> pp headAr
         let ar = headAr - length ts
-        report $ "    ar: " <> pp ar
+        -- report $ "    ar: " <> pp ar
         when (ar < 0) $ error "[arityOf] negative arity!"
         return $ Just ar
       A.TLam t -> fmap (1 +) <$> arityOf t

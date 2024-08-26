@@ -33,6 +33,8 @@ import UnusedArgs
 import ExactSplit
 import OpenModule
 import ConsImplicitArgs
+import Where
+import Levels
 
 -- ** partial application / currying
 import MultiArgFun
@@ -89,6 +91,8 @@ mod UnusedArgs;
 mod ExactSplit;
 mod OpenModule;
 mod ConsImplicitArgs;
+mod Where;
+mod Levels;
 
 mod MultiArgFun;
 mod Curry;
@@ -142,6 +146,8 @@ fn main() {
   ExactSplit::main();
   OpenModule::main();
   ConsImplicitArgs::main();
+  Where::main();
+  Levels::main();
 
   MultiArgFun::main();
   Curry::main();

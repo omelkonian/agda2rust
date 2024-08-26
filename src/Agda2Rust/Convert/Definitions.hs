@@ -70,10 +70,7 @@ instance A.Definition ~> RDef where
       goD pragma theDef
     where
     dx :: R.Ident
-    dx | Just (recName, recField) <- isRecordProjection theDef
-       = unqualField recName recField
-       | otherwise
-       = unqualR defName
+    dx = defNameR defn
 
     goD :: Maybe Pragma -> A.Defn :~> RDef
     goD pragma = \case
@@ -126,15 +123,15 @@ instance A.Definition ~> RDef where
         tdef <- liftTCM $ A.toTreeless defName
         report $ " tdef: " <> pp tdef
         telV0 <- telListView defType
-        report $ " telV0: " <> pp telV0
+        -- report $ " telV0: " <> pp telV0
         let (topIntros, tterm) = A.tLamView tdef
-        report $ " topIntros: " <> pp topIntros
+        -- report $ " topIntros: " <> pp topIntros
         let droppedIntros = A.droppedPars defn
-        report $ " droppedIntros: " <> pp droppedIntros
+        -- report $ " droppedIntros: " <> pp droppedIntros
         telV <- telListViewUpTo (length (fst telV0)) defType
-        report $ " telV: " <> pp telV
+        -- report $ " telV: " <> pp telV
         CompileDef <$> goFn pragma (-topIntros) telV \raiseIntros -> do
-          report $ " raiseIntros: " <> pp raiseIntros
+          -- report $ " raiseIntros: " <> pp raiseIntros
           go (A.raise (raiseIntros - droppedIntros) tterm)
         where
       d | Just (NoFFI _) <- pragma ->
@@ -148,9 +145,9 @@ instance A.Definition ~> RDef where
           cDef <- A.instantiateDef =<< A.getConstInfo dc
           return [ (dc, A.defType cDef) | hasQuantityNon0 cDef]
           )
-        report $ " cs: " <> pp cs
+        -- report $ " cs: " <> pp cs
         A.TelV tel _ <- A.telViewUpTo dataPars defType
-        report $ " tel: " <> pp tel
+        -- report $ " tel: " <> pp tel
         params <- fmap R.mkIdent <$> mapMaybeM shouldKeepTyParam (A.telToList tel)
         variants <- A.addContext tel (gos cs)
         let unusedParams = filter (unusedIn variants) params
@@ -165,17 +162,18 @@ instance A.Definition ~> RDef where
         report " compiling record"
         -- NB: incorporate conHead/namedCon in the future for accuracy
         --     + to solve the issue with private (non-public) fields
-        report $ " recPars: " <> pp recPars
-        report $ " recTel: " <> pp recTel
-        report $ " recConHead: " <> pp recConHead
+        -- report $ " recPars: " <> pp recPars
+        -- report $ " recTel: " <> pp recTel
+        -- report $ " recConHead: " <> pp recConHead
         setRecordConstructor recConHead
         let (tel, fs) = splitAt recPars (A.telToList recTel)
-        report $ " tel: " <> pp tel
-        report $ " fs: " <> pp fs
+        -- report $ " tel: " <> pp tel
+        -- report $ " fs: " <> pp fs
         params <- fmap R.mkIdent <$> mapMaybeM shouldKeepTyParam tel
-        report $ " params: " <> show params
-        fields <- A.addContext tel (goFs $ A.unDom <$> filter hasQuantityNon0 fs)
-        report $ " fields: " <> show fields
+        -- report $ " params: " <> show params
+        fs' <- filterM shouldKeepRecField fs
+        fields <- A.addContext tel $ goFs (A.unDom <$> fs')
+        -- report $ " fields: " <> show fields
         let unusedParams = filter (unusedIn fields) params
         setUnusedTyParams defName (ppR <$> unusedParams)
         return $ CompileDef $ RStruct dx (RTyParam <$> params) (fields <>
@@ -200,9 +198,10 @@ instance A.Definition ~> RDef where
          -> C (R.Item ())
     goFn pragma raiseIntros acc goBody = do
       (ps, as, resTy, body) <- goFn' 0 raiseIntros acc
-      report $ "ps: " <> pp ps
+      -- report $ "ps: " <> pp ps
       let mkFn | ConstNoFFI <- pragma{-, null as-} = RConstFn
-               | otherwise = RFn
+               | isAnonymousName defName           = RPrivFn
+               | otherwise                         = RFn
       if | ConstNoFFI <- pragma, null ps, null as
          -> return $ RConst dx resTy body
          | StaticNoFFI <- pragma, null ps, null as
@@ -224,7 +223,7 @@ instance A.Definition ~> RDef where
         return $ (ps0 <> ps, as0 <> as, resTy, body)
       goFn' allIntros raiseIntros ([], resTy) = do
         resTy' <- go resTy
-        report $ " allIntros: " <> pp allIntros
+        -- report $ " allIntros: " <> pp allIntros
         body <- inFunIntros allIntros $ goBody raiseIntros
         return ([], [], resTy', body)
 

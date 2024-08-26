@@ -49,21 +49,21 @@ import Agda.Syntax.Common
   , ArgName, bareNameWithDefault
   , LensQuantity(..), hasQuantity0
   , LensHiding(..), visible
-  , MetaId(..)
+  , MetaId(..), NameId(NameId)
   , Ranged(..), Origin(..), getOrigin )
 import Agda.Syntax.TopLevelModuleName
   ( TopLevelModuleName, moduleNameToFileName )
 
 -- * abstract syntax
 import Agda.Syntax.Abstract.Name
-  ( qnameToList0 )
+  ( qnameToList0, isNoName )
 
 -- * internal syntax
 import Agda.Syntax.Internal
   ( QName, qnameName, qnameModule, qnameFromList
   , Term(..), Type, Type''(El), unEl
   , Level(..)
-  , Sort(..), Sort'(..), isSort
+  , Sort(..), Sort'(..), isSort, getSort
   , Abs(..), unAbs, absName
   , Dom(..), unDom, domName, pDom, defaultDom
   , Elim, Elim'(..), Elims, argsFromElims
